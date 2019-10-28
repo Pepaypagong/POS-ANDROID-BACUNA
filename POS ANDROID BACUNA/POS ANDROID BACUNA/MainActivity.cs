@@ -14,6 +14,7 @@ namespace POS_ANDROID_BACUNA
             base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             // Set our view from the "main" layout resource
+            //TEST COMMIT
             SetContentView(Resource.Layout.activity_main);
         }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
