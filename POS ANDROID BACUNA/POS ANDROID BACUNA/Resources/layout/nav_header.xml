@@ -1,0 +1,34 @@
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:background="?attr/colorPrimaryDark">
+   
+       <TextView
+           android:id="@+id/txtBusinessName"
+           android:layout_marginTop="20dp"
+           android:layout_marginLeft="20dp"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="BACUNA RTW"
+           android:textSize="20sp"
+           android:textColor="?attr/colorPrimary"
+           fontPath="fonts/Roboto-BoldItalic.ttf"
+           android:contextClickable="true"
+           android:layout_gravity="left | center"
+       />
+
+        <TextView
+           fontPath="fonts/Roboto-Regular.ttf"
+           android:layout_marginTop="16dp"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginRight="20dp"
+           android:text=">"
+           android:textSize="30sp"
+           android:textColor="?attr/colorPrimary"
+           android:layout_gravity="right | center"
+        />
+
+</FrameLayout>

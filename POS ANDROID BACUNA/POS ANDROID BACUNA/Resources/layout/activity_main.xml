@@ -1,7 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout 
+    android:id="@+id/drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-</RelativeLayout>
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <include
+        layout="@layout/include_body_container"
+    />
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="325dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:theme="@style/ThemeOverlay.AppCompat.navTheme"
+        android:background="?attr/colorPrimaryDark"
+        app:headerLayout="@layout/nav_header"
+        app:itemTextColor="?android:attr/colorPrimary"
+        app:itemIconTint="?android:attr/colorPrimary"
+        app:menu="@menu/nav_menu"                    
+        app:fontPath="fonts/Roboto-BoldItalic.ttf"
+    />
+
+</android.support.v4.widget.DrawerLayout>
