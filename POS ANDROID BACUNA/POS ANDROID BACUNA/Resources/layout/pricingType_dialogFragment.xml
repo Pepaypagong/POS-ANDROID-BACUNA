@@ -1,0 +1,73 @@
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:minWidth="300dp"
+    android:minHeight="300dp">
+    <LinearLayout 
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="?attr/colorPrimaryDark"
+            android:layout_marginBottom="10dp">
+            <TextView android:id="@+id/groupname"
+                android:layout_centerVertical="true"
+                android:paddingLeft="20dp"
+                android:textSize="20sp"
+                android:textColor="#ffffff"
+                android:textStyle="normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select price type"/>
+            <ImageButton
+                android:id="@+id/btnPricingTypeClose"
+                android:backgroundTint="@color/mtrl_btn_transparent_bg_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="2dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+        </RelativeLayout>
+        <RadioGroup android:minWidth="25px" 
+            android:minHeight="25px" 
+            android:paddingLeft="10dp"
+            android:layout_width="match_parent" 
+            android:layout_height="wrap_content" 
+            android:id="@+id/radioGrpPricingType">  
+            <RadioButton 
+                android:layout_width="wrap_content" 
+                android:layout_height="wrap_content" 
+                android:checked="true" 
+                android:text="Retail" 
+                android:textSize="18sp"
+                android:id="@+id/radioRetail" />  
+            <RadioButton 
+                android:layout_width="wrap_content" 
+                android:layout_height="wrap_content" 
+                android:text="Wholesale" 
+                android:textSize="18sp"
+                android:id="@+id/radioWholesale" />
+            <RadioButton 
+                android:layout_width="wrap_content" 
+                android:layout_height="wrap_content" 
+                android:text="Runner" 
+                android:textSize="18sp"
+                android:id="@+id/radioRunner" /> 
+        </RadioGroup>
+    </LinearLayout>
+    <Button
+        android:id="@+id/btnPricingTypeSave"
+        android:layout_weight="0"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SAVE"
+        android:textSize="18sp"
+        android:layout_gravity="center"
+    />
+</LinearLayout>

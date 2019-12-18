@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+  <item
+    android:id="@+id/toolbarMenu_pricingType"
+    app:showAsAction="ifRoom"
+    android:title="Retail" />
+  <item
+    android:id="@+id/toolbarMenu_customer"
+    android:icon="@drawable/checkout_icon"
+    app:showAsAction="ifRoom"
+    android:title="Info" />
+
+</menu> 

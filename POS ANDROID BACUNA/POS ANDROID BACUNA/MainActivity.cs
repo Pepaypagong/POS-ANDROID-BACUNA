@@ -7,6 +7,8 @@ using Android.Support.V4.Widget;
 using SupportActionBar = Android.Support.V7.App.ActionBar;
 using SupportToolbar = Android.Support.V7.Widget.Toolbar;
 using SupportFragment = Android.Support.V4.App.Fragment;
+using SupportFragmentTransaction = Android.Support.V4.App.FragmentTransaction;
+using SupportFragmentManager = Android.Support.V4.App.FragmentManager;
 using Android.Support.Design.Widget;
 using System;
 using Android.Views;
@@ -16,6 +18,7 @@ using Calligraphy;
 using POS_ANDROID_BACUNA.Fragments;
 using System.Collections.Generic;
 using Android.Support.V4.App;
+using Newtonsoft.Json;
 
 namespace POS_ANDROID_BACUNA
 {
@@ -30,7 +33,8 @@ namespace POS_ANDROID_BACUNA
         private TransactionsFragment mTransactionsFragment;
         private SettingsFragment mSettingsFragment;
         private Stack<SupportFragment> mStackFragment;
-
+        private IMenu mCurrentToolBarMenu;
+        private string mCurrentSelectedPriceType = "Retail";
         protected override void AttachBaseContext(Context @base)
         {
             base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base));
@@ -88,6 +92,8 @@ namespace POS_ANDROID_BACUNA
         {
             navigationView.NavigationItemSelected += (object sender, NavigationView.NavigationItemSelectedEventArgs e) =>
             {
+                InvalidateOptionsMenu();//redraw toolbar Menu
+
                 e.MenuItem.SetChecked(true);
                 SupportActionBar ab = SupportActionBar;
 
@@ -134,6 +140,8 @@ namespace POS_ANDROID_BACUNA
 
         public override void OnBackPressed()
         {
+            InvalidateOptionsMenu();//redraw toolbar Menu
+
             if (SupportFragmentManager.BackStackEntryCount > 0)
             {
                 SupportFragmentManager.PopBackStack();
@@ -143,7 +151,7 @@ namespace POS_ANDROID_BACUNA
                 NavigationView navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
                 navigationView.SetCheckedItem(CurrentSelectedNavigation(mCurrentFragment));
                 mDrawerLayout.CloseDrawers();//close drawer on back press
-            } 
+            }
             else
             {
                 base.OnBackPressed();
@@ -186,14 +194,55 @@ namespace POS_ANDROID_BACUNA
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+
             switch (item.ItemId)
             {
-                case  Android.Resource.Id.Home:
+                case Android.Resource.Id.Home:
                     mDrawerLayout.OpenDrawer((int)GravityFlags.Left);
+                    return true;
+                case Resource.Id.toolbarMenu_pricingType:
+                    //show dialog here
+                    SupportFragmentTransaction transaction = SupportFragmentManager.BeginTransaction();
+                    PricingTypeDialogFragment pricingTypeDialog = new PricingTypeDialogFragment();
+                    //pass current selected price type t
+                    var args = new Bundle();
+                    args.PutString("currentPricingType", mCurrentSelectedPriceType);
+                    pricingTypeDialog.Arguments = args;
+
+                    pricingTypeDialog.Show(transaction, "pricingTypeDialogFragment");
+                    return true;
+                case Resource.Id.toolbarMenu_customer:
+                    Android.Widget.Toast.MakeText(this, "Clicked Customer Icon!", Android.Widget.ToastLength.Long).Show();
                     return true;
                 default:
                     return base.OnOptionsItemSelected(item);
             }
+        }
+
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            mCurrentToolBarMenu = menu;
+
+            if (mCurrentFragment == mCheckoutFragment)
+            {
+                MenuInflater.Inflate(Resource.Menu.toolbar_menu_checkout, menu);
+                //code here to set the selected price type
+                IMenuItem item = menu.FindItem(Resource.Id.toolbarMenu_pricingType);
+                item.SetTitle(mCurrentSelectedPriceType);
+            }
+            else if (mCurrentFragment == mProductsFragment)
+            {
+                MenuInflater.Inflate(Resource.Menu.toolbar_menu_products, menu);
+            }
+
+            return base.OnCreateOptionsMenu(menu);
+        }
+
+        public void SetToolBarMenuTextFromFragment(string menuText)
+        {
+            IMenuItem item = mCurrentToolBarMenu.FindItem(Resource.Id.toolbarMenu_pricingType);
+            item.SetTitle(menuText);
+            mCurrentSelectedPriceType = menuText;
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
