@@ -6,4 +6,5 @@
     <string name="transactions_title">TRANSACTIONS</string>
     <string name="settings_title">SETTINGS</string>
     <string name="action_settings">Settings</string>
+    <string name="select_customer">Select Customer</string>
 </resources>

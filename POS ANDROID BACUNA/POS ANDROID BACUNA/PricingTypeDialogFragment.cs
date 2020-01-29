@@ -4,6 +4,7 @@ using Android.Views;
 using Android.Support.V4.App;
 using Android.Widget;
 using Newtonsoft.Json;
+using Android.Content;
 
 namespace POS_ANDROID_BACUNA
 {
@@ -47,7 +48,6 @@ namespace POS_ANDROID_BACUNA
 
                 //set text on main act
                 ((MainActivity)this.Activity).SetToolBarMenuTextFromFragment(mCheckedRadioButton.Text);
-
                 this.Dismiss();
             };
 
@@ -88,5 +88,12 @@ namespace POS_ANDROID_BACUNA
             base.OnActivityCreated(savedInstanceState);
             Dialog.Window.Attributes.WindowAnimations = Resource.Style.dialog_animation;//Set the animation
         }
+
+        public override void OnDestroy()
+        {
+            ((MainActivity)this.Activity).PricingTypeDialogFragmentOnActivityResult();
+            base.OnDestroy();
+        }
+
     }
 }

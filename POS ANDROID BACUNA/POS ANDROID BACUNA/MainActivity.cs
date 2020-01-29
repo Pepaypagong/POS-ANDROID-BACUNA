@@ -22,7 +22,7 @@ using Newtonsoft.Json;
 
 namespace POS_ANDROID_BACUNA
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
     public class MainActivity : AppCompatActivity
     {
         private DrawerLayout mDrawerLayout;
@@ -35,9 +35,12 @@ namespace POS_ANDROID_BACUNA
         private Stack<SupportFragment> mStackFragment;
         private IMenu mCurrentToolBarMenu;
         private string mCurrentSelectedPriceType = "Retail";
+        private View mCurrentSelectedCustomerButtonLayout = null;
+        static bool mDialogShown = false;  // flag for stopping double click
+
         protected override void AttachBaseContext(Context @base)
         {
-            base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base));
+            base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base)); //custom font
         }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -201,22 +204,35 @@ namespace POS_ANDROID_BACUNA
                     mDrawerLayout.OpenDrawer((int)GravityFlags.Left);
                     return true;
                 case Resource.Id.toolbarMenu_pricingType:
-                    //show dialog here
-                    SupportFragmentTransaction transaction = SupportFragmentManager.BeginTransaction();
-                    PricingTypeDialogFragment pricingTypeDialog = new PricingTypeDialogFragment();
-                    //pass current selected price type t
-                    var args = new Bundle();
-                    args.PutString("currentPricingType", mCurrentSelectedPriceType);
-                    pricingTypeDialog.Arguments = args;
-
-                    pricingTypeDialog.Show(transaction, "pricingTypeDialogFragment");
+                    if (!mDialogShown) //avoid double click
+                    {
+                        mDialogShown = true;
+                        //show dialog here
+                        SupportFragmentTransaction transaction = SupportFragmentManager.BeginTransaction();
+                        PricingTypeDialogFragment pricingTypeDialog = new PricingTypeDialogFragment();
+                        //pass current selected price type t
+                        var args = new Bundle();
+                        args.PutString("currentPricingType", mCurrentSelectedPriceType);
+                        pricingTypeDialog.Arguments = args;
+                        pricingTypeDialog.Show(transaction, "pricingTypeDialogFragment");
+                    }
                     return true;
                 case Resource.Id.toolbarMenu_customer:
-                    Android.Widget.Toast.MakeText(this, "Clicked Customer Icon!", Android.Widget.ToastLength.Long).Show();
+                    if (!mDialogShown)
+                    {
+                        mDialogShown = true;
+                        Intent intent = new Intent(this, typeof(CheckoutSelectCustomerActivity));
+                        StartActivityForResult(intent, 1234);
+                    }
                     return true;
                 default:
                     return base.OnOptionsItemSelected(item);
             }
+        }
+
+        public void PricingTypeDialogFragmentOnActivityResult()
+        {
+            mDialogShown = false; //flag to enable dialog show 
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -229,6 +245,9 @@ namespace POS_ANDROID_BACUNA
                 //code here to set the selected price type
                 IMenuItem item = menu.FindItem(Resource.Id.toolbarMenu_pricingType);
                 item.SetTitle(mCurrentSelectedPriceType);
+                //set the action layout for the selected customer
+                IMenuItem selectedCustomerItem = menu.FindItem(Resource.Id.toolbarMenu_customer);
+                selectedCustomerItem.SetActionView(mCurrentSelectedCustomerButtonLayout);
             }
             else if (mCurrentFragment == mProductsFragment)
             {
@@ -243,6 +262,61 @@ namespace POS_ANDROID_BACUNA
             IMenuItem item = mCurrentToolBarMenu.FindItem(Resource.Id.toolbarMenu_pricingType);
             item.SetTitle(menuText);
             mCurrentSelectedPriceType = menuText;
+        }
+
+        public void ChangeSelectCustomerIcon(string customerName)
+        {
+            IMenuItem item = mCurrentToolBarMenu.FindItem(Resource.Id.toolbarMenu_customer);
+
+            LayoutInflater inflater = (LayoutInflater)this.GetSystemService(Context.LayoutInflaterService);
+            View buttonView = inflater.Inflate(Resource.Layout.checkout_fragment_customer_name_button, null);
+            TextView txtCustomerNameButtonTitle = buttonView.FindViewById<TextView>(Resource.Id.txtCustomerName);
+            txtCustomerNameButtonTitle.Text = customerName;
+            item.SetActionView(buttonView);
+            subscribeCustomLayoutToClick(item);
+
+            //set current selected customer button layout
+            mCurrentSelectedCustomerButtonLayout = buttonView;
+        }
+
+        public void subscribeCustomLayoutToClick(IMenuItem item)
+        {
+            item.ActionView.Click += (sender, args) => {
+                this.OnOptionsItemSelected(item);
+            };
+        }
+
+        public void removeActionLayout(IMenuItem item)
+        {
+            item.SetActionView(null);
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+            if (requestCode == 1234)
+            {
+                mDialogShown = false; //flag to enable dialog show 
+                if (resultCode == Result.Ok)
+                {
+                    var removeCustomer = data.GetBooleanExtra("removeCustomer", false);
+                    if (removeCustomer == true)
+                    {
+                        // remove action layout
+                        IMenuItem item = mCurrentToolBarMenu.FindItem(Resource.Id.toolbarMenu_customer);
+                        removeActionLayout(item);
+                    }
+                    else
+                    {
+                        var customerName = data.GetStringExtra("Key");
+                        ChangeSelectCustomerIcon(customerName);
+                    }
+                }
+                else
+                {
+                    //canceldialog
+                }
+            }
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)

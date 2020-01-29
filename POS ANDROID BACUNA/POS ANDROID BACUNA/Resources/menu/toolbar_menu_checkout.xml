@@ -9,6 +9,5 @@
     android:id="@+id/toolbarMenu_customer"
     android:icon="@drawable/checkout_icon"
     app:showAsAction="ifRoom"
-    android:title="Info" />
-
+    android:title="Customer"/>
 </menu> 
