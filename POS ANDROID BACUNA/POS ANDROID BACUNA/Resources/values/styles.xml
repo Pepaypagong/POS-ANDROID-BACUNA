@@ -5,6 +5,7 @@
     <item name="colorPrimary">#ffff</item>
     <item name="colorPrimaryDark">#363f4d</item>
     <item name="colorAccent">#2dd1ac</item>
+    <item name="elevation">0dp</item>
   </style>
 
   <style name="ThemeOverlay.AppCompat.navTheme">
@@ -16,6 +17,16 @@
   <style name="dialog_animation">
     <item name="android:windowEnterAnimation">@anim/slide_up</item>
     <item name="android:windowExitAnimation">@anim/slide_right</item>
+  </style>
+
+  <!--TabLayout Theme-->
+
+  <style name="TabLayoutThemes" parent="Widget.Design.TabLayout">
+
+    <item name="tabIndicatorColor">#FFFFFF</item>
+    <item name="tabIndicatorHeight">2dp</item>
+    <item name="tabSelectedTextColor">#212121</item>
+    
   </style>
   
 </resources>
