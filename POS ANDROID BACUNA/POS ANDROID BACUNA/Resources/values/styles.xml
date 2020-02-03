@@ -22,11 +22,15 @@
   <!--TabLayout Theme-->
 
   <style name="TabLayoutThemes" parent="Widget.Design.TabLayout">
-
-    <item name="tabIndicatorColor">#FFFFFF</item>
+    <item name="tabTextAppearance">@style/TabLayoutTextAppearance</item>
+    <item name="tabIndicatorColor">#2dd1ac</item>
     <item name="tabIndicatorHeight">2dp</item>
-    <item name="tabSelectedTextColor">#212121</item>
-    
+    <item name="tabSelectedTextColor">#2dd1ac</item>
+    <item name="tabRippleColor">#F8F8F8</item>
+  </style>
+
+  <style name="TabLayoutTextAppearance" parent="TextAppearance.Design.Tab">
+    <item name="android:textSize">14sp</item>
   </style>
   
 </resources>

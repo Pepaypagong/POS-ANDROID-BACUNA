@@ -19,6 +19,7 @@ using POS_ANDROID_BACUNA.Fragments;
 using System.Collections.Generic;
 using Android.Support.V4.App;
 using Newtonsoft.Json;
+using Android.Views.InputMethods;
 
 namespace POS_ANDROID_BACUNA
 {
@@ -72,6 +73,8 @@ namespace POS_ANDROID_BACUNA
             {
                 SetUpDrawerContent(navigationView);
             }
+            mDrawerLayout.DrawerOpened += MDrawerLayout_DrawerOpened;
+
 
             var trans = SupportFragmentManager.BeginTransaction();
 
@@ -89,6 +92,11 @@ namespace POS_ANDROID_BACUNA
             trans.Commit();
 
             mCurrentFragment = mCheckoutFragment;
+        }
+
+        private void MDrawerLayout_DrawerOpened(object sender, DrawerLayout.DrawerOpenedEventArgs e)
+        {
+            hideKeyboard();
         }
 
         private void SetUpDrawerContent(NavigationView navigationView)
@@ -197,7 +205,6 @@ namespace POS_ANDROID_BACUNA
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-
             switch (item.ItemId)
             {
                 case Android.Resource.Id.Home:
@@ -316,6 +323,15 @@ namespace POS_ANDROID_BACUNA
                 {
                     //canceldialog
                 }
+            }
+        }
+
+        void hideKeyboard()
+        {
+            var im = ((InputMethodManager)GetSystemService(Android.Content.Context.InputMethodService));
+            if (CurrentFocus != null)
+            {
+                im.HideSoftInputFromWindow(CurrentFocus.WindowToken, HideSoftInputFlags.None);
             }
         }
 
