@@ -63,6 +63,8 @@
     <Compile Include="CheckoutSelectCustomerActivity.cs" />
     <Compile Include="Customers.cs" />
     <Compile Include="CustomersListViewAdapter.cs" />
+    <Compile Include="Data Classes\Product.cs" />
+    <Compile Include="Fragments\RecyclerViewAdapter.cs" />
     <Compile Include="Fragments\SettingsFragment.cs" />
     <Compile Include="Fragments\TransactionsFragment.cs" />
     <Compile Include="Fragments\CustomersFragment.cs" />
@@ -233,6 +235,20 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\barcode_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\checkout_fragment_list_item_grid.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\space.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\checkout_fragment_list_item_listview.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
