@@ -38,7 +38,7 @@ namespace POS_ANDROID_BACUNA
             SetSupportActionBar(toolBar);
 
             SupportActionBar ab = SupportActionBar;
-            ab.SetHomeAsUpIndicator(Resource.Drawable.menu_icon_small);
+            ab.SetHomeAsUpIndicator(Resource.Drawable.left_icon);
             ab.SetDisplayHomeAsUpEnabled(true);
             ab.SetTitle(Resource.String.select_customer);
 

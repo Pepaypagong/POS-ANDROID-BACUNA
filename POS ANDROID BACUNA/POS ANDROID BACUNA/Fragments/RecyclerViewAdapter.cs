@@ -11,12 +11,14 @@ using Android.Runtime;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using SupportFragment = Android.Support.V4.App.Fragment;
 using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
     class RecyclerViewAdapter : RecyclerView.Adapter
     {
+        RecyclerView mRecyclerView;
         CardView mCardViewRowItem;
         CardView mCardViewItemHolder;
         LinearLayout mllItemHolder;
@@ -24,13 +26,21 @@ namespace POS_ANDROID_BACUNA.Fragments
         float mDpVal;
         private List<Product> mProducts;
         bool mIsGrid;
+        CheckoutFragment mCheckoutFragment;
+        Button mBtnCheckoutButton;
+        Context mCheckoutContext;
 
-        public RecyclerViewAdapter(float dpVal, int gridHeight, List<Product> products, bool isGrid)
+        int counter;
+        public RecyclerViewAdapter(float dpVal, int gridHeight, List<Product> products, bool isGrid, RecyclerView recyclerView, Button btnCheckoutButton, Context checkoutContext)
         {
             mGridHeight = gridHeight;
             mDpVal = dpVal;
             mProducts = products;
             mIsGrid = isGrid;
+            mRecyclerView = recyclerView;
+            mCheckoutFragment = new CheckoutFragment();
+            mBtnCheckoutButton = btnCheckoutButton;
+            mCheckoutContext = checkoutContext;
         }
 
         public class MyViewHolder : RecyclerView.ViewHolder
@@ -78,11 +88,11 @@ namespace POS_ANDROID_BACUNA.Fragments
             };
 
             int _topMargin = DpToPixel(2);
-            int _bottomMargin = DpToPixel(10);
+            int _bottomMargin = DpToPixel(5);
             int _leftMargin = DpToPixel(5);
             int _rightMargin = DpToPixel(5);
 
-            int _rowCount = mIsGrid ? 4 : 7; //itenerary if isgrid=true rows=4 else 7
+            int _rowCount = mIsGrid ? 4 : 7; //itenerary if isgrid=true rows=4 else 7 //unused
 
             int _heightBalance = (_topMargin + _bottomMargin)*_rowCount;
 
@@ -105,7 +115,8 @@ namespace POS_ANDROID_BACUNA.Fragments
         public override void OnBindViewHolder(RecyclerView.ViewHolder viewHolder, int position)
         {
             MyViewHolder myHolder = viewHolder as MyViewHolder;
-
+            myHolder.mMainView.Click -= MMainView_Click;//unsubscibe to avoid multiple firing of clicks
+            myHolder.mMainView.Click += MMainView_Click; //set click event for row
             myHolder.mProductName.Text = mProducts[position].productName;
             //condition here to display price based on transaction pricing type
             myHolder.mProductPrice.Text = "\u20b1 "+(mProducts[position].productRetailPrice).ToString();
@@ -122,6 +133,23 @@ namespace POS_ANDROID_BACUNA.Fragments
             {
                 //set item image here
             }
+        }
+
+        private void MMainView_Click(object sender, EventArgs e)
+        {
+            int position = mRecyclerView.GetChildAdapterPosition((View)sender);
+
+            //add to cart
+            GlobalCart.globalProductsCart.Add(new Product()
+            {
+                productId = mProducts[position].productId,
+                productName = mProducts[position].productName,
+                productRetailPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
+                productColorBg = mProducts[position].productColorBg
+            });
+
+            //update checkoutbutton.
+            mCheckoutFragment.SetCheckoutButtonTotal(mBtnCheckoutButton, mCheckoutContext);
         }
 
         public override int ItemCount

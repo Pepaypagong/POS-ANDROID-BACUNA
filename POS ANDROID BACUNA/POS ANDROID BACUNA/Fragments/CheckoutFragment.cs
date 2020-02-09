@@ -16,12 +16,12 @@ using SearchView = Android.Support.V7.Widget.SearchView;
 using Android.Views.InputMethods;
 using Android.Support.V7.Widget;
 using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
+using Android.Graphics;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
     public class CheckoutFragment : SupportFragment
     {
-
         TabLayout mTabs;
         Android.Support.V7.Widget.Toolbar toolbar;
         bool mToolbarVisibiltyStatus = true;
@@ -32,12 +32,11 @@ namespace POS_ANDROID_BACUNA.Fragments
         RecyclerView mRecyclerViewItemsList;
         RecyclerView.LayoutManager mLayoutManager;
         bool mIsGrid = true; //grid view or listview 
-
         LayoutInflater mLayoutInflater;
         ViewGroup mViewGroup;
-
-        int mGridLayoutItemHeight;
         float mDpVal; //screen density
+        Button mBtnCheckoutButton;
+        IMenu mCurrentToolBarMenu = null;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -78,15 +77,20 @@ namespace POS_ANDROID_BACUNA.Fragments
             mDpVal = cont.Resources.DisplayMetrics.Density;
 
             SetGridLayout(inflater,container, mIsGrid);
+
+            mBtnCheckoutButton = thisFragmentView.FindViewById<Button>(Resource.Id.btnCheckoutTotal);
+
             return thisFragmentView;
         }
 
         private int SetItemListContainerHeight(LinearLayout layout, Android.Support.V7.Widget.Toolbar layoutBelow)
         {
+            var rlCheckoutButtonContainer = thisFragmentView.FindViewById<RelativeLayout>(Resource.Id.rlCheckoutButtonContainer);
+
             int actionBarHeight = dpToPixel(40);
             int tabLayoutHeight = mTabs.Height;
             int searchToolBarHeight = toolbar.Height;
-            int checkoutButtonHeight = dpToPixel(50);
+            int checkoutButtonHeight = rlCheckoutButtonContainer.Height;
             int marginOffset = dpToPixel(10);
             int fragmentContainerHeight = thisFragmentView.Height;
 
@@ -114,12 +118,16 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void Toolbar_MenuItemClick(object sender, Android.Support.V7.Widget.Toolbar.MenuItemClickEventArgs e)
         {
+
             if (e.Item.ItemId == Resource.Id.barcode)
             {
-
+                //clear cart
+                GlobalCart.globalProductsCart.Clear();
+                SetCheckoutButtonTotal(mBtnCheckoutButton, Context);
             }
             else if (e.Item.ItemId == Resource.Id.toggle_grid_appearance)
             {
+                 //change icon based 
                 if (mIsGrid)
                 {
                     mIsGrid = false;
@@ -128,9 +136,24 @@ namespace POS_ANDROID_BACUNA.Fragments
                 {
                     mIsGrid = true;
                 }
+                SetToogleIcon(mIsGrid);
                 SetGridLayout(mLayoutInflater, mViewGroup, mIsGrid);
                 mRecyclerViewItemsList.Invalidate();
             }
+        }
+
+        public void SetToogleIcon(bool isGrid)
+        {
+            IMenuItem item = mCurrentToolBarMenu.FindItem(Resource.Id.toggle_grid_appearance);
+            if (isGrid)
+            {
+                item.SetIcon(Resource.Drawable.listview_icon);
+            }
+            else
+            {
+                item.SetIcon(Resource.Drawable.gridview_icon);
+            }
+            
         }
 
         private void SetGridLayout(LayoutInflater inflater, ViewGroup container, bool isGrid)
@@ -154,8 +177,36 @@ namespace POS_ANDROID_BACUNA.Fragments
             //POST RENDERING
             gridHolder.Post(() => 
             {
-                mRecyclerViewItemsList.SetAdapter(new RecyclerViewAdapter(mDpVal, SetItemListContainerHeight(gridHolder, toolbar), PopulateProductData(),mIsGrid));
+                mRecyclerViewItemsList.SetAdapter(new RecyclerViewAdapter(mDpVal, 
+                    SetItemListContainerHeight(gridHolder, toolbar), 
+                    PopulateProductData(),mIsGrid,mRecyclerViewItemsList,mBtnCheckoutButton, Context));
             });
+        }
+        
+        public void SetCheckoutButtonTotal(Button btn, Context context)
+        {
+            int itemCount = GlobalCart.globalProductsCart.Count();
+            decimal totalPrice = 0;
+
+            if (itemCount == 0)
+            {
+                int colorInt = context.GetColor(Resource.Color.colorAccent);
+                Color colorAccent = new Color(colorInt);
+
+                btn.SetTextColor(colorAccent);
+                btn.Background = context.GetDrawable(Resource.Drawable.buttonCheckoutRoundBorderNoItem);
+                btn.Text = "No Item = " + "\u20b1 " + "0.00";
+            }
+            else 
+            {
+                btn.SetTextColor(Android.Graphics.Color.White);
+                btn.Background = context.GetDrawable(Resource.Drawable.buttonCheckoutRoundBorderWithItem);
+                foreach (var item in GlobalCart.globalProductsCart)
+                {
+                    totalPrice += item.productRetailPrice;
+                }
+                btn.Text = itemCount.ToString() + " Item = \u20b1" + totalPrice.ToString();
+            }
         }
 
         private List<Product> PopulateProductData()
@@ -165,8 +216,8 @@ namespace POS_ANDROID_BACUNA.Fragments
             int productid = 1;
             int productCount = 20;
             string productName = "PRODUCT ";
-            decimal productPrice = Convert.ToDecimal(200.00);
-            string productColor = "7F00FF"; //violet
+            decimal productPrice = Convert.ToDecimal(200.50);
+            string productColor = "808080"; //7F00FF violet
 
             for (int i = 0; i < productCount; i++)
             {
@@ -175,17 +226,11 @@ namespace POS_ANDROID_BACUNA.Fragments
                     productName = productName + productid.ToString(),
                     productRetailPrice = productPrice + Convert.ToDecimal(productid),
                     productColorBg = productColor
-                });;
+                });
                 productid++;
             }
 
             return mProducts;
-        }
-
-        public int ItemHeight(RecyclerView rv, int rowCount)
-        {
-            int returnHeight = mGridLayoutItemHeight / rowCount;
-            return returnHeight;
         }
 
         private void SearchCancelButton_Click(object sender, EventArgs e)
@@ -219,6 +264,10 @@ namespace POS_ANDROID_BACUNA.Fragments
             toolbar.InflateMenu(Resource.Menu.toolbar_menu_checkout_search_items);
             //set visibility of toolbar bacause it is redrawn
             toolbar.Menu.SetGroupVisible(Resource.Id.menugroup_search, mToolbarVisibiltyStatus);
+            //getMenu
+            mCurrentToolBarMenu = toolbar.Menu;
+            //setMenuIconBasedOnSavedStateOfTheIcon
+            SetToogleIcon(mIsGrid);
             base.OnCreateOptionsMenu(menu, inflater);
         }
 

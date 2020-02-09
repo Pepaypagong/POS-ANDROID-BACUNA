@@ -10,7 +10,7 @@
           app:showAsAction="always"/>
 
     <item android:id="@+id/toggle_grid_appearance"
-        android:icon="@drawable/toggle_appearance_icon"
+        android:icon="@drawable/listview_icon"
         android:title="toggle"
         app:showAsAction="always"/>
   </group>

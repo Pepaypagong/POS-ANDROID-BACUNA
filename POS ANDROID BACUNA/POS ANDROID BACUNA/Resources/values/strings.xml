@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">CHECKOUT</string>
     <string name="checkout_title">CHECKOUT</string>
+    <string name="checkout_button_no_item">No Item = \u20b1 0.00</string>
     <string name="search_bar_query_hint_checkout">Search Items</string>
     <string name="products_title">PRODUCTS</string>
     <string name="customers_title">CUSTOMERS</string>

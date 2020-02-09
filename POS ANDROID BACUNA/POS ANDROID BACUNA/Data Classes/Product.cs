@@ -12,7 +12,7 @@ using Android.Widget;
 
 namespace POS_ANDROID_BACUNA.Data_Classes
 {
-    class Product
+    public class Product
     {
         public int productId {get; set;}
         public string productName { get; set; }
