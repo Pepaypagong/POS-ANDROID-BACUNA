@@ -9,19 +9,19 @@
       android:title="Checkout"/>
     <item
       android:id="@+id/nav_products"
-      android:icon="@drawable/checkout_icon"
+      android:icon="@drawable/products_icon"
       android:title="Products"/>
     <item
       android:id="@+id/nav_customers"
-      android:icon="@drawable/checkout_icon"
+      android:icon="@drawable/customer_icon"
       android:title="Customers"/>
     <item
       android:id="@+id/nav_transactions"
-      android:icon="@drawable/checkout_icon"
+      android:icon="@drawable/transactions_icon"
       android:title="Transactions"/>
     <item
       android:id="@+id/nav_settings"
-      android:icon="@drawable/checkout_icon"
+      android:icon="@drawable/settings_icon"
       android:title="Settings"/>
   </group>
 

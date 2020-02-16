@@ -37,15 +37,16 @@ namespace POS_ANDROID_BACUNA.Fragments
         float mDpVal; //screen density
         Button mBtnCheckoutButton;
         IMenu mCurrentToolBarMenu = null;
+        bool mShowSizes = false;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
+            HasOptionsMenu = true; //enable on menu on fragment
             base.OnCreate(savedInstanceState);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            HasOptionsMenu = true; //enable on menu on fragment
             mLayoutInflater = inflater;
             mViewGroup = container;
             thisFragmentView = inflater.Inflate(Resource.Layout.checkout_fragment, container, false);
@@ -118,8 +119,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void Toolbar_MenuItemClick(object sender, Android.Support.V7.Widget.Toolbar.MenuItemClickEventArgs e)
         {
-
-            if (e.Item.ItemId == Resource.Id.barcode)
+            if(e.Item.ItemId == Resource.Id.barcode)
             {
                 //clear cart
                 GlobalCart.globalProductsCart.Clear();
@@ -214,10 +214,9 @@ namespace POS_ANDROID_BACUNA.Fragments
             List<Product> mProducts = new List<Product>();
 
             int productid = 1;
-            int productCount = 20;
+            int productCount = 50;
             string productName = "PRODUCT ";
-            decimal productPrice = Convert.ToDecimal(200.50);
-            string productColor = "808080"; //7F00FF violet
+            decimal productPrice = Convert.ToDecimal(250.50);
 
             for (int i = 0; i < productCount; i++)
             {
@@ -225,7 +224,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                     productId = productid,
                     productName = productName + productid.ToString(),
                     productRetailPrice = productPrice + Convert.ToDecimal(productid),
-                    productColorBg = productColor
+                    productColorBg = Guid.NewGuid().ToString().Substring(0,6) //random color
                 });
                 productid++;
             }
@@ -269,6 +268,43 @@ namespace POS_ANDROID_BACUNA.Fragments
             //setMenuIconBasedOnSavedStateOfTheIcon
             SetToogleIcon(mIsGrid);
             base.OnCreateOptionsMenu(menu, inflater);
+        }
+
+        public override void OnPrepareOptionsMenu(IMenu menu)
+        { 
+            //subscribe click to menu item show sizes
+            IMenuItem item = mCurrentToolBarMenu.FindItem(Resource.Id.showSize);
+            TextView showSizeEvent = (TextView)item.ActionView;
+            
+            showSizeEvent.Click += delegate (object sender, EventArgs e) { ShowSizeEvent_Click(sender, e, showSizeEvent); };
+            base.OnPrepareOptionsMenu(menu);
+        }
+
+        public void SetShowSizesAppearance()
+        { 
+        
+        }
+
+        private void ShowSizeEvent_Click(object sender, EventArgs e, TextView txtShowSize)
+        {
+            if (mShowSizes)
+            {
+                //put strike to text and color to gray
+                int colorInt = Context.GetColor(Resource.Color.jepoyGray);
+                Color colorGray = new Color(colorInt);
+                txtShowSize.SetTextColor(colorGray);
+                txtShowSize.SetBackgroundResource(Resource.Drawable.strikethrough_line);
+                mShowSizes = false;
+            }
+            else
+            {
+                //remove strike, change color to accent color
+                int colorInt = Context.GetColor(Resource.Color.colorAccent);
+                Color colorAccent = new Color(colorInt);
+                txtShowSize.SetTextColor(colorAccent);
+                txtShowSize.SetBackgroundResource(0);
+                mShowSizes = true;
+            }
         }
 
         private void onCreateTabLayout(string[] categories)

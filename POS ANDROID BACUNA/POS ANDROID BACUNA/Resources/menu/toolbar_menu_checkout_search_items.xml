@@ -4,6 +4,12 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <group android:id="@+id/menugroup_search">
+    
+    <item android:id="@+id/showSize"
+          android:title="SHOW SIZES"
+          app:showAsAction="always"
+          app:actionLayout="@layout/checkout_fragment_toolbar_item_showSizes"/>
+    
     <item android:id="@+id/barcode"
           android:icon="@drawable/barcode_icon"
           android:title="barcode"
@@ -14,5 +20,6 @@
         android:title="toggle"
         app:showAsAction="always"/>
   </group>
+
 </menu>
 

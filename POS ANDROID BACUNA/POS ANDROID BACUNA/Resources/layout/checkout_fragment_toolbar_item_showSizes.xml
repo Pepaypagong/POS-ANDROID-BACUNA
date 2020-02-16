@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/txtShowSizes"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:text="SHOW SIZES"
+    android:textStyle="bold"
+    android:background="@drawable/strikethrough_line"
+    android:textColor="#808080"
+    android:clickable="true"
+    android:gravity="center_vertical"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:layout_marginRight="4dp">
+
+</TextView>

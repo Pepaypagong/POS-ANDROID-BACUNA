@@ -10,11 +10,14 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
+using Android.Bluetooth;
 
 namespace POS_ANDROID_BACUNA
 {
     public static class GlobalCart
     {
         public static List<Product> globalProductsCart = new List<Product>();
+        public static bool mIsPrinterSet = false;
+        public static BluetoothDevice mSelectedDevice;
     }
 }

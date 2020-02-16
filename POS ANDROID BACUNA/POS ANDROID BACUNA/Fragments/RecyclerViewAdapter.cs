@@ -30,7 +30,6 @@ namespace POS_ANDROID_BACUNA.Fragments
         Button mBtnCheckoutButton;
         Context mCheckoutContext;
 
-        int counter;
         public RecyclerViewAdapter(float dpVal, int gridHeight, List<Product> products, bool isGrid, RecyclerView recyclerView, Button btnCheckoutButton, Context checkoutContext)
         {
             mGridHeight = gridHeight;

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <android.support.v7.widget.Toolbar
+            android:id="@+id/toolBarPrinterSelectedPrinter"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            app:popupTheme="@style/AppTheme"
+            app:itemIconTint="?attr/colorPrimaryDark"
+            android:layout_alignParentTop="true">
+    </android.support.v7.widget.Toolbar>
+    <TextView
+        android:id="@+id/txtPrinterName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/imgPrinterChecked"
+        android:text="Printer Name"
+        android:layout_marginBottom="10dp"
+        android:textSize="25sp"
+        android:gravity="center"
+    />
+    <ImageView
+        android:id="@+id/imgPrinterChecked"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/printer_checked_icon"
+        android:layout_marginBottom="20dp"
+    />
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/txtInputPaperType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@id/textSwitcherPrintDuplicate">
+
+        <EditText
+            android:id="@+id/txtPaperType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="58 mm"
+            android:inputType="textEmailAddress"
+            android:hint="Paper type"
+        />
+    </android.support.design.widget.TextInputLayout>
+    <Switch
+        android:id="@+id/textSwitcherPrintDuplicate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginBottom="10dp"
+        android:text="Print duplicate receipts"
+        android:layout_above="@id/btnTestPrint"
+    />
+    <Button
+        android:id="@+id/btnTestPrint"
+        android:text="Print a test"
+        android:textStyle="bold"
+        android:textColor="#fff"
+        android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginBottom="10dp"
+        android:background="?android:attr/colorAccent"
+        android:layout_alignParentBottom="true"
+        android:foreground="?android:attr/selectableItemBackground"
+    />
+</RelativeLayout>

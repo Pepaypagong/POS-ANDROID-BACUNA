@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="60dp"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:orientation="horizontal"
+    android:weightSum="100">
+  <TextView
+      android:text="Device Name"
+      android:layout_width="0dp"
+      android:layout_weight="92"
+      android:layout_height="match_parent"
+      android:minHeight="60dp"
+      android:textSize="17sp"
+      android:gravity="center_vertical"
+      android:layout_gravity="center_vertical"
+      android:id="@+id/txtBluetoothDeviceName" />
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_weight="8"
+        android:layout_height="wrap_content"
+        android:background="@drawable/right_icon_round"
+        android:layout_gravity="center_vertical"
+    />
+</LinearLayout>

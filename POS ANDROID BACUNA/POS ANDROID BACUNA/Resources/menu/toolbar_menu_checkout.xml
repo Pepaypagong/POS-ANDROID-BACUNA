@@ -7,7 +7,7 @@
     android:title="Retail" />
   <item
     android:id="@+id/toolbarMenu_customer"
-    android:icon="@drawable/checkout_icon"
+    android:icon="@drawable/newCustomer_icon"
     app:showAsAction="ifRoom"
     android:title="Customer"/>
 </menu> 
