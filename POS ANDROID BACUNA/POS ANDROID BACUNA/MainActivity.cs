@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using Android.Support.V4.App;
 using Newtonsoft.Json;
 using Android.Views.InputMethods;
+using POS_ANDROID_BACUNA.Data_Classes;
 
 namespace POS_ANDROID_BACUNA
 {
@@ -36,7 +37,6 @@ namespace POS_ANDROID_BACUNA
         private Stack<SupportFragment> mStackFragment;
         private IMenu mCurrentToolBarMenu;
         private string mCurrentSelectedPriceType = "Retail";
-        private View mCurrentSelectedCustomerButtonLayout = null;
         static bool mDialogShown = false;  // flag for stopping double click
 
         protected override void AttachBaseContext(Context @base)
@@ -65,6 +65,8 @@ namespace POS_ANDROID_BACUNA
             ab.SetHomeAsUpIndicator(Resource.Drawable.menu_icon_small);
             ab.SetDisplayHomeAsUpEnabled(true);
             ab.SetTitle(Resource.String.checkout_title);
+
+            //adjust spacing of logo from title of actionbar
 
             mDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
 
@@ -229,7 +231,7 @@ namespace POS_ANDROID_BACUNA
                     {
                         mDialogShown = true;
                         Intent intent = new Intent(this, typeof(CheckoutSelectCustomerActivity));
-                        StartActivityForResult(intent, 1234);
+                        StartActivityForResult(intent, 1);
                     }
                     return true;
                 default:
@@ -254,7 +256,7 @@ namespace POS_ANDROID_BACUNA
                 item.SetTitle(mCurrentSelectedPriceType);
                 //set the action layout for the selected customer
                 IMenuItem selectedCustomerItem = menu.FindItem(Resource.Id.toolbarMenu_customer);
-                selectedCustomerItem.SetActionView(mCurrentSelectedCustomerButtonLayout);
+                selectedCustomerItem.SetActionView(GlobalVariables.mCurrentSelectedCustomerButtonLayout);
             }
             else if (mCurrentFragment == mProductsFragment)
             {
@@ -283,7 +285,7 @@ namespace POS_ANDROID_BACUNA
             subscribeCustomLayoutToClick(item);
 
             //set current selected customer button layout
-            mCurrentSelectedCustomerButtonLayout = buttonView;
+            GlobalVariables.mCurrentSelectedCustomerButtonLayout = buttonView;
         }
 
         public void subscribeCustomLayoutToClick(IMenuItem item)
@@ -295,34 +297,30 @@ namespace POS_ANDROID_BACUNA
 
         public void removeActionLayout(IMenuItem item)
         {
-            item.SetActionView(null);
+            GlobalVariables.mCurrentSelectedCustomerButtonLayout = null;
+            item.SetActionView(GlobalVariables.mCurrentSelectedCustomerButtonLayout);
         }
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
-            if (requestCode == 1234)
+            if (requestCode == 1)
             {
-                mDialogShown = false; //flag to enable dialog show 
-                if (resultCode == Result.Ok)
-                {
-                    var removeCustomer = data.GetBooleanExtra("removeCustomer", false);
-                    if (removeCustomer == true)
-                    {
-                        // remove action layout
-                        IMenuItem item = mCurrentToolBarMenu.FindItem(Resource.Id.toolbarMenu_customer);
-                        removeActionLayout(item);
-                    }
-                    else
-                    {
-                        var customerName = data.GetStringExtra("Key");
-                        ChangeSelectCustomerIcon(customerName);
-                    }
-                }
-                else
-                {
-                    //canceldialog
-                }
+                mDialogShown = false;
+                SetSelectedCustomerIconAppearance();
+            }
+        }
+
+        public void SetSelectedCustomerIconAppearance()
+        {
+            if (GlobalVariables.mHasSelectedCustomerOnCheckout == true)
+            {
+                ChangeSelectCustomerIcon(GlobalVariables.mCurrentSelectedCustomerOnCheckout);
+            }
+            else
+            {
+                IMenuItem item = mCurrentToolBarMenu.FindItem(Resource.Id.toolbarMenu_customer);
+                removeActionLayout(item);
             }
         }
 

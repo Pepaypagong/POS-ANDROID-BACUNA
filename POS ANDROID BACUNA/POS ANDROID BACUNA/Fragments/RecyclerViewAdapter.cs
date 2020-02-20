@@ -13,6 +13,7 @@ using Android.Views;
 using Android.Widget;
 using SupportFragment = Android.Support.V4.App.Fragment;
 using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
+using POS_ANDROID_BACUNA.Data_Classes;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -118,7 +119,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             myHolder.mMainView.Click += MMainView_Click; //set click event for row
             myHolder.mProductName.Text = mProducts[position].productName;
             //condition here to display price based on transaction pricing type
-            myHolder.mProductPrice.Text = "\u20b1 "+(mProducts[position].productRetailPrice).ToString();
+            myHolder.mProductPrice.Text = "\u20b1 "+String.Format("{0:n}",mProducts[position].productRetailPrice);
             if (mIsGrid)
             {
                 myHolder.mItemBackgroudHolderGrid.SetBackgroundColor(Android.Graphics.Color.ParseColor("#" + (mProducts[position].productColorBg)));
@@ -139,7 +140,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             int position = mRecyclerView.GetChildAdapterPosition((View)sender);
 
             //add to cart
-            GlobalCart.globalProductsCart.Add(new Product()
+            GlobalVariables.globalProductsCart.Add(new Product()
             {
                 productId = mProducts[position].productId,
                 productName = mProducts[position].productName,
@@ -147,6 +148,30 @@ namespace POS_ANDROID_BACUNA.Fragments
                 productColorBg = mProducts[position].productColorBg
             });
 
+            bool alreadyExists = GlobalVariables.globalProductsOnCart.Any(x => x.productId == mProducts[position].productId);
+
+            if (alreadyExists)
+            {
+                foreach (var item in GlobalVariables.globalProductsOnCart)
+                {
+                    if (item.productId == mProducts[position].productId)
+                    {
+                        item.productCountOnCart = item.productCountOnCart + 1;
+                        item.productSubTotalPrice = (item.productCountOnCart) * item.productPrice;
+                    }
+                }
+            }
+            else {
+                GlobalVariables.globalProductsOnCart.Add(new ProductsOnCart()
+                {
+                    productId = mProducts[position].productId,
+                    productName = mProducts[position].productName,
+                    productPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
+                    productCountOnCart = 1,
+                    productCategoryId = 1,
+                    productSubTotalPrice = Convert.ToDecimal(mProducts[position].productRetailPrice)
+                }); 
+            }
             //update checkoutbutton.
             mCheckoutFragment.SetCheckoutButtonTotal(mBtnCheckoutButton, mCheckoutContext);
         }

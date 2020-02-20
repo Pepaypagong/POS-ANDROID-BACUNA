@@ -4,4 +4,10 @@
     <color name="colorPrimaryDark">#363f4d</color>
     <color name="colorAccent">#2dd1ac</color>
     <color name="jepoyGray">#808080</color>
+    <color name="colorRed">#ffff0000</color>
+    <color name="blurredWhite">#44FFFFFF</color>
+    <color name="transparent">#00ffffff</color>
+    <color name="colorLightBlack">#4F5662</color>
+    <color name="colorBlurred">#B0B5BE</color>
+    <color name="colorBlurredBackground">#FAFAFA</color>
 </resources>

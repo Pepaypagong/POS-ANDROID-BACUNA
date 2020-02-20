@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="60dp"
+    android:orientation="horizontal"
+    android:weightSum="100"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    android:gravity="center_vertical">
+    <TextView
+        android:id="@+id/txtQty"
+        android:layout_weight="15"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="69 X"
+        android:textColor="@color/colorLightBlack"
+        android:textStyle="bold" /> 
+    <LinearLayout
+        android:paddingLeft="5dp"
+        android:layout_weight="50"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="100">
+        <TextView
+            android:id="@+id/txtItemName"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_weight="50"
+            android:layout_height="0dp"
+            android:textSize="17sp"
+            android:text="(S) Polo Jacket"
+            android:textColor="@color/colorLightBlack"/>
+        <TextView
+            android:id="@+id/txtItemPrice"
+            android:gravity="top"
+            android:layout_width="match_parent"
+            android:layout_weight="50"
+            android:layout_height="0dp"
+            android:textSize="15sp"
+            android:text="P100.00"
+            android:textColor="#808080"
+            android:textStyle="bold"/>
+    </LinearLayout>
+    
+    <TextView
+        android:id="@+id/txtSubTotal"
+        android:layout_weight="35"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
+        android:textSize="16sp"
+        android:textAlignment="textEnd"
+        android:text="P 6,900.00"
+        android:textColor="@color/colorLightBlack"
+        android:textStyle="bold" />
+</LinearLayout>

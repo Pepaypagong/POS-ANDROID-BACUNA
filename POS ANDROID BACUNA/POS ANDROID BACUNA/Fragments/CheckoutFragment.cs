@@ -17,6 +17,7 @@ using Android.Views.InputMethods;
 using Android.Support.V7.Widget;
 using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
 using Android.Graphics;
+using POS_ANDROID_BACUNA.Data_Classes;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -80,8 +81,37 @@ namespace POS_ANDROID_BACUNA.Fragments
             SetGridLayout(inflater,container, mIsGrid);
 
             mBtnCheckoutButton = thisFragmentView.FindViewById<Button>(Resource.Id.btnCheckoutTotal);
+            mBtnCheckoutButton.Click += MBtnCheckoutButton_Click;
 
             return thisFragmentView;
+        }
+
+        private void MBtnCheckoutButton_Click(object sender, EventArgs e)
+        {
+            //disable if no items on cart
+            if (GlobalVariables.globalProductsCart.Count == 0)
+            {
+                DialogMessageService.MessageBox(Context, "Your cart is empty", "Please add some products to the cart first.");
+            }
+            else
+            {
+                Intent intent = new Intent(Context, typeof(CheckoutFragmentCartActivity));
+                intent.AddFlags(ActivityFlags.NoAnimation);
+                StartActivityForResult(intent,2);
+            }
+        }
+
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+            if (requestCode == 2)
+            {
+                //call method from main activity that will reset selected customer
+                ((MainActivity)this.Activity).SetSelectedCustomerIconAppearance();
+
+                //refresh button
+                SetCheckoutButtonTotal(mBtnCheckoutButton, Context);
+            }
         }
 
         private int SetItemListContainerHeight(LinearLayout layout, Android.Support.V7.Widget.Toolbar layoutBelow)
@@ -122,7 +152,8 @@ namespace POS_ANDROID_BACUNA.Fragments
             if(e.Item.ItemId == Resource.Id.barcode)
             {
                 //clear cart
-                GlobalCart.globalProductsCart.Clear();
+                GlobalVariables.globalProductsCart.Clear();
+                GlobalVariables.globalProductsOnCart.Clear();
                 SetCheckoutButtonTotal(mBtnCheckoutButton, Context);
             }
             else if (e.Item.ItemId == Resource.Id.toggle_grid_appearance)
@@ -185,7 +216,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         
         public void SetCheckoutButtonTotal(Button btn, Context context)
         {
-            int itemCount = GlobalCart.globalProductsCart.Count();
+            int itemCount = GlobalVariables.globalProductsCart.Count();
             decimal totalPrice = 0;
 
             if (itemCount == 0)
@@ -201,11 +232,11 @@ namespace POS_ANDROID_BACUNA.Fragments
             {
                 btn.SetTextColor(Android.Graphics.Color.White);
                 btn.Background = context.GetDrawable(Resource.Drawable.buttonCheckoutRoundBorderWithItem);
-                foreach (var item in GlobalCart.globalProductsCart)
+                foreach (var item in GlobalVariables.globalProductsOnCart)
                 {
-                    totalPrice += item.productRetailPrice;
+                    totalPrice += item.productSubTotalPrice;
                 }
-                btn.Text = itemCount.ToString() + " Item = \u20b1" + totalPrice.ToString();
+                btn.Text = itemCount.ToString() + " Item = \u20b1 " + String.Format("{0:n}",totalPrice);
             }
         }
 
@@ -215,8 +246,8 @@ namespace POS_ANDROID_BACUNA.Fragments
 
             int productid = 1;
             int productCount = 50;
-            string productName = "PRODUCT ";
-            decimal productPrice = Convert.ToDecimal(250.50);
+            string productName = "THIS IS A LONG ASS PRODUCT NAME ";
+            decimal productPrice = Convert.ToDecimal(2000.50);
 
             for (int i = 0; i < productCount; i++)
             {

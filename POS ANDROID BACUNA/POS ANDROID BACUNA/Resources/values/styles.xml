@@ -7,6 +7,11 @@
     <item name="colorAccent">#2dd1ac</item>
   </style>
 
+  <!-- Toolbar Title Theme -->
+  <style name="ToolbarTitleTheme" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+    <item name="android:textSize">16sp</item>
+  </style>
+
   <style name="ThemeOverlay.AppCompat.navTheme">
     <item name="colorPrimary">#ffff</item>
     <item name="colorPrimaryDark">#363f4d</item>

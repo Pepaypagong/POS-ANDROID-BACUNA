@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolBarCheckoutCart"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        app:popupTheme="@style/AppTheme"
+        app:itemIconTint="?attr/colorPrimaryDark"
+    />
+    <ExpandableListView
+        android:id="@+id/lvCheckoutCartItemList"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:splitMotionEvents="false"
+        android:layout_below="@id/toolBarCheckoutCart"
+        android:groupIndicator="@null"
+        android:listSelector="@color/colorPrimary"
+        android:choiceMode="singleChoice"
+        android:dividerHeight="1px"
+        android:background="@color/colorPrimary"
+    />
+
+    <LinearLayout
+        android:id="@+id/rlCheckoutCartButtonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_alignParentBottom="true"
+        android:weightSum="100"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnCheckoutCartClear"
+            android:layout_weight="10"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/trashcan_icon"
+            android:layout_marginRight="5dp"
+            android:tint="@android:color/holo_red_light"
+            android:background="?android:attr/colorPrimary"
+        />
+
+        <Button
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingRight="8dp"
+            android:paddingLeft="30dp"
+            android:id="@+id/btnCheckoutCartTotal"
+            android:layout_weight="90"
+            android:layout_width="0dp"
+            android:minHeight="50dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/buttonCheckoutRoundBorderNoItem"
+            android:text="@string/checkout_button_no_item"
+            android:textColor="?android:attr/colorAccent"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_gravity="center_horizontal"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:layout_centerInParent="true"
+            android:drawableRight="@drawable/right_icon_round_white"
+        />
+    </LinearLayout>
+</RelativeLayout>

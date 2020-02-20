@@ -20,7 +20,8 @@
             android:layout_height="?android:attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme"
-            app:itemIconTint="?attr/colorPrimaryDark">
+            app:itemIconTint="?attr/colorPrimaryDark"
+            app:titleTextAppearance="@style/ToolbarTitleTheme">
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

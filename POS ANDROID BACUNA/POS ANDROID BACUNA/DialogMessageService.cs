@@ -28,5 +28,6 @@ namespace POS_ANDROID_BACUNA
 
             return builder;
         }
+
     }
 }

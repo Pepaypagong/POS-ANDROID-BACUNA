@@ -52,17 +52,17 @@ namespace POS_ANDROID_BACUNA.Fragments
                     else if (mBluetoothAdapter.IsEnabled)
                     {
                         mDialogShown = true;
-                        mIsPrinterSet = GlobalCart.mIsPrinterSet;
+                        mIsPrinterSet = GlobalVariables.mIsPrinterSet;
                         //if there is selected printer, jump to selected printer test print, else jump to printer list
                         if (mIsPrinterSet)
                         {
                             Intent intent = new Intent(Context, typeof(SettingsFragmentSelectedPrinterActivity));
-                            StartActivityForResult(intent, 1111);
+                            StartActivityForResult(intent, 3);
                         }
                         else
                         {
                             Intent intent = new Intent(Context, typeof(SettingsFragmentPrinterListActivity));
-                            StartActivityForResult(intent, 1111);
+                            StartActivityForResult(intent, 3);
                         }
                     }
                     else
@@ -76,7 +76,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
-            if (requestCode == 1111)
+            if (requestCode == 3)
             {
                 mDialogShown = false; //flag to enable dialog show 
             }

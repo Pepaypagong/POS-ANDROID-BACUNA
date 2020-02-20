@@ -40,6 +40,8 @@
             android:textColor="#fff"
             android:textStyle="bold"
             android:text="AAAAAAAAAAAAAAA"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:layout_gravity="center_horizontal"
         />
         <TextView

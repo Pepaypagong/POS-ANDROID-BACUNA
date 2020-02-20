@@ -59,8 +59,8 @@ namespace POS_ANDROID_BACUNA.Fragments
 
             //show selected printer page
             Intent intent = new Intent(this, typeof(SettingsFragmentSelectedPrinterActivity));
-            GlobalCart.mIsPrinterSet = true;
-            GlobalCart.mSelectedDevice = selectedDevice;
+            GlobalVariables.mIsPrinterSet = true;
+            GlobalVariables.mSelectedDevice = selectedDevice;
             Finish();
             StartActivity(intent);
         }

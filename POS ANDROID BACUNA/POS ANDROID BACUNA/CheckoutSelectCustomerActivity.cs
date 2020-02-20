@@ -16,6 +16,8 @@ using SupportToolbar = Android.Support.V7.Widget.Toolbar;
 using SupportActionBar = Android.Support.V7.App.ActionBar;
 using SupportSearchBar = Android.Support.V7.Widget.SearchView;
 using Android.Views.InputMethods;
+using POS_ANDROID_BACUNA.Fragments;
+using POS_ANDROID_BACUNA.Data_Classes;
 
 namespace POS_ANDROID_BACUNA
 {
@@ -94,20 +96,20 @@ namespace POS_ANDROID_BACUNA
             string firstName = mItems[e.Position].FirstName;
             string lastName = mItems[e.Position].LastName;
 
-            //Android.Widget.Toast.MakeText(this, firstName, Android.Widget.ToastLength.Long).Show();
-
-            var result = new Intent(); 
-            result.PutExtra("Key", firstName + " " + lastName); 
-            SetResult(Result.Ok, result);
+            //var result = new Intent(); 
+            //result.PutExtra("Key", firstName + " " + lastName);
+            GlobalVariables.mCurrentSelectedCustomerOnCheckout = firstName + " " + lastName; //set current selected customer
+            GlobalVariables.mHasSelectedCustomerOnCheckout = true;
+            SetResult(Result.Ok); //SetResult(Result.Ok, result);
 
             Finish();
         }
 
-        private void MBtnSelectCustomer_Click(object sender, EventArgs e)
+        private void MBtnSelectCustomer_Click(object sender, EventArgs e) //remove customer
         {
-            var result = new Intent();
-            result.PutExtra("removeCustomer", true);
-            SetResult(Result.Ok, result);
+            GlobalVariables.mCurrentSelectedCustomerOnCheckout = "";
+            GlobalVariables.mHasSelectedCustomerOnCheckout = false;
+            SetResult(Result.Ok);
 
             Finish();
             //remove the action layout on checkout
@@ -123,6 +125,11 @@ namespace POS_ANDROID_BACUNA
                 default:
                     return base.OnOptionsItemSelected(item);
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
         }
 
     }

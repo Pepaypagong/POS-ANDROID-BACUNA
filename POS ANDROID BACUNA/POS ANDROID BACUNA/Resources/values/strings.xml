@@ -4,6 +4,8 @@
   <string name="checkout_show_size_crossed"><strike>SHOW SIZE</strike></string>
   <string name="checkout_show_size">SHOW SIZE</string>
   <string name="checkout_button_no_item">No Item = \u20b1 0.00</string>
+  <string name="checkout_cart_title">Cart</string>
+  
   <string name="search_bar_query_hint_checkout">Search Items</string>
   <string name="products_title">PRODUCTS</string>
   <string name="customers_title">CUSTOMERS</string>

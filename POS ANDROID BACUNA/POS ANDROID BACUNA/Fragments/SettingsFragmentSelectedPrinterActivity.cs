@@ -42,12 +42,12 @@ namespace POS_ANDROID_BACUNA.Fragments
             mBtnTestPrint = FindViewById<Button>(Resource.Id.btnTestPrint);
             mBtnTestPrint.Click += new SingleClickListener(MBtnTestPrint_Click).OnClick;
             mTxtSelectedPrinterName = FindViewById<TextView>(Resource.Id.txtPrinterName);
-            mTxtSelectedPrinterName.Text = GlobalCart.mSelectedDevice.Name;
+            mTxtSelectedPrinterName.Text = GlobalVariables.mSelectedDevice.Name;
         }
 
         private void MBtnTestPrint_Click(object sender, EventArgs e)
         {
-            PrintText(GlobalCart.mSelectedDevice, toPrint("20200201","BACUNA RTW","BEELINE BUILDING, BRGY. BACLARAN","PARANAQUE CITY, PHILIPPINES","09174897988", 
+            PrintText(GlobalVariables.mSelectedDevice, toPrint("20200201","BACUNA RTW","BEELINE BUILDING, BRGY. BACLARAN","PARANAQUE CITY, PHILIPPINES","09174897988", 
                 "JEFFREY BACUNA"," ",
                 "Please come again, thank you :)"));
         }
@@ -74,8 +74,8 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         public void removeSelectedPrinter()
         {
-            GlobalCart.mSelectedDevice = null;
-            GlobalCart.mIsPrinterSet = false;
+            GlobalVariables.mSelectedDevice = null;
+            GlobalVariables.mIsPrinterSet = false;
             Finish();
         }
 
@@ -117,7 +117,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                 line //line divider
             };
 
-            List<Product> cartItems = GlobalCart.globalProductsCart;
+            List<Product> cartItems = GlobalVariables.globalProductsCart;
             decimal totalPrice = 0;
 
             //get items from cart
