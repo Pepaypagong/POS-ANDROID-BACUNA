@@ -243,7 +243,28 @@ namespace POS_ANDROID_BACUNA.Fragments
                     removeActionLayout(item);
                 }
             }
-            
+            else if(requestCode == 5)
+            {
+                //refresh grid
+                listAdapter.NotifyDataSetChanged();
+                SetCheckoutButtonTotal(mBtnCartTotal,this);
+                if (GlobalVariables.mIsFromRemoveItem)
+                {
+                    lvCartItemList.CollapseGroup(previousGroup);
+                    //go back to checkout page if cart count = 0
+                    if (GlobalVariables.globalProductsOnCart.Count == 0)
+                    {
+                        Finish();
+                    }
+                }
+            }
+            else if (requestCode == 6)
+            {
+                //refresh grid
+                listAdapter.NotifyDataSetChanged();
+                SetCheckoutButtonTotal(mBtnCartTotal, this);
+            }
+
         }
 
         public void removeActionLayout(IMenuItem item)
@@ -276,7 +297,8 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         public void SetCheckoutButtonTotal(Button btn, Context context)
         {
-            int itemCount = GlobalVariables.globalProductsCart.Count();
+            int itemCount = GlobalVariables.globalProductsOnCart.Sum(item => item.productCountOnCart);
+
             decimal totalPrice = 0;
 
             if (itemCount == 0)
@@ -335,7 +357,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         protected override void OnPause()
         {
             base.OnPause();
-            OverridePendingTransition(0, 0);
+            OverridePendingTransition(0, 0);//removeanimation
         }
     }
 }

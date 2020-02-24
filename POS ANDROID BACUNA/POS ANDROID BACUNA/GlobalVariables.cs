@@ -24,5 +24,12 @@ namespace POS_ANDROID_BACUNA.Data_Classes
         public static string mCurrentSelectedCustomerOnCheckout = "";
         public static bool mHasSelectedCustomerOnCheckout = false;
         public static bool mIsAllCollapsed = true; //check if all listview items on cart is closed
+
+        public static int mCurrentSelectedItemIdOnCart; //for changing qty or price
+        public static string mCurrentSelectedItemNameOnCart; //for changing qty or price
+        public static int mCurrentSelectedItemQtyOnCart; //for changing qty or price
+        public static decimal mCurrentSelectedItemPriceOnCart; //for changing qty or price
+
+        public static bool mIsFromRemoveItem; //flag for collapsing cart list on activity result
     }
 }

@@ -73,6 +73,7 @@
     <Compile Include="Data Classes\Product.cs" />
     <Compile Include="Data Classes\ProductsOnCart.cs" />
     <Compile Include="DialogMessageService.cs" />
+    <Compile Include="Fragments\CheckoutFragmentCartNumpadActivity.cs" />
     <Compile Include="Fragments\RecyclerViewAdapter.cs" />
     <Compile Include="Fragments\SettingsFragment.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartActivity.cs" />
@@ -380,6 +381,24 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\checkout_fragment_cart_list_item_parent.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\borderTop.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\borderBottom.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\checkout_fragment_cart_child_numpad.xml">
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
       <SubType>Designer</SubType>
     </AndroidResource>

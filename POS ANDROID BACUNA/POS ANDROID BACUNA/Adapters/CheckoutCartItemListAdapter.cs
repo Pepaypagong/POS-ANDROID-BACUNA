@@ -11,6 +11,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using POS_ANDROID_BACUNA.Data_Classes;
+using POS_ANDROID_BACUNA.Fragments;
 
 namespace POS_ANDROID_BACUNA.Adapters
 {
@@ -20,6 +21,7 @@ namespace POS_ANDROID_BACUNA.Adapters
         private List<ProductsOnCart> _listDataHeader; // header titles
                                               // child data in format of header title, child title
         private Dictionary<string, List<string>> _listDataChild;
+        int _groupPosition; 
 
         public CheckoutCartItemListAdapter(Activity context, List<ProductsOnCart> listDataHeader, Dictionary<String, List<string>> listChildData)
         {
@@ -39,6 +41,7 @@ namespace POS_ANDROID_BACUNA.Adapters
 
         public override View GetChildView(int groupPosition, int childPosition, bool isLastChild, View convertView, ViewGroup parent)
         {
+            _groupPosition = groupPosition;
             string childText = (string)GetChild(groupPosition, childPosition);
             string pesoSign = "\u20b1";
             string itemsOrItem = " items";
@@ -61,15 +64,38 @@ namespace POS_ANDROID_BACUNA.Adapters
 
             txtQtyOnCart.Text = qtyOnCart;
             txtItemPrice.Text = itemPrice;
-            llQtyOnCart.Click += delegate (object sender, EventArgs e) {
-                Toast.MakeText(_context, "Qty = " + qtyOnCart, ToastLength.Short).Show();
-            };
-            llItemPrice.Click += delegate (object sender, EventArgs e) {
-                Toast.MakeText(_context, "PRICE = " + itemPrice, ToastLength.Short).Show();
-            };
 
+            llQtyOnCart.Click -= LlQtyOnCart_Click;
+            llQtyOnCart.Click += LlQtyOnCart_Click;
+            llItemPrice.Click -= LlItemPrice_Click;
+            llItemPrice.Click += LlItemPrice_Click;
             return convertView;
         }
+
+        private void LlQtyOnCart_Click(object sender, EventArgs e)
+        {
+            Intent intent = new Intent(_context, typeof(CheckoutFragmentCartNumpadActivity));
+            intent.PutExtra("numpadType", "change_qty");
+            SetGlobalData();
+            _context.StartActivityForResult(intent, 5);
+        }
+
+        private void LlItemPrice_Click(object sender, EventArgs e)
+        {
+            Intent intent = new Intent(_context, typeof(CheckoutFragmentCartNumpadActivity));
+            intent.PutExtra("numpadType", "change_price");
+            SetGlobalData();
+            _context.StartActivityForResult(intent, 6);
+        }
+
+        private void SetGlobalData()
+        {
+            GlobalVariables.mCurrentSelectedItemIdOnCart = _listDataHeader[_groupPosition].productId;
+            GlobalVariables.mCurrentSelectedItemNameOnCart = _listDataHeader[_groupPosition].productName;
+            GlobalVariables.mCurrentSelectedItemQtyOnCart = _listDataHeader[_groupPosition].productCountOnCart;
+            GlobalVariables.mCurrentSelectedItemPriceOnCart = _listDataHeader[_groupPosition].productPrice;
+        }
+
         public override int GetChildrenCount(int groupPosition)
         {
             return _listDataChild[_listDataHeader[groupPosition].productId.ToString()].Count;

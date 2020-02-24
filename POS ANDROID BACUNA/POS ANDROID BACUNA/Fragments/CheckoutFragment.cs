@@ -89,12 +89,13 @@ namespace POS_ANDROID_BACUNA.Fragments
         private void MBtnCheckoutButton_Click(object sender, EventArgs e)
         {
             //disable if no items on cart
-            if (GlobalVariables.globalProductsCart.Count == 0)
+            if (GlobalVariables.globalProductsOnCart.Count == 0)
             {
                 DialogMessageService.MessageBox(Context, "Your cart is empty", "Please add some products to the cart first.");
             }
             else
             {
+                GlobalVariables.mIsAllCollapsed = true;
                 Intent intent = new Intent(Context, typeof(CheckoutFragmentCartActivity));
                 intent.AddFlags(ActivityFlags.NoAnimation);
                 StartActivityForResult(intent,2);
@@ -216,7 +217,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         
         public void SetCheckoutButtonTotal(Button btn, Context context)
         {
-            int itemCount = GlobalVariables.globalProductsCart.Count();
+            int itemCount = GlobalVariables.globalProductsOnCart.Sum(item => item.productCountOnCart);
             decimal totalPrice = 0;
 
             if (itemCount == 0)
@@ -246,15 +247,15 @@ namespace POS_ANDROID_BACUNA.Fragments
 
             int productid = 1;
             int productCount = 50;
-            string productName = "THIS IS A LONG ASS PRODUCT NAME ";
-            decimal productPrice = Convert.ToDecimal(2000.50);
+            string productName = "(S) Product ";
+            decimal productPrice = Convert.ToDecimal(100);
 
             for (int i = 0; i < productCount; i++)
             {
                 mProducts.Add(new Product() { 
                     productId = productid,
                     productName = productName + productid.ToString(),
-                    productRetailPrice = productPrice + Convert.ToDecimal(productid),
+                    productRetailPrice = productPrice + (Convert.ToDecimal(productid) * 2),
                     productColorBg = Guid.NewGuid().ToString().Substring(0,6) //random color
                 });
                 productid++;

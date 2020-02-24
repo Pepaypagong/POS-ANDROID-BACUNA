@@ -156,6 +156,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                 {
                     if (item.productId == mProducts[position].productId)
                     {
+                        item.productPrice = item.productOrigPrice; //update price on click to reset the price on cart
                         item.productCountOnCart = item.productCountOnCart + 1;
                         item.productSubTotalPrice = (item.productCountOnCart) * item.productPrice;
                     }
@@ -166,6 +167,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                 {
                     productId = mProducts[position].productId,
                     productName = mProducts[position].productName,
+                    productOrigPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
                     productPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
                     productCountOnCart = 1,
                     productCategoryId = 1,
