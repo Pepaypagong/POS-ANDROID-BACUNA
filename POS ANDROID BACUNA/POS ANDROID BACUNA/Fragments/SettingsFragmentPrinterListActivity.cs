@@ -37,8 +37,9 @@ namespace POS_ANDROID_BACUNA.Fragments
             mToolBar = FindViewById<SupportToolbar>(Resource.Id.toolBarPrinterList);
             SetSupportActionBar(mToolBar);
             SupportActionBar actionBar = SupportActionBar;
-            actionBar.SetHomeAsUpIndicator(Resource.Drawable.left_icon);
+            //actionBar.SetHomeAsUpIndicator(Resource.Drawable.left_icon_thin);
             actionBar.SetDisplayHomeAsUpEnabled(true);
+            actionBar.SetDisplayShowHomeEnabled(true);
             actionBar.SetTitle(Resource.String.settings_select_printer);
             mListViewPrinters = FindViewById<ListView>(Resource.Id.lvBluetoothDevicesList);
             mListViewPrinters.ItemClick += MListViewPrinters_ItemClick;

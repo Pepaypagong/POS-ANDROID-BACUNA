@@ -7,6 +7,13 @@
     <item name="colorAccent">#2dd1ac</item>
   </style>
 
+  <style name="AppThemeRedMenuColor" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="colorPrimary">#ffff</item>
+    <item name="colorPrimaryDark">#363f4d</item>
+    <item name="colorAccent">#2dd1ac</item>
+    <item name="actionMenuTextColor">@color/colorRed</item>
+  </style>
+
   <!-- Toolbar Title Theme -->
   <style name="ToolbarTitleTheme" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
     <item name="android:textSize">16sp</item>
@@ -36,5 +43,6 @@
   <style name="TabLayoutTextAppearance" parent="TextAppearance.Design.Tab">
     <item name="android:textSize">14sp</item>
   </style>
+
   
 </resources>

@@ -36,8 +36,9 @@ namespace POS_ANDROID_BACUNA.Fragments
             mToolBar = FindViewById<SupportToolbar>(Resource.Id.toolBarPrinterSelectedPrinter);
             SetSupportActionBar(mToolBar);
             SupportActionBar actionBar = SupportActionBar;
-            actionBar.SetHomeAsUpIndicator(Resource.Drawable.left_icon);
+            //actionBar.SetHomeAsUpIndicator(Resource.Drawable.left_icon_thin);
             actionBar.SetDisplayHomeAsUpEnabled(true);
+            actionBar.SetDisplayShowHomeEnabled(true);
             actionBar.SetTitle(Resource.String.settings_select_printer);
             mBtnTestPrint = FindViewById<Button>(Resource.Id.btnTestPrint);
             mBtnTestPrint.Click += new SingleClickListener(MBtnTestPrint_Click).OnClick;

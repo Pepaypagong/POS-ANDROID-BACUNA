@@ -52,6 +52,9 @@ namespace POS_ANDROID_BACUNA.Adapters
             string qtyOnCart = _listDataHeader[groupPosition].productCountOnCart.ToString() + itemsOrItem;
             string itemPrice = pesoSign + String.Format("{0:n}", _listDataHeader[groupPosition].productPrice);
 
+            decimal discAmt = _listDataHeader[groupPosition].productDiscountAmount;
+            string itemDiscount = discAmt == 0 ? "DISCOUNT" : pesoSign + String.Format("{0:n}", discAmt);
+
             if (convertView == null)
             {
                 convertView = _context.LayoutInflater.Inflate(Resource.Layout.checkout_fragment_cart_list_item_child, parent, false);
@@ -61,31 +64,100 @@ namespace POS_ANDROID_BACUNA.Adapters
             TextView txtItemDiscount = (TextView)convertView.FindViewById(Resource.Id.txtItemDiscount);
             LinearLayout llQtyOnCart = (LinearLayout)convertView.FindViewById(Resource.Id.llItemsOnCart);
             LinearLayout llItemPrice = (LinearLayout)convertView.FindViewById(Resource.Id.llItemPriceOnCart);
+            LinearLayout llItemDiscountOnCart = (LinearLayout)convertView.FindViewById(Resource.Id.llItemDiscountOnCart);
 
             txtQtyOnCart.Text = qtyOnCart;
             txtItemPrice.Text = itemPrice;
+            txtItemDiscount.Text = itemDiscount;
 
             llQtyOnCart.Click -= LlQtyOnCart_Click;
             llQtyOnCart.Click += LlQtyOnCart_Click;
             llItemPrice.Click -= LlItemPrice_Click;
             llItemPrice.Click += LlItemPrice_Click;
+            llItemDiscountOnCart.Click -= LlItemDiscountOnCart_Click;
+            llItemDiscountOnCart.Click += LlItemDiscountOnCart_Click;
             return convertView;
         }
 
         private void LlQtyOnCart_Click(object sender, EventArgs e)
         {
-            Intent intent = new Intent(_context, typeof(CheckoutFragmentCartNumpadActivity));
-            intent.PutExtra("numpadType", "change_qty");
-            SetGlobalData();
-            _context.StartActivityForResult(intent, 5);
+            if (_listDataHeader[_groupPosition].productDiscountAmount == 0)
+            {
+                Intent intent = new Intent(_context, typeof(CheckoutFragmentCartNumpadActivity));
+                intent.PutExtra("numpadType", "change_qty");
+                SetGlobalData();
+                _context.StartActivityForResult(intent, 5);
+            }
+            else
+            {
+                itemQuantityClickWithMessage();
+            }
+        }
+        private void itemQuantityClickWithMessage()
+        {
+            Android.App.AlertDialog.Builder builder = new Android.App.AlertDialog.Builder(_context);
+            Android.App.AlertDialog alert = builder.Create();
+            alert.SetTitle("Remove discount?");
+            alert.SetMessage("Once you edit this product, the DISCOUNT applied to it will be removed. Is that okay?");
+
+            alert.SetButton2("CANCEL", (c, ev) =>
+            {
+                //cancel button
+            });
+
+            alert.SetButton("YES", (c, ev) =>
+            {
+                Intent intent = new Intent(_context, typeof(CheckoutFragmentCartNumpadActivity));
+                intent.PutExtra("numpadType", "change_qty");
+                SetGlobalData();
+                _context.StartActivityForResult(intent, 5);
+            });
+
+            alert.Show();
         }
 
         private void LlItemPrice_Click(object sender, EventArgs e)
         {
-            Intent intent = new Intent(_context, typeof(CheckoutFragmentCartNumpadActivity));
-            intent.PutExtra("numpadType", "change_price");
+            if (_listDataHeader[_groupPosition].productDiscountAmount == 0)
+            {
+                Intent intent = new Intent(_context, typeof(CheckoutFragmentCartNumpadActivity));
+                intent.PutExtra("numpadType", "change_price");
+                SetGlobalData();
+                _context.StartActivityForResult(intent, 6);
+            }
+            else
+            {
+                itemPriceClickWithMessage();
+            }
+        }
+
+        private void itemPriceClickWithMessage()
+        {
+            Android.App.AlertDialog.Builder builder = new Android.App.AlertDialog.Builder(_context);
+            Android.App.AlertDialog alert = builder.Create();
+            alert.SetTitle("Remove discount?");
+            alert.SetMessage("Once you edit this product, the DISCOUNT applied to it will be removed. Is that okay?");
+
+            alert.SetButton2("CANCEL", (c, ev) =>
+            {
+                //cancel button
+            });
+
+            alert.SetButton("YES", (c, ev) =>
+            {
+                Intent intent = new Intent(_context, typeof(CheckoutFragmentCartNumpadActivity));
+                intent.PutExtra("numpadType", "change_price");
+                SetGlobalData();
+                _context.StartActivityForResult(intent, 6);
+            });
+
+            alert.Show();
+        }
+        private void LlItemDiscountOnCart_Click(object sender, EventArgs e)
+        {
+            Intent intent = new Intent(_context, typeof(CheckoutFragmentCartNumpadDiscountActivity));
             SetGlobalData();
-            _context.StartActivityForResult(intent, 6);
+            _context.StartActivityForResult(intent, 7);
         }
 
         private void SetGlobalData()
@@ -94,6 +166,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             GlobalVariables.mCurrentSelectedItemNameOnCart = _listDataHeader[_groupPosition].productName;
             GlobalVariables.mCurrentSelectedItemQtyOnCart = _listDataHeader[_groupPosition].productCountOnCart;
             GlobalVariables.mCurrentSelectedItemPriceOnCart = _listDataHeader[_groupPosition].productPrice;
+            GlobalVariables.mCurrentSelectedItemDiscountAmountOnCart = _listDataHeader[_groupPosition].productDiscountAmount;
         }
 
         public override int GetChildrenCount(int groupPosition)

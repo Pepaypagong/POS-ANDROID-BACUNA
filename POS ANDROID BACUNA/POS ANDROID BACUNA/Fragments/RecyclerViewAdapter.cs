@@ -157,6 +157,8 @@ namespace POS_ANDROID_BACUNA.Fragments
                     if (item.productId == mProducts[position].productId)
                     {
                         item.productPrice = item.productOrigPrice; //update price on click to reset the price on cart
+                        item.productDiscountAmount = 0.00M; //reset discount amt to 0 if already on cart
+                        item.productDiscountPercentage = 0.00M; //reset discount percentage to 0 if already on cart
                         item.productCountOnCart = item.productCountOnCart + 1;
                         item.productSubTotalPrice = (item.productCountOnCart) * item.productPrice;
                     }
@@ -171,7 +173,9 @@ namespace POS_ANDROID_BACUNA.Fragments
                     productPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
                     productCountOnCart = 1,
                     productCategoryId = 1,
-                    productSubTotalPrice = Convert.ToDecimal(mProducts[position].productRetailPrice)
+                    productSubTotalPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
+                    productDiscountAmount = 0.00M,
+                    productDiscountPercentage = 0.00M
                 }); 
             }
             //update checkoutbutton.

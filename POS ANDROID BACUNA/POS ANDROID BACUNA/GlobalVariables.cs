@@ -29,7 +29,10 @@ namespace POS_ANDROID_BACUNA.Data_Classes
         public static string mCurrentSelectedItemNameOnCart; //for changing qty or price
         public static int mCurrentSelectedItemQtyOnCart; //for changing qty or price
         public static decimal mCurrentSelectedItemPriceOnCart; //for changing qty or price
+        public static decimal mCurrentSelectedItemDiscountAmountOnCart; //for changing disc
 
         public static bool mIsFromRemoveItem; //flag for collapsing cart list on activity result
+
+        public static bool mIsCashDiscountSelected = true; //for text watcher of discount on text changed;
     }
 }

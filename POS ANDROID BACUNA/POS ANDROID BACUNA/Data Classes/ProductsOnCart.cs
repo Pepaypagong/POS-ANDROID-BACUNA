@@ -19,6 +19,8 @@ namespace POS_ANDROID_BACUNA.Data_Classes
         public int productCategoryId { get; set; }
         public decimal productPrice { get; set; }
         public decimal productOrigPrice { get; set; }
+        public decimal productDiscountAmount { get; set; }
+        public decimal productDiscountPercentage { get; set; }
         public decimal productSubTotalPrice { get; set; }
         public int productCountOnCart { get; set; }
     }

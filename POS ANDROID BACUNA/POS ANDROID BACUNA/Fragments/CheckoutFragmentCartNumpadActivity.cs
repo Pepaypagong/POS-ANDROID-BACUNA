@@ -53,8 +53,9 @@ namespace POS_ANDROID_BACUNA.Fragments
             mToolBar = FindViewById<SupportToolbar>(Resource.Id.toolBarCheckoutCartNumpad);
             SetSupportActionBar(mToolBar);
             SupportActionBar actionBar = SupportActionBar;
-            actionBar.SetHomeAsUpIndicator(Resource.Drawable.left_icon);
+            //actionBar.SetHomeAsUpIndicator(Resource.Drawable.left_icon_thin);
             actionBar.SetDisplayHomeAsUpEnabled(true);
+            actionBar.SetDisplayShowHomeEnabled(true); //back icon
             actionBar.Title = GlobalVariables.mCurrentSelectedItemNameOnCart;
 
             SetViews(NumPadType()); //set labels based on numpad type
@@ -119,9 +120,12 @@ namespace POS_ANDROID_BACUNA.Fragments
             }
             else if (_numpadType == "change_discount")
             {
-                mTxtOldQty.Text = "Discount :";
-                mTxtNewQty.Text = "Discount :";
-                mTxtRemoveItem.Text = "Discount";
+                mTxtOldQty.Text = "Original Subtotal";
+                mTxtNewQty.Text = "Edit discount amount";
+                mTxtRemoveItem.Text = "";
+                mTxtRemoveItem.Enabled = false;
+                mEtNumpadValue.SetFilters(new IInputFilter[] { new InputFilterLengthFilter(changePriceMaxLength) });//set max length
+                mEtNumpadValue.RequestFocus();
             }
             else
             {
@@ -142,7 +146,10 @@ namespace POS_ANDROID_BACUNA.Fragments
             }
             else if (_numpadType == "change_discount")
             {
-
+                //orig subtotal
+                mEtOldNumpadValue.Text = mPesoSign + string.Format("{0:n}", GlobalVariables.mCurrentSelectedItemQtyOnCart * GlobalVariables.mCurrentSelectedItemPriceOnCart);
+                
+                mEtNumpadValue.Text = mPesoSign + string.Format("{0:n}", GlobalVariables.mCurrentSelectedItemDiscountAmountOnCart);
             }
             else
             {
@@ -173,15 +180,89 @@ namespace POS_ANDROID_BACUNA.Fragments
             else if (_numpadType == "change_price")
             {
                 ChangePriceEvent();
-                mEtNumpadValue.AddTextChangedListener(new MoneyTextWatcher("", mEtNumpadValue, mTxtOK,this));
+                mEtNumpadValue.AddTextChangedListener(new MoneyTextWatcher("", mEtNumpadValue, mTxtOK,this,true,isInitialPriceChange));
             }
             else if (_numpadType == "change_discount")
             {
-
+                ChangeDiscountEvent();
+                mEtNumpadValue.AddTextChangedListener(new MoneyTextWatcher("", mEtNumpadValue, mTxtOK, this,false,false));
             }
             else
             {
                 //data not available error
+            }
+        }
+
+        private void ChangeDiscountEvent()
+        {
+            int childCount = mGridNumpad.ChildCount;
+
+            for (int i = 0; i < childCount; i++)
+            {
+                TextView numberPad = (TextView)mGridNumpad.GetChildAt(i);
+                numberPad.Click += delegate (object sender, EventArgs e) {
+                    if (isInitialPriceChange)
+                    {
+                        isInitialPriceChange = false;
+                        if (numberPad.Text != "OK")
+                        {
+                            mEtNumpadValue.Text = mPesoSign + "0.00";
+                        }
+                    }
+                    if (numberPad.Text == "Del")
+                    {
+                        if (mEtNumpadValue.Text.Length <= 5)
+                        {
+                            string holder = mEtNumpadValue.Text;
+
+                            string firstDigit = holder.Substring(1, 1);
+                            string secondDigit = holder.Substring(3, 1);
+
+                            holder = holder.Remove(1, 1).Insert(1, "0"); //first digit always 0 on del
+                            holder = holder.Remove(3, 1).Insert(3, firstDigit);
+                            holder = holder.Remove(4, 1).Insert(4, secondDigit);
+                            mEtNumpadValue.Text = holder;
+                        }
+                        else
+                        {
+                            mEtNumpadValue.Text = mEtNumpadValue.Text.Remove(mEtNumpadValue.Text.Length - 1, 1);
+                        }
+
+                    }
+                    else if (numberPad.Text == "OK")
+                    {
+                        decimal newDiscount = Convert.ToDecimal(mEtNumpadValue.Text.Replace(",", "").Replace("\u20b1", ""));
+                        GlobalVariables.mCurrentSelectedItemDiscountAmountOnCart = newDiscount;
+                        foreach (var item in GlobalVariables.globalProductsOnCart)
+                        {
+                            if (item.productId == GlobalVariables.mCurrentSelectedItemIdOnCart)
+                            {
+                                item.productDiscountAmount = newDiscount;
+                                item.productSubTotalPrice = (item.productCountOnCart * item.productPrice) - item.productDiscountAmount;
+                            }
+                        }
+                        GlobalVariables.mIsFromRemoveItem = false;
+                        Finish();
+                    }
+                    else
+                    {
+                        if (numberPad.Text == "0")
+                        {
+                            if (mEtNumpadValue.Text == mPesoSign + "0.00")
+                            {
+                                //mEtNumpadValue.Text = mEtNumpadValue.Text + numberPad.Text;
+                            }
+                            else
+                            {
+                                mEtNumpadValue.Text = mEtNumpadValue.Text + numberPad.Text;
+                            }
+                        }
+                        else
+                        {
+                            mEtNumpadValue.Text = mEtNumpadValue.Text + numberPad.Text;
+                        }
+                    }
+                };
             }
         }
 
@@ -231,6 +312,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                             {
                                 item.productPrice = newPrice;
                                 item.productSubTotalPrice = (item.productCountOnCart) * item.productPrice;
+                                item.productDiscountAmount = 0.00M; //revert discount to 0
                             }
                         }
                         GlobalVariables.mIsFromRemoveItem = false;
@@ -294,6 +376,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                                 {
                                     item.productCountOnCart = newQty;
                                     item.productSubTotalPrice = (item.productCountOnCart) * item.productPrice;
+                                    item.productDiscountAmount = 0.00M; //revert discount to 0
                                 }
                             }
                             GlobalVariables.mIsFromRemoveItem = false;
@@ -326,21 +409,31 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         public class MoneyTextWatcher : Java.Lang.Object, ITextWatcher
         {
-            private string current = "";
             private EditText mEditText;
             private TextView mNumpadOk;
             private Context mContext;
-
-            public MoneyTextWatcher(string _current, EditText _mEditText, TextView _txtNumpadCheck, Context _context)
+            private bool mIsForPrice;
+            private bool mIsInitialLoad;
+            public MoneyTextWatcher(string _current, EditText _mEditText, TextView _txtNumpadCheck, Context _context, bool _isForPrice, bool _isInitialLoad)
             {
-                current = _current;
                 mEditText = _mEditText;
                 mNumpadOk = _txtNumpadCheck;
                 mContext = _context;
+                mIsForPrice = _isForPrice;
+                mIsInitialLoad = _isInitialLoad;
             }
 
             public void AfterTextChanged(IEditable s)
             {
+                if (mIsInitialLoad)
+                {
+                    mIsInitialLoad = false;
+                    //disable ok
+                    int colorInt = mContext.GetColor(Resource.Color.jepoyGray);
+                    Color color = new Color(colorInt);
+                    mNumpadOk.SetTextColor(color);
+                    mNumpadOk.Enabled = false;
+                }
                
             }
 
@@ -352,7 +445,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             public void OnTextChanged(ICharSequence s, int start, int before, int count)
             {
                 string value = mEditText.Text.Replace(",", "").Replace("\u20b1", "").Replace(".", "").TrimStart('0');
-                if (value == "")
+                if (mIsForPrice & value == "")
                 {
                     //disable ok
                     int colorInt = mContext.GetColor(Resource.Color.jepoyGray);

@@ -252,6 +252,15 @@ namespace POS_ANDROID_BACUNA.Fragments
 
             for (int i = 0; i < productCount; i++)
             {
+                if (i == 0)
+                {
+                    productName = "W_W_W_W_W_W_W_W_W_W_W_W_W_W_W_WX";
+                }
+                else
+                {
+                    productName = "(S) Product ";
+                }
+
                 mProducts.Add(new Product() { 
                     productId = productid,
                     productName = productName + productid.ToString(),

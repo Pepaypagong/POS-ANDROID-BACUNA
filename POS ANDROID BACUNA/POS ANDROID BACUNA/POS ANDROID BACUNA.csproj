@@ -73,6 +73,7 @@
     <Compile Include="Data Classes\Product.cs" />
     <Compile Include="Data Classes\ProductsOnCart.cs" />
     <Compile Include="DialogMessageService.cs" />
+    <Compile Include="Fragments\CheckoutFragmentCartNumpadDiscountActivity.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartNumpadActivity.cs" />
     <Compile Include="Fragments\RecyclerViewAdapter.cs" />
     <Compile Include="Fragments\SettingsFragment.cs" />
@@ -402,6 +403,30 @@
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
       <SubType>Designer</SubType>
     </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\checkout_fragment_cart_child_numpad_discount.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\check_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\toolbar_menu_checkout_cart_discount.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\left_icon_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\left_icon_thin.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\left_icon_arrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

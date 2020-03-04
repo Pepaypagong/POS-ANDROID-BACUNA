@@ -49,8 +49,9 @@ namespace POS_ANDROID_BACUNA.Fragments
             mToolBar = FindViewById<SupportToolbar>(Resource.Id.toolBarCheckoutCart);
             SetSupportActionBar(mToolBar);
             SupportActionBar actionBar = SupportActionBar;
-            actionBar.SetHomeAsUpIndicator(Resource.Drawable.left_icon);
+            //actionBar.SetHomeAsUpIndicator(Resource.Drawable.left_icon_thin);
             actionBar.SetDisplayHomeAsUpEnabled(true);
+            actionBar.SetDisplayShowHomeEnabled(true);
             actionBar.SetTitle(Resource.String.checkout_cart_title);
 
             //get screendensity
@@ -258,7 +259,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                     }
                 }
             }
-            else if (requestCode == 6)
+            else if (requestCode == 6 | requestCode == 7)
             {
                 //refresh grid
                 listAdapter.NotifyDataSetChanged();
