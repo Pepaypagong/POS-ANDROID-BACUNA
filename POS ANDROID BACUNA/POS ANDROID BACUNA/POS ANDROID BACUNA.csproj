@@ -70,12 +70,15 @@
     <Compile Include="BluetoothDevicesListViewAdapter.cs" />
     <Compile Include="CustomersListViewAdapter.cs" />
     <Compile Include="Data Classes\ConnectedBluetoothDevice.cs" />
+    <Compile Include="Data Classes\ParentProducts.cs" />
     <Compile Include="Data Classes\Product.cs" />
+    <Compile Include="Data Classes\ProductCategories.cs" />
+    <Compile Include="Data Classes\ProductSizes.cs" />
     <Compile Include="Data Classes\ProductsOnCart.cs" />
     <Compile Include="DialogMessageService.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartNumpadDiscountActivity.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartNumpadActivity.cs" />
-    <Compile Include="Fragments\RecyclerViewAdapter.cs" />
+    <Compile Include="Adapters\RecyclerViewAdapter.cs" />
     <Compile Include="Fragments\SettingsFragment.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartActivity.cs" />
     <Compile Include="Fragments\SettingsFragmentPrinterListActivity.cs" />

@@ -39,6 +39,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         Button mBtnCheckoutButton;
         IMenu mCurrentToolBarMenu = null;
         bool mShowSizes = false;
+        string mSelectedProductCategory = "All";
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -52,8 +53,8 @@ namespace POS_ANDROID_BACUNA.Fragments
             mViewGroup = container;
             thisFragmentView = inflater.Inflate(Resource.Layout.checkout_fragment, container, false);
             mTabs = thisFragmentView.FindViewById<TabLayout>(Resource.Id.tabs);
-            string[] categories = { "All", "Polo", "Blouse", "Pants", "Shorts", "Palda", "Caps", "Panyo" };
-            onCreateTabLayout(categories); //add tabs and texts
+
+            FnSetUpCategories();
 
             toolbar = thisFragmentView.FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.checkoutSearchToolbar);
             toolbar.MenuItemClick += Toolbar_MenuItemClick;
@@ -84,6 +85,34 @@ namespace POS_ANDROID_BACUNA.Fragments
             mBtnCheckoutButton.Click += MBtnCheckoutButton_Click;
 
             return thisFragmentView;
+        }
+
+        public void FnSetUpCategories()
+        {
+            List<ProductCategories> productCategories = new List<ProductCategories>();
+            productCategories.Add(new ProductCategories() { productCategoryId = 1, productCategoryName = "All" });
+            productCategories.Add(new ProductCategories() { productCategoryId = 2, productCategoryName = "Polo" });
+            productCategories.Add(new ProductCategories() { productCategoryId = 3, productCategoryName = "Blouse" });
+            productCategories.Add(new ProductCategories() { productCategoryId = 4, productCategoryName = "Pants" });
+            productCategories.Add(new ProductCategories() { productCategoryId = 5, productCategoryName = "Palda" });
+            productCategories.Add(new ProductCategories() { productCategoryId = 6, productCategoryName = "Panyo" });
+
+            for (int i = 0; i < productCategories.Count; i++)
+            {
+                mTabs.AddTab(mTabs.NewTab().SetText(productCategories[i].productCategoryName));
+            }
+
+            mTabs.TabSelected += (object sender, TabLayout.TabSelectedEventArgs e) =>
+            {
+                var tab = e.Tab;
+
+                mSelectedProductCategory = tab.Text;
+                //redraw grid
+                SetGridLayout(mLayoutInflater, mViewGroup, mIsGrid);
+                mRecyclerViewItemsList.Invalidate();
+
+                Toast.MakeText((MainActivity)this.Activity, "Showed " + tab.Text + " Products",ToastLength.Long).Show();
+            };
         }
 
         private void MBtnCheckoutButton_Click(object sender, EventArgs e)
@@ -152,10 +181,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             if(e.Item.ItemId == Resource.Id.barcode)
             {
-                //clear cart
-                GlobalVariables.globalProductsCart.Clear();
-                GlobalVariables.globalProductsOnCart.Clear();
-                SetCheckoutButtonTotal(mBtnCheckoutButton, Context);
+
             }
             else if (e.Item.ItemId == Resource.Id.toggle_grid_appearance)
             {
@@ -209,9 +235,9 @@ namespace POS_ANDROID_BACUNA.Fragments
             //POST RENDERING
             gridHolder.Post(() => 
             {
-                mRecyclerViewItemsList.SetAdapter(new RecyclerViewAdapter(mDpVal, 
+                mRecyclerViewItemsList.SetAdapter(new CheckoutRecyclerViewAdapter(mDpVal, 
                     SetItemListContainerHeight(gridHolder, toolbar), 
-                    PopulateProductData(),mIsGrid,mRecyclerViewItemsList,mBtnCheckoutButton, Context));
+                    PopulateProductData2(mSelectedProductCategory,mShowSizes),PopulateParentProducts(),mIsGrid,mRecyclerViewItemsList,mBtnCheckoutButton, Context, mShowSizes));
             });
         }
         
@@ -241,33 +267,112 @@ namespace POS_ANDROID_BACUNA.Fragments
             }
         }
 
+        private List<ProductSizes> PopulateSizesData()
+        {
+            List<ProductSizes> mSizes = new List<ProductSizes>();
+            mSizes.Add(new ProductSizes() { productSizeId = 1, productSizeName = "0" });
+            mSizes.Add(new ProductSizes() { productSizeId = 2, productSizeName = "2" });
+            mSizes.Add(new ProductSizes() { productSizeId = 3, productSizeName = "4" });
+            mSizes.Add(new ProductSizes() { productSizeId = 4, productSizeName = "6" });
+            mSizes.Add(new ProductSizes() { productSizeId = 5, productSizeName = "8" });
+            mSizes.Add(new ProductSizes() { productSizeId = 6, productSizeName = "10" });
+            mSizes.Add(new ProductSizes() { productSizeId = 7, productSizeName = "12" });
+            mSizes.Add(new ProductSizes() { productSizeId = 8, productSizeName = "14" });
+            mSizes.Add(new ProductSizes() { productSizeId = 9, productSizeName = "16" });
+            mSizes.Add(new ProductSizes() { productSizeId = 10, productSizeName = "18" });
+            mSizes.Add(new ProductSizes() { productSizeId = 11, productSizeName = "20" });
+            mSizes.Add(new ProductSizes() { productSizeId = 12, productSizeName = "24" });
+            mSizes.Add(new ProductSizes() { productSizeId = 13, productSizeName = "S" });
+            mSizes.Add(new ProductSizes() { productSizeId = 14, productSizeName = "M" });
+            mSizes.Add(new ProductSizes() { productSizeId = 15, productSizeName = "L" });
+            mSizes.Add(new ProductSizes() { productSizeId = 16, productSizeName = "XL" });
+            mSizes.Add(new ProductSizes() { productSizeId = 17, productSizeName = "2X" });
+            mSizes.Add(new ProductSizes() { productSizeId = 18, productSizeName = "3X" });
+            return mSizes;
+        }
+
         private List<Product> PopulateProductData()
         {
             List<Product> mProducts = new List<Product>();
+            List<ProductSizes> mSizes = PopulateSizesData();
 
             int productid = 1;
-            int productCount = 50;
-            string productName = "(S) Product ";
+            int productCount = 10;
+            string productName = "Product ";
             decimal productPrice = Convert.ToDecimal(100);
 
             for (int i = 0; i < productCount; i++)
             {
-                if (i == 0)
-                {
-                    productName = "W_W_W_W_W_W_W_W_W_W_W_W_W_W_W_WX";
-                }
-                else
-                {
-                    productName = "(S) Product ";
-                }
+                productName = i == 0 ? "Product " : "Product ";
 
-                mProducts.Add(new Product() { 
-                    productId = productid,
-                    productName = productName + productid.ToString(),
-                    productRetailPrice = productPrice + (Convert.ToDecimal(productid) * 2),
-                    productColorBg = Guid.NewGuid().ToString().Substring(0,6) //random color
-                });
+                for (int x = 0; x < mSizes.Count; x++)
+                {
+                    string sizeName = "(" + mSizes[x].productSizeName + ") "; //fetch from list of sizes
+                    mProducts.Add(new Product()
+                    {
+                        productId = productid,
+                        productName = sizeName + productName + productid.ToString(),
+                        productSize = sizeName,
+                        productRetailPrice = productPrice + (Convert.ToDecimal(productid) * 2),
+                        productColorBg = Guid.NewGuid().ToString().Substring(0, 6) //random color
+                    });
+                }
                 productid++;
+            }
+
+            return mProducts;
+        }
+
+        private List<ParentProducts> PopulateParentProducts() 
+        {
+            List<ParentProducts> mParentProducts = new List<ParentProducts>();
+            mParentProducts.Add(new ParentProducts() { parentProductId = 1, parentProductName = "Pants Black", categoryName = "Pants" }); //use category id
+            mParentProducts.Add(new ParentProducts() { parentProductId = 2, parentProductName = "Polo Jacket Kat", categoryName = "Polo" });
+            mParentProducts.Add(new ParentProducts() { parentProductId = 3, parentProductName = "Polo Barong", categoryName = "Polo" });
+            mParentProducts.Add(new ParentProducts() { parentProductId = 4, parentProductName = "Baby Collar Kat", categoryName = "Blouse" });
+            mParentProducts.Add(new ParentProducts() { parentProductId = 5, parentProductName = "Marine Collar Kat", categoryName = "Blouse" });
+            //filter by product category
+            if (mSelectedProductCategory != "All")
+            {
+                mParentProducts = mParentProducts.Where(o => o.categoryName == mSelectedProductCategory).ToList();
+            }
+            return mParentProducts;
+        }
+
+
+        private List<Product> PopulateProductData2(string _productCategory, bool _showSize)
+        {
+            List<Product> mProducts = new List<Product>();
+            //
+
+            //pants
+            mProducts.Add(new Product() { productId = 1, productName = "(24) Pants Black", productCategory = "Pants", productSize = "24", productRetailPrice = 150.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 2, productName = "(S) Pants Black", productCategory = "Pants", productSize = "S", productRetailPrice = 160.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 3, productName = "(M) Pants Black", productCategory = "Pants", productSize = "M", productRetailPrice = 170.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 4, productName = "(L) Pants Black", productCategory = "Pants", productSize = "L", productRetailPrice = 180.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            //polo
+            mProducts.Add(new Product() { productId = 5, productName = "(24) Polo Jacket Kat", productCategory = "Polo", productSize = "24", productRetailPrice = 110.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 6, productName = "(S) Polo Jacket Kat", productCategory = "Polo", productSize = "S", productRetailPrice = 120.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 7, productName = "(M) Polo Jacket Kat", productCategory = "Polo", productSize = "M", productRetailPrice = 130.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 8, productName = "(L) Polo Jacket Kat", productCategory = "Polo", productSize = "L", productRetailPrice = 140.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 9, productName = "(24) Polo Barong", productCategory = "Polo", productSize = "24", productRetailPrice = 160.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 10, productName = "(S) Polo Barong", productCategory = "Polo", productSize = "S", productRetailPrice = 170.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 11, productName = "(M) Polo Barong", productCategory = "Polo", productSize = "M", productRetailPrice = 180.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 12, productName = "(L) Polo Barong", productCategory = "Polo", productSize = "L", productRetailPrice = 190.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            //blouse
+            mProducts.Add(new Product() { productId = 13, productName = "(S) Baby Collar Kat", productCategory = "Blouse", productSize = "S", productRetailPrice = 120.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 14, productName = "(M) Baby Collar Kat", productCategory = "Blouse", productSize = "M", productRetailPrice = 130.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 15, productName = "(L) Baby Collar Kat", productCategory = "Blouse", productSize = "L", productRetailPrice = 140.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 16, productName = "(XL) Baby Collar Kat", productCategory = "Blouse", productSize = "XL", productRetailPrice = 150.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 17, productName = "(S) Marine Collar Kat", productCategory = "Blouse", productSize = "S", productRetailPrice = 100.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 18, productName = "(M) Marine Collar Kat", productCategory = "Blouse", productSize = "M", productRetailPrice = 110.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 19, productName = "(L) Marine Collar Kat", productCategory = "Blouse", productSize = "L", productRetailPrice = 120.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 20, productName = "(XL) Marine Collar Kat", productCategory = "Blouse", productSize = "XL", productRetailPrice = 130.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+
+            //filter by product category
+            if (mSelectedProductCategory != "All")
+            {
+                mProducts = mProducts.Where(o => o.productCategory == mSelectedProductCategory).ToList();
             }
 
             return mProducts;
@@ -318,18 +423,23 @@ namespace POS_ANDROID_BACUNA.Fragments
             TextView showSizeEvent = (TextView)item.ActionView;
             
             showSizeEvent.Click += delegate (object sender, EventArgs e) { ShowSizeEvent_Click(sender, e, showSizeEvent); };
-            base.OnPrepareOptionsMenu(menu);
-        }
+            //set pre saved state of showsizes toggle
+            int colorInt = Context.GetColor(mShowSizes ? Resource.Color.colorAccent : Resource.Color.jepoyGray);
+            Color textColor = new Color(colorInt);
+            showSizeEvent.SetTextColor(textColor);
+            showSizeEvent.SetBackgroundResource(mShowSizes ? 0 : Resource.Drawable.strikethrough_line);
 
-        public void SetShowSizesAppearance()
-        { 
-        
+            base.OnPrepareOptionsMenu(menu);
         }
 
         private void ShowSizeEvent_Click(object sender, EventArgs e, TextView txtShowSize)
         {
             if (mShowSizes)
             {
+                //refresh grid
+                SetGridLayout(mLayoutInflater, mViewGroup, mIsGrid);
+                mRecyclerViewItemsList.Invalidate();
+
                 //put strike to text and color to gray
                 int colorInt = Context.GetColor(Resource.Color.jepoyGray);
                 Color colorGray = new Color(colorInt);
@@ -339,6 +449,10 @@ namespace POS_ANDROID_BACUNA.Fragments
             }
             else
             {
+                //refresh grid
+                SetGridLayout(mLayoutInflater, mViewGroup, mIsGrid);
+                mRecyclerViewItemsList.Invalidate();
+
                 //remove strike, change color to accent color
                 int colorInt = Context.GetColor(Resource.Color.colorAccent);
                 Color colorAccent = new Color(colorInt);
@@ -346,20 +460,6 @@ namespace POS_ANDROID_BACUNA.Fragments
                 txtShowSize.SetBackgroundResource(0);
                 mShowSizes = true;
             }
-        }
-
-        private void onCreateTabLayout(string[] categories)
-        {
-            for (int i = 0; i < categories.Length; i++)
-            {
-                mTabs.AddTab(mTabs.NewTab().SetText(categories[i]));
-            }
-
-            mTabs.TabSelected += (object sender, TabLayout.TabSelectedEventArgs e) =>
-            {
-                var tab = e.Tab;
-                Android.Widget.Toast.MakeText((MainActivity)this.Activity, "Clicked " + tab.Text + " Tab", Android.Widget.ToastLength.Long).Show();
-            };
         }
 
         public class ViewClickListener : Java.Lang.Object, View.IOnTouchListener

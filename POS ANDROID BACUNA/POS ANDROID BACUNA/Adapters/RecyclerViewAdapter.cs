@@ -17,7 +17,7 @@ using POS_ANDROID_BACUNA.Data_Classes;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
-    class RecyclerViewAdapter : RecyclerView.Adapter
+    class CheckoutRecyclerViewAdapter : RecyclerView.Adapter
     {
         RecyclerView mRecyclerView;
         CardView mCardViewRowItem;
@@ -26,21 +26,25 @@ namespace POS_ANDROID_BACUNA.Fragments
         int mGridHeight;
         float mDpVal;
         private List<Product> mProducts;
+        private List<ParentProducts> mParentProducts;
+        bool mShowSizes;
         bool mIsGrid;
         CheckoutFragment mCheckoutFragment;
         Button mBtnCheckoutButton;
         Context mCheckoutContext;
 
-        public RecyclerViewAdapter(float dpVal, int gridHeight, List<Product> products, bool isGrid, RecyclerView recyclerView, Button btnCheckoutButton, Context checkoutContext)
+        public CheckoutRecyclerViewAdapter(float dpVal, int gridHeight, List<Product> products, List<ParentProducts> parentProducts, bool isGrid, RecyclerView recyclerView, Button btnCheckoutButton, Context checkoutContext, bool showSizes)
         {
             mGridHeight = gridHeight;
             mDpVal = dpVal;
             mProducts = products;
+            mParentProducts= parentProducts;
             mIsGrid = isGrid;
             mRecyclerView = recyclerView;
             mCheckoutFragment = new CheckoutFragment();
             mBtnCheckoutButton = btnCheckoutButton;
             mCheckoutContext = checkoutContext;
+            mShowSizes = showSizes;
         }
 
         public class MyViewHolder : RecyclerView.ViewHolder
@@ -115,11 +119,20 @@ namespace POS_ANDROID_BACUNA.Fragments
         public override void OnBindViewHolder(RecyclerView.ViewHolder viewHolder, int position)
         {
             MyViewHolder myHolder = viewHolder as MyViewHolder;
-            myHolder.mMainView.Click -= MMainView_Click;//unsubscibe to avoid multiple firing of clicks
-            myHolder.mMainView.Click += MMainView_Click; //set click event for row
-            myHolder.mProductName.Text = mProducts[position].productName;
-            //condition here to display price based on transaction pricing type
-            myHolder.mProductPrice.Text = "\u20b1 "+String.Format("{0:n}",mProducts[position].productRetailPrice);
+            if (mShowSizes)
+            {
+                myHolder.mMainView.Click -= MMainView_Click;//unsubscibe to avoid multiple firing of clicks
+                myHolder.mMainView.Click += MMainView_Click; //set click event for row
+            }
+            else
+            {
+                myHolder.mMainView.Click -= ParentProduct_Click;//unsubscibe to avoid multiple firing of clicks
+                myHolder.mMainView.Click += ParentProduct_Click; //set click event for row
+            }
+
+            myHolder.mProductName.Text = mShowSizes ? mProducts[position].productName : mParentProducts[position].parentProductName;
+            //condition here to display price based on transaction pricing type 
+            myHolder.mProductPrice.Text = mShowSizes ? "\u20b1 " +String.Format("{0:n}",mProducts[position].productRetailPrice) : "";
             if (mIsGrid)
             {
                 myHolder.mItemBackgroudHolderGrid.SetBackgroundColor(Android.Graphics.Color.ParseColor("#" + (mProducts[position].productColorBg)));
@@ -182,11 +195,16 @@ namespace POS_ANDROID_BACUNA.Fragments
             mCheckoutFragment.SetCheckoutButtonTotal(mBtnCheckoutButton, mCheckoutContext);
         }
 
+        private void ParentProduct_Click(object sender, EventArgs e)
+        {
+
+        }
+
         public override int ItemCount
         {
             get
             {
-                return mProducts.Count;
+                return mShowSizes ? mProducts.Count : mParentProducts.Count;
             }
         }
 
