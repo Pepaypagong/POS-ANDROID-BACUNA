@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -46,16 +46,35 @@
             android:textColor="#808080"
             android:textStyle="bold"/>
     </LinearLayout>
-    
-    <TextView
-        android:id="@+id/txtSubTotal"
+    <LinearLayout
+        android:paddingLeft="5dp"
         android:layout_weight="35"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingLeft="5dp"
-        android:textSize="16sp"
-        android:textAlignment="textEnd"
-        android:text="P 6,900.00"
-        android:textColor="@color/colorLightBlack"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:weightSum="100">
+        <TextView
+            android:id="@+id/txtOrigSubTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:paddingLeft="5dp"
+            android:textSize="16sp"
+            android:textAlignment="textEnd"
+            android:text="P 6,900.00"
+            android:background="@drawable/strikethrough_line_thin"
+            android:textColor="@color/colorLightBlack"
+            android:textStyle="normal" />
+        <TextView
+            android:id="@+id/txtSubTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:textSize="16sp"
+            android:textAlignment="textEnd"
+            android:text="P 6,900.00"
+            android:textColor="@color/colorLightBlack"
+            android:textStyle="bold" />
+    </LinearLayout>
+
 </LinearLayout>

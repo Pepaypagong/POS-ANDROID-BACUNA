@@ -196,6 +196,8 @@ namespace POS_ANDROID_BACUNA.Adapters
             string productQty = _listDataHeader[groupPosition].productCountOnCart.ToString() + " X";
             string productPrice = pesoSign + String.Format("{0:n}",_listDataHeader[groupPosition].productPrice);
             string productSubTotal = pesoSign + String.Format("{0:n}", _listDataHeader[groupPosition].productSubTotalPrice);
+            string productOriginalSubTotal = pesoSign + String.Format("{0:n}", _listDataHeader[groupPosition].productPrice * _listDataHeader[groupPosition].productCountOnCart); 
+            decimal productDiscount = _listDataHeader[groupPosition].productDiscountAmount;
 
             convertView = convertView ?? _context.LayoutInflater.Inflate(Resource.Layout.checkout_fragment_cart_list_item_parent, parent, false);
 
@@ -203,6 +205,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             var txtPrice = (TextView)convertView.FindViewById(Resource.Id.txtItemPrice);
             var txtQty = (TextView)convertView.FindViewById(Resource.Id.txtQty);
             var txtSubTotal = (TextView)convertView.FindViewById(Resource.Id.txtSubTotal);
+            var txtOrigSubTotal = (TextView)convertView.FindViewById(Resource.Id.txtOrigSubTotal);
 
             if (convertView != null)
             {
@@ -218,6 +221,7 @@ namespace POS_ANDROID_BACUNA.Adapters
                     txtItemName.SetTextColor(colorLightBlack);
                     txtPrice.SetTextColor(colorLightBlack);
                     txtSubTotal.SetTextColor(colorLightBlack);
+                    txtOrigSubTotal.SetTextColor(colorLightBlack);
                     txtQty.SetTextColor(colorLightBlack);
                 }
                 else
@@ -233,6 +237,7 @@ namespace POS_ANDROID_BACUNA.Adapters
                         txtItemName.SetTextColor(colorLightBlack);
                         txtPrice.SetTextColor(colorLightBlack);
                         txtSubTotal.SetTextColor(colorLightBlack);
+                        txtOrigSubTotal.SetTextColor(colorLightBlack);
                         txtQty.SetTextColor(colorLightBlack);
                     }
                     else
@@ -246,16 +251,27 @@ namespace POS_ANDROID_BACUNA.Adapters
                         txtItemName.SetTextColor(colorBlurred);
                         txtPrice.SetTextColor(colorBlurred);
                         txtSubTotal.SetTextColor(colorBlurred);
+                        txtOrigSubTotal.SetTextColor(colorBlurred);
                         txtQty.SetTextColor(colorBlurred);
                     }
                     
                 }
             }
 
+            if (productDiscount > 0)
+            {
+                txtOrigSubTotal.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                txtOrigSubTotal.Visibility = ViewStates.Invisible;
+            }
+
             txtItemName.Text = productName;
             txtPrice.Text = productPrice;
             txtQty.Text = productQty;
             txtSubTotal.Text = productSubTotal;
+            txtOrigSubTotal.Text = productOriginalSubTotal;
 
             return convertView;
         }
