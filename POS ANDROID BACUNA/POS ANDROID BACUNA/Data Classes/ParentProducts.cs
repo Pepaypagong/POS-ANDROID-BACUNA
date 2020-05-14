@@ -17,6 +17,7 @@ namespace POS_ANDROID_BACUNA.Data_Classes
         public int parentProductId { get; set; }
         public string parentProductName { get; set; }
         public int categoryId { get; set; }
-        public string categoryName { get; set; } 
+        public string categoryName { get; set; }
+        public string productColorBg { get; set; }
     }
 }

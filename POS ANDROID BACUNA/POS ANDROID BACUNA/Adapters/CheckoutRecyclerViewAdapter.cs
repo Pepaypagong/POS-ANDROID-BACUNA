@@ -14,8 +14,9 @@ using Android.Widget;
 using SupportFragment = Android.Support.V4.App.Fragment;
 using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
 using POS_ANDROID_BACUNA.Data_Classes;
+using POS_ANDROID_BACUNA.Fragments;
 
-namespace POS_ANDROID_BACUNA.Fragments
+namespace POS_ANDROID_BACUNA.Adapters
 {
     class CheckoutRecyclerViewAdapter : RecyclerView.Adapter
     {
@@ -50,6 +51,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         public class MyViewHolder : RecyclerView.ViewHolder
         {
             public View mMainView { get; set; }
+            public TextView mProductId { get; set; }
             public TextView mProductName { get; set; }
             public TextView mProductPrice { get; set; }
             public LinearLayout mItemBackgroudHolderGrid { get; set; }
@@ -78,12 +80,14 @@ namespace POS_ANDROID_BACUNA.Fragments
             }
 
             ImageView imgItemImage = itemView.FindViewById<ImageView>(Resource.Id.imageView);
+            TextView txtProductId = itemView.FindViewById<TextView>(Resource.Id.txtProductId);
             TextView txtProductName = itemView.FindViewById<TextView>(Resource.Id.txtProductName);
             TextView txtProductPrice = itemView.FindViewById<TextView>(Resource.Id.txtProductPrice);
-            
+
 
             MyViewHolder view = new MyViewHolder(itemView)
             {
+                mProductId = txtProductId,
                 mProductName = txtProductName,
                 mProductPrice = txtProductPrice,
                 mItemBackgroudHolderGrid = mllItemHolder,
@@ -130,16 +134,20 @@ namespace POS_ANDROID_BACUNA.Fragments
                 myHolder.mMainView.Click += ParentProduct_Click; //set click event for row
             }
 
+            myHolder.mProductId.Text = mShowSizes ? mProducts[position].productId.ToString(): mParentProducts[position].parentProductId.ToString();
             myHolder.mProductName.Text = mShowSizes ? mProducts[position].productName : mParentProducts[position].parentProductName;
             //condition here to display price based on transaction pricing type 
             myHolder.mProductPrice.Text = mShowSizes ? "\u20b1 " +String.Format("{0:n}",mProducts[position].productRetailPrice) : "";
+
             if (mIsGrid)
             {
-                myHolder.mItemBackgroudHolderGrid.SetBackgroundColor(Android.Graphics.Color.ParseColor("#" + (mProducts[position].productColorBg)));
+                myHolder.mItemBackgroudHolderGrid.SetBackgroundColor
+                    (Android.Graphics.Color.ParseColor("#" + (mShowSizes ? mProducts[position].productColorBg: mParentProducts[position].productColorBg)));
             }
             else
             {
-                myHolder.mItemBackgroudHolderListView.SetCardBackgroundColor(Android.Graphics.Color.ParseColor("#" + (mProducts[position].productColorBg)));
+                myHolder.mItemBackgroudHolderListView.SetCardBackgroundColor
+                    (Android.Graphics.Color.ParseColor("#" + (mShowSizes ? mProducts[position].productColorBg : mParentProducts[position].productColorBg)));
             }
 
             if (mProducts[position].productImage != null)
@@ -197,7 +205,21 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void ParentProduct_Click(object sender, EventArgs e)
         {
+            if (!GlobalVariables.mIsCheckoutFragmentMultiSizeAddOpened)
+            {
+                GlobalVariables.mIsCheckoutFragmentMultiSizeAddOpened = true;
+                int position = mRecyclerView.GetChildAdapterPosition((View)sender);
 
+                TextView prodName = mRecyclerView.FindViewHolderForAdapterPosition(position).ItemView.FindViewById<TextView>(Resource.Id.txtProductName);
+                TextView prodId = mRecyclerView.FindViewHolderForAdapterPosition(position).ItemView.FindViewById<TextView>(Resource.Id.txtProductId);
+
+                GlobalVariables.mCurrentSelectedItemNameMultiSize = prodName.Text;
+                GlobalVariables.mCurrentSelectedItemIdMultiSize = Convert.ToInt32(prodId.Text);
+
+                Intent intent = new Intent(mCheckoutContext, typeof(CheckoutFragmentMultiSizeAdd));
+                intent.AddFlags(ActivityFlags.NoAnimation);
+                ((Activity)mCheckoutContext).StartActivityForResult(intent, 8); //callback not working used global var instead to prevent double click
+            }
         }
 
         public override int ItemCount

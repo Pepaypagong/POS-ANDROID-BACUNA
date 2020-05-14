@@ -18,6 +18,7 @@ using Android.Support.V7.Widget;
 using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Data_Classes;
+using POS_ANDROID_BACUNA.Adapters;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -36,7 +37,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         LayoutInflater mLayoutInflater;
         ViewGroup mViewGroup;
         float mDpVal; //screen density
-        Button mBtnCheckoutButton;
+        public Button mBtnCheckoutButton;
         IMenu mCurrentToolBarMenu = null;
         bool mShowSizes = false;
         string mSelectedProductCategory = "All";
@@ -142,6 +143,10 @@ namespace POS_ANDROID_BACUNA.Fragments
                 //refresh button
                 SetCheckoutButtonTotal(mBtnCheckoutButton, Context);
             }
+        }
+        public void MultiSizeAddActivityResult()
+        { 
+        
         }
 
         private int SetItemListContainerHeight(LinearLayout layout, Android.Support.V7.Widget.Toolbar layoutBelow)
@@ -326,11 +331,13 @@ namespace POS_ANDROID_BACUNA.Fragments
         private List<ParentProducts> PopulateParentProducts() 
         {
             List<ParentProducts> mParentProducts = new List<ParentProducts>();
-            mParentProducts.Add(new ParentProducts() { parentProductId = 1, parentProductName = "Pants Black", categoryName = "Pants" }); //use category id
-            mParentProducts.Add(new ParentProducts() { parentProductId = 2, parentProductName = "Polo Jacket Kat", categoryName = "Polo" });
-            mParentProducts.Add(new ParentProducts() { parentProductId = 3, parentProductName = "Polo Barong", categoryName = "Polo" });
-            mParentProducts.Add(new ParentProducts() { parentProductId = 4, parentProductName = "Baby Collar Kat", categoryName = "Blouse" });
-            mParentProducts.Add(new ParentProducts() { parentProductId = 5, parentProductName = "Marine Collar Kat", categoryName = "Blouse" });
+            mParentProducts.Add(new ParentProducts() { parentProductId = 1, parentProductName = "Pants Black", categoryName = "Pants", productColorBg = "00203e" }); //use category id
+            mParentProducts.Add(new ParentProducts() { parentProductId = 2, parentProductName = "PJ Kat", categoryName = "Polo", productColorBg = "f7cac9" });
+            mParentProducts.Add(new ParentProducts() { parentProductId = 3, parentProductName = "Polo Barong", categoryName = "Polo", productColorBg = "ffdc73" });
+            mParentProducts.Add(new ParentProducts() { parentProductId = 4, parentProductName = "BC Kat", categoryName = "Blouse", productColorBg = "a0db8e" });
+            mParentProducts.Add(new ParentProducts() { parentProductId = 5, parentProductName = "MC Kat", categoryName = "Blouse", productColorBg = "ffc0cb" });
+            mParentProducts.Add(new ParentProducts() { parentProductId = 6, parentProductName = "Pants White", categoryName = "Pants", productColorBg = "dcdcdc" });
+            mParentProducts.Add(new ParentProducts() { parentProductId = 7, parentProductName = "Polo Straight", categoryName = "Polo", productColorBg = "f26052" });
             //filter by product category
             if (mSelectedProductCategory != "All")
             {
@@ -343,31 +350,53 @@ namespace POS_ANDROID_BACUNA.Fragments
         private List<Product> PopulateProductData2(string _productCategory, bool _showSize)
         {
             List<Product> mProducts = new List<Product>();
-            //
 
             //pants
-            mProducts.Add(new Product() { productId = 1, productName = "(24) Pants Black", productCategory = "Pants", productSize = "24", productRetailPrice = 150.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 2, productName = "(S) Pants Black", productCategory = "Pants", productSize = "S", productRetailPrice = 160.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 3, productName = "(M) Pants Black", productCategory = "Pants", productSize = "M", productRetailPrice = 170.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 4, productName = "(L) Pants Black", productCategory = "Pants", productSize = "L", productRetailPrice = 180.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 1, parentProductId = 1, productName = "(XL) Pants Black", productCategory = "Pants", productSize = "XL", productRetailPrice = 180.00M, productColorBg = "00203e" });
+            mProducts.Add(new Product() { productId = 2, parentProductId = 1, productName = "(L) Pants Black", productCategory = "Pants", productSize = "L", productRetailPrice = 180.00M, productColorBg = "00203e" });
+            mProducts.Add(new Product() { productId = 3, parentProductId = 1, productName = "(M) Pants Black", productCategory = "Pants", productSize = "M", productRetailPrice = 180.00M, productColorBg = "00203e" });
+            mProducts.Add(new Product() { productId = 4, parentProductId = 1, productName = "(S) Pants Black", productCategory = "Pants", productSize = "S", productRetailPrice = 180.00M, productColorBg = "00203e" });
+            mProducts.Add(new Product() { productId = 5, parentProductId = 1, productName = "(24) Pants Black", productCategory = "Pants", productSize = "24", productRetailPrice = 150.00M, productColorBg = "00203e" });
+            mProducts.Add(new Product() { productId = 6, parentProductId = 1, productName = "(22) Pants Black", productCategory = "Pants", productSize = "22", productRetailPrice = 150.00M, productColorBg = "00203e" });
+            mProducts.Add(new Product() { productId = 7, parentProductId = 1, productName = "(20) Pants Black", productCategory = "Pants", productSize = "20", productRetailPrice = 150.00M, productColorBg = "00203e" });
+            mProducts.Add(new Product() { productId = 8, parentProductId = 1, productName = "(18) Pants Black", productCategory = "Pants", productSize = "18", productRetailPrice = 150.00M, productColorBg = "00203e" });
             //polo
-            mProducts.Add(new Product() { productId = 5, productName = "(24) Polo Jacket Kat", productCategory = "Polo", productSize = "24", productRetailPrice = 110.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 6, productName = "(S) Polo Jacket Kat", productCategory = "Polo", productSize = "S", productRetailPrice = 120.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 7, productName = "(M) Polo Jacket Kat", productCategory = "Polo", productSize = "M", productRetailPrice = 130.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 8, productName = "(L) Polo Jacket Kat", productCategory = "Polo", productSize = "L", productRetailPrice = 140.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 9, productName = "(24) Polo Barong", productCategory = "Polo", productSize = "24", productRetailPrice = 160.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 10, productName = "(S) Polo Barong", productCategory = "Polo", productSize = "S", productRetailPrice = 170.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 11, productName = "(M) Polo Barong", productCategory = "Polo", productSize = "M", productRetailPrice = 180.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 12, productName = "(L) Polo Barong", productCategory = "Polo", productSize = "L", productRetailPrice = 190.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 9, parentProductId = 2, productName = "(24) Polo Jacket Kat", productCategory = "Polo", productSize = "24", productRetailPrice = 110.00M, productColorBg ="f7cac9" });
+            mProducts.Add(new Product() { productId = 10, parentProductId = 2, productName = "(S) Polo Jacket Kat", productCategory = "Polo", productSize = "S", productRetailPrice = 120.00M, productColorBg = "f7cac9"});
+            mProducts.Add(new Product() { productId = 11, parentProductId = 2, productName = "(M) Polo Jacket Kat", productCategory = "Polo", productSize = "M", productRetailPrice = 130.00M, productColorBg = "f7cac9"});
+            mProducts.Add(new Product() { productId = 12, parentProductId = 2, productName = "(L) Polo Jacket Kat", productCategory = "Polo", productSize = "L", productRetailPrice = 140.00M, productColorBg = "f7cac9"});
+
+            mProducts.Add(new Product() { productId = 13, parentProductId = 3, productName = "(24) Polo Barong", productCategory = "Polo", productSize = "24", productRetailPrice = 160.00M, productColorBg = "ffdc73" });
+            mProducts.Add(new Product() { productId = 14, parentProductId = 3, productName = "(S) Polo Barong", productCategory = "Polo", productSize = "S", productRetailPrice = 170.00M, productColorBg = "ffdc73" });
+            mProducts.Add(new Product() { productId = 15, parentProductId = 3, productName = "(M) Polo Barong", productCategory = "Polo", productSize = "M", productRetailPrice = 180.00M, productColorBg = "ffdc73"});
+            mProducts.Add(new Product() { productId = 16, parentProductId = 3, productName = "(L) Polo Barong", productCategory = "Polo", productSize = "L", productRetailPrice = 190.00M, productColorBg = "ffdc73"});
             //blouse
-            mProducts.Add(new Product() { productId = 13, productName = "(S) Baby Collar Kat", productCategory = "Blouse", productSize = "S", productRetailPrice = 120.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 14, productName = "(M) Baby Collar Kat", productCategory = "Blouse", productSize = "M", productRetailPrice = 130.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 15, productName = "(L) Baby Collar Kat", productCategory = "Blouse", productSize = "L", productRetailPrice = 140.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 16, productName = "(XL) Baby Collar Kat", productCategory = "Blouse", productSize = "XL", productRetailPrice = 150.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 17, productName = "(S) Marine Collar Kat", productCategory = "Blouse", productSize = "S", productRetailPrice = 100.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 18, productName = "(M) Marine Collar Kat", productCategory = "Blouse", productSize = "M", productRetailPrice = 110.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 19, productName = "(L) Marine Collar Kat", productCategory = "Blouse", productSize = "L", productRetailPrice = 120.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
-            mProducts.Add(new Product() { productId = 20, productName = "(XL) Marine Collar Kat", productCategory = "Blouse", productSize = "XL", productRetailPrice = 130.00M, productColorBg = Guid.NewGuid().ToString().Substring(0, 6) });
+            mProducts.Add(new Product() { productId = 17, parentProductId = 4, productName = "(S) Baby Collar Kat", productCategory = "Blouse", productSize = "S", productRetailPrice = 120.00M, productColorBg = "a0db8e"});
+            mProducts.Add(new Product() { productId = 18, parentProductId = 4, productName = "(M) Baby Collar Kat", productCategory = "Blouse", productSize = "M", productRetailPrice = 130.00M, productColorBg = "a0db8e"});
+            mProducts.Add(new Product() { productId = 19, parentProductId = 4, productName = "(L) Baby Collar Kat", productCategory = "Blouse", productSize = "L", productRetailPrice = 140.00M, productColorBg = "a0db8e"});
+            mProducts.Add(new Product() { productId = 20, parentProductId = 4, productName = "(XL) Baby Collar Kat", productCategory = "Blouse", productSize = "XL", productRetailPrice = 150.00M, productColorBg = "a0db8e" });
+
+            mProducts.Add(new Product() { productId = 21, parentProductId = 5, productName = "(S) Marine Collar Kat", productCategory = "Blouse", productSize = "S", productRetailPrice = 100.00M, productColorBg = "ffc0cb" });
+            mProducts.Add(new Product() { productId = 22, parentProductId = 5, productName = "(M) Marine Collar Kat", productCategory = "Blouse", productSize = "M", productRetailPrice = 110.00M, productColorBg = "ffc0cb" });
+            mProducts.Add(new Product() { productId = 23, parentProductId = 5, productName = "(L) Marine Collar Kat", productCategory = "Blouse", productSize = "L", productRetailPrice = 120.00M, productColorBg = "ffc0cb" });
+            mProducts.Add(new Product() { productId = 24, parentProductId = 5, productName = "(XL) Marine Collar Kat", productCategory = "Blouse", productSize = "XL", productRetailPrice = 130.00M, productColorBg = "ffc0cb" });
+
+            mProducts.Add(new Product() { productId = 25, parentProductId = 6, productName = "(XL) Pants White", productCategory = "Pants", productSize = "XL", productRetailPrice = 180.00M, productColorBg = "dcdcdc" });
+            mProducts.Add(new Product() { productId = 26, parentProductId = 6, productName = "(L) Pants White", productCategory = "Pants", productSize = "L", productRetailPrice = 180.00M, productColorBg = "dcdcdc" });
+            mProducts.Add(new Product() { productId = 27, parentProductId = 6, productName = "(M) Pants White", productCategory = "Pants", productSize = "M", productRetailPrice = 180.00M, productColorBg = "dcdcdc" });
+            mProducts.Add(new Product() { productId = 28, parentProductId = 6, productName = "(S) Pants White", productCategory = "Pants", productSize = "S", productRetailPrice = 180.00M, productColorBg = "dcdcdc" });
+            mProducts.Add(new Product() { productId = 29, parentProductId = 6, productName = "(24) Pants White", productCategory = "Pants", productSize = "24", productRetailPrice = 150.00M, productColorBg = "dcdcdc" });
+            mProducts.Add(new Product() { productId = 30, parentProductId = 6, productName = "(22) Pants White", productCategory = "Pants", productSize = "22", productRetailPrice = 150.00M, productColorBg = "dcdcdc" });
+            mProducts.Add(new Product() { productId = 31, parentProductId = 6, productName = "(20) Pants White", productCategory = "Pants", productSize = "20", productRetailPrice = 150.00M, productColorBg = "dcdcdc" });
+            mProducts.Add(new Product() { productId = 32, parentProductId = 6, productName = "(18) Pants White", productCategory = "Pants", productSize = "18", productRetailPrice = 150.00M, productColorBg = "dcdcdc" });
+            //polo
+            mProducts.Add(new Product() { productId = 33, parentProductId = 7, productName = "(20) Polo Straight Kat", productCategory = "Polo", productSize = "20", productRetailPrice = 110.00M, productColorBg = "f26052" });
+            mProducts.Add(new Product() { productId = 34, parentProductId = 7, productName = "(S) Polo Straight Kat", productCategory = "Polo", productSize = "S", productRetailPrice = 120.00M, productColorBg = "f26052" });
+            mProducts.Add(new Product() { productId = 35, parentProductId = 7, productName = "(M) Polo Straight Kat", productCategory = "Polo", productSize = "M", productRetailPrice = 130.00M, productColorBg = "f26052" });
+            mProducts.Add(new Product() { productId = 36, parentProductId = 7, productName = "(L) Polo Straight Kat", productCategory = "Polo", productSize = "L", productRetailPrice = 140.00M, productColorBg = "f26052" });
+            //fill globalproductListHere
+            GlobalVariables.globalProductList.Clear();
+            GlobalVariables.globalProductList = mProducts;
 
             //filter by product category
             if (mSelectedProductCategory != "All")

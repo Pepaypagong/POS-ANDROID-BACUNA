@@ -94,6 +94,9 @@ namespace POS_ANDROID_BACUNA
             trans.Commit();
 
             mCurrentFragment = mCheckoutFragment;
+
+            //pass to global variable the instance of the checkout fragment
+            GlobalVariables.mCheckoutFragmentCurrentInstance = mCheckoutFragment;
         }
 
         private void MDrawerLayout_DrawerOpened(object sender, DrawerLayout.DrawerOpenedEventArgs e)

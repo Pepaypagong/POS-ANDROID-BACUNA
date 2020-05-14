@@ -49,7 +49,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         private void MBtnTestPrint_Click(object sender, EventArgs e)
         {
             PrintText(GlobalVariables.mSelectedDevice, toPrint("20200201","BACUNA RTW","BEELINE BUILDING, BRGY. BACLARAN","PARANAQUE CITY, PHILIPPINES","09174897988", 
-                "JEFFREY BACUNA"," ",
+                "JEFFREY BACUNA", GlobalVariables.mCurrentSelectedCustomerOnCheckout,
                 "Please come again, thank you :)"));
         }
 
@@ -118,18 +118,18 @@ namespace POS_ANDROID_BACUNA.Fragments
                 line //line divider
             };
 
-            List<Product> cartItems = GlobalVariables.globalProductsCart;
+            List<ProductsOnCart> cartItems = GlobalVariables.globalProductsOnCart;
             decimal totalPrice = 0;
 
             //get items from cart
             foreach (var item in cartItems)
             {
-                int itemQty = 12;
-                string size = "S";
-                totalPrice += itemQty * item.productRetailPrice;
+                int itemQty = item.productCountOnCart;
+                string size = item.productSize;
+                totalPrice += itemQty * item.productPrice;
 
-                returnVal.Add("("+size+ ") " + item.productName);
-                returnVal.Add(quantityAndPriceLine(itemQty, item.productRetailPrice, maxPaperWidth));
+                returnVal.Add(item.productName);//returnVal.Add("("+size+") " + item.productName);
+                returnVal.Add(quantityAndPriceLine(itemQty, item.productPrice, maxPaperWidth));
                 if (cartItems.IndexOf(item) < cartItems.Count-1)//last item
                 {
                     returnVal.Add(returnSpaceSmall);
@@ -148,7 +148,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             string retVal = "";
             string totalLabel = "TOTAL:";
-            string pesoSign = "P ";
+            string pesoSign = "P";
 
             int totalLabelLength = totalLabel.Length;
             int totalAmountLength = (pesoSign+String.Format("{0:n}", _totalPrice)).ToString().Length;
@@ -169,7 +169,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         string quantityAndPriceLine(int _qty, decimal _retailPrice, int _maxPaperWidth)
         {
             string retVal = "";
-            string pesoSign = "P ";
+            string pesoSign = "P";
             string qtyAndPrice = (_qty + " pcs * " + String.Format("{0:n}", _retailPrice)).ToString();
             string subTotalPrice = (pesoSign + String.Format("{0:n}", (_retailPrice * _qty))).ToString();
 

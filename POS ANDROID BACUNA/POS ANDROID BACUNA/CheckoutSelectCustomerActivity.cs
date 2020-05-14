@@ -58,9 +58,11 @@ namespace POS_ANDROID_BACUNA
             //populate listview
             mListView = FindViewById<ListView>(Resource.Id.myListView);
             mItems = new List<Customers>();
-            mItems.Add(new Customers() { FirstName = "Jeffrey", LastName = "Bacuña", Age = "24", Gender = "Male" });
-            mItems.Add(new Customers() { FirstName = "Joan", LastName = "Bacuña", Age = "21", Gender = "Female" });
-            mItems.Add(new Customers() { FirstName = "Justine", LastName = "Bacuña", Age = "18", Gender = "Male" });
+            mItems.Add(new Customers() { FirstName = "Jeffrey", LastName = "Bacuna", Age = "24", Gender = "Male" });
+            mItems.Add(new Customers() { FirstName = "Joan", LastName = "Bacuna", Age = "21", Gender = "Female" });
+            mItems.Add(new Customers() { FirstName = "Justine", LastName = "Bacuna", Age = "18", Gender = "Male" });
+            mItems.Add(new Customers() { FirstName = "Melinda", LastName = "Bacuna", Age = "56", Gender = "Female" });
+            mItems.Add(new Customers() { FirstName = "Generoso", LastName = "Bacuna", Age = "55", Gender = "Male" });
 
             CustomersListViewAdapter adapter = new CustomersListViewAdapter(this, mItems);
 

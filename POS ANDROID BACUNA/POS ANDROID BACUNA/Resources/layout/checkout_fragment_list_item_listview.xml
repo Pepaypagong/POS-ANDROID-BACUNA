@@ -63,4 +63,9 @@
         android:text="AAAAAAAAAAAAAAA"
         android:gravity="center"
     />
+        <TextView
+            android:id="@+id/txtProductId"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+        />
 </LinearLayout>

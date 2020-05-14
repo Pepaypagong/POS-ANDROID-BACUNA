@@ -59,6 +59,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             lvCartItemList = FindViewById<ExpandableListView>(Resource.Id.lvCheckoutCartItemList);
             rlCheckoutCartButtonContainer = FindViewById<LinearLayout>(Resource.Id.rlCheckoutCartButtonContainer);
             mBtnCartTotal = FindViewById<Button>(Resource.Id.btnCheckoutCartTotal);
+            mBtnCartTotal.Click += MBtnCartTotal_Click;
             SetCheckoutButtonTotal(mBtnCartTotal,this);
             mBtnClearCart = FindViewById<ImageButton>(Resource.Id.btnCheckoutCartClear);
             mBtnClearCart.Click += MBtnClearCart_Click;
@@ -86,6 +87,33 @@ namespace POS_ANDROID_BACUNA.Fragments
                 //}
                 //lvCartItemList.SetSelection(listAdapter.GroupCount - 1); scroll to bottom but only works on click
             });
+        }
+
+        private void MBtnCartTotal_Click(object sender, EventArgs e)
+        {
+            Android.App.AlertDialog.Builder builder = new Android.App.AlertDialog.Builder(this);
+            Android.App.AlertDialog alert = builder.Create();
+            alert.SetTitle("Confirm Transaction");
+            alert.SetMessage("Print receipt and start a new transaction?");
+
+            alert.SetButton2("CANCEL", (c, ev) =>
+            {
+                //cancel button
+            });
+
+            alert.SetButton("YES", (c, ev) =>
+            {
+                PrintText(GlobalVariables.mSelectedDevice, toPrint("20200201", "BACUNA RTW", "BEELINE BUILDING, BRGY. BACLARAN", "PARANAQUE CITY, PHILIPPINES", "09174897988",
+                "JEFFREY BACUNA", GlobalVariables.mCurrentSelectedCustomerOnCheckout,
+                "Please come again, thank you :)"));
+                GlobalVariables.globalProductsCart.Clear();
+                GlobalVariables.globalProductsOnCart.Clear();
+                GlobalVariables.mIsAllCollapsed = true;
+                Finish();
+            });
+
+            alert.Show();
+            
         }
 
         public int maxNoOfRowsDisplayed()
@@ -244,11 +272,11 @@ namespace POS_ANDROID_BACUNA.Fragments
                     removeActionLayout(item);
                 }
             }
-            else if(requestCode == 5)
+            else if (requestCode == 5)
             {
                 //refresh grid
                 listAdapter.NotifyDataSetChanged();
-                SetCheckoutButtonTotal(mBtnCartTotal,this);
+                SetCheckoutButtonTotal(mBtnCartTotal, this);
                 if (GlobalVariables.mIsFromRemoveItem)
                 {
                     lvCartItemList.CollapseGroup(previousGroup);
@@ -265,7 +293,6 @@ namespace POS_ANDROID_BACUNA.Fragments
                 listAdapter.NotifyDataSetChanged();
                 SetCheckoutButtonTotal(mBtnCartTotal, this);
             }
-
         }
 
         public void removeActionLayout(IMenuItem item)
@@ -359,6 +386,167 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             base.OnPause();
             OverridePendingTransition(0, 0);//removeanimation
+        }
+
+        //PRINT FUNCTIONS
+        public List<string> toPrint(string _transNo, string _storeName, string _storeAddress1,
+            string _storeAddress2, string _storeContactNo, string _cashierName, string _customerName, string footerNote)
+        {
+            int maxPaperWidth = 32;
+            string wideCharsStart = "\u001b!\u0010";
+            string wideCharsEnd = "\u001b!\u0000";
+            string boldStart = "\u001b!\u0008";
+            string boldEnd = "\u001b!\u0000";
+            string returnSpace = "\r\n";
+            string returnSpaceSmall = "";
+            _cashierName = "Cashier:" + boldStart + _cashierName + boldEnd;
+
+            string line = "";
+            for (int i = 0; i < 32; i++)
+            {
+                if (i == 0 | i == 32)
+                {
+                    returnSpaceSmall += "-";
+                }
+                else
+                {
+                    returnSpaceSmall += " ";
+                }
+                line += "-";
+            }
+
+            List<string> returnVal = new List<string>() {
+                boldStart +wideCharsStart+ centeredString(maxPaperWidth, _storeName)+wideCharsEnd + boldEnd, //STORENAME
+                centeredString(maxPaperWidth, _storeAddress1), //STORE ADDRESS 1
+                centeredString(maxPaperWidth, _storeAddress2), //STORE ADDRESS 2
+                centeredString(maxPaperWidth, _storeContactNo),returnSpace, //STORE ADDRESS 2
+                "Transaction #:" + boldStart + _transNo + boldEnd, //trans no
+                "Date:" + boldStart + DateTime.Now.ToString("MMM d, yyyy h:mm tt")  + boldEnd, //date now String.Format("MMM d, yyyy h:mm tt",DateTime.Now)
+                _cashierName, //CASHIER NAME
+                "Customer:" + boldStart + _customerName + boldEnd, //CustomerName
+                line //line divider
+            };
+
+            List<ProductsOnCart> cartItems = GlobalVariables.globalProductsOnCart;
+            decimal totalPrice = 0;
+
+            //get items from cart
+            foreach (var item in cartItems)
+            {
+                int itemQty = item.productCountOnCart;
+                string size = item.productSize;
+                totalPrice += itemQty * item.productPrice;
+
+                returnVal.Add(item.productName);//returnVal.Add("("+size+") " + item.productName);
+                returnVal.Add(quantityAndPriceLine(itemQty, item.productPrice, maxPaperWidth));
+                if (cartItems.IndexOf(item) < cartItems.Count - 1)//last item
+                {
+                    returnVal.Add(returnSpaceSmall);
+                }
+            }
+
+            //Footer
+            returnVal.Add(line);
+            returnVal.Add(TotalLine(totalPrice, wideCharsStart, wideCharsEnd, maxPaperWidth));
+            returnVal.Add(line);
+            returnVal.Add(centeredString(maxPaperWidth, footerNote));
+            return returnVal;
+        }
+
+        string TotalLine(decimal _totalPrice, string _boldStart, string _boldEnd, int _maxPaperWidth)
+        {
+            string retVal = "";
+            string totalLabel = "TOTAL:";
+            string pesoSign = "P";
+
+            int totalLabelLength = totalLabel.Length;
+            int totalAmountLength = (pesoSign + String.Format("{0:n}", _totalPrice)).ToString().Length;
+
+            int spacingCount = _maxPaperWidth - (totalLabelLength + totalAmountLength);
+            string spaceBetween = "";
+
+            for (int i = 0; i < spacingCount; i++)
+            {
+                spaceBetween += " ";
+            }
+
+            retVal = _boldStart + totalLabel + spaceBetween + pesoSign + String.Format("{0:n}", _totalPrice) + _boldEnd;
+
+            return retVal;
+        }
+
+        string quantityAndPriceLine(int _qty, decimal _retailPrice, int _maxPaperWidth)
+        {
+            string retVal = "";
+            string pesoSign = "P";
+            string qtyAndPrice = (_qty + " pcs * " + String.Format("{0:n}", _retailPrice)).ToString();
+            string subTotalPrice = (pesoSign + String.Format("{0:n}", (_retailPrice * _qty))).ToString();
+
+            int qtyAndPriceLength = qtyAndPrice.Length;
+            int subTotalPriceLength = subTotalPrice.Length;
+
+            int spacingCount = _maxPaperWidth - (qtyAndPriceLength + subTotalPriceLength);
+            string spaceBetween = "";
+
+            for (int i = 0; i < spacingCount; i++)
+            {
+                spaceBetween += " ";
+            }
+
+            retVal = qtyAndPrice + spaceBetween + subTotalPrice;
+            return retVal;
+        }
+
+        public string centeredString(int _paperWidth, string _stringToAdjust)
+        {
+            string retVal = _stringToAdjust;
+            int inputLength = _stringToAdjust.Length;
+
+            if (inputLength > _paperWidth)
+            {
+                //do nothing because max input on address line is 32.
+            }
+            else
+            {
+                //compute spacing here
+                int leftSpacingCount = (_paperWidth - inputLength) / 2;
+                string space = "";
+                for (int i = 0; i < leftSpacingCount; i++)
+                {
+                    space += " ";
+                }
+                retVal = space + _stringToAdjust;
+            }
+
+            return retVal;
+        }
+
+        public async void PrintText(BluetoothDevice selectedDevice, List<string> input)
+        {
+            try
+            {
+                BluetoothSocket _socket = selectedDevice.CreateRfcommSocketToServiceRecord(UUID.FromString("00001101-0000-1000-8000-00805f9b34fb"));
+
+                await _socket.ConnectAsync();
+                string footerSpace = "\r\n" + "\r\n" + "\r\n" + "\r\n" + "\r\n";
+
+                for (int i = 0; i < input.Count; i++)
+                {
+                    string toPrint = input[i] + "\r\n";
+                    if (i == input.Count - 1)
+                    {
+                        toPrint = input[i] + footerSpace;
+                    }
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(toPrint);
+                    await _socket.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+                }
+                _socket.Close();
+            }
+            catch (Exception exp)
+            {
+                //BluetoothMessage("Attention", "Please turn on the printer.");
+                //throw exp;
+            }
         }
     }
 }

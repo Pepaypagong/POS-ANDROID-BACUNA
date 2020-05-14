@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapters\CheckoutCartItemListAdapter.cs" />
+    <Compile Include="Adapters\CheckoutMultiAddListRecyclerViewAdapter.cs" />
     <Compile Include="CheckoutSelectCustomerActivity.cs" />
     <Compile Include="Data Classes\Customers.cs" />
     <Compile Include="BluetoothDevicesListViewAdapter.cs" />
@@ -78,7 +79,8 @@
     <Compile Include="DialogMessageService.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartNumpadDiscountActivity.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartNumpadActivity.cs" />
-    <Compile Include="Adapters\RecyclerViewAdapter.cs" />
+    <Compile Include="Adapters\CheckoutRecyclerViewAdapter.cs" />
+    <Compile Include="Fragments\CheckoutFragmentMultiSizeAdd.cs" />
     <Compile Include="Fragments\SettingsFragment.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartActivity.cs" />
     <Compile Include="Fragments\SettingsFragmentPrinterListActivity.cs" />
@@ -433,6 +435,18 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\strikethrough_line_thin.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\checkout_fragment_multi_size_add.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\checkout_fragment_multi_size_add_list_item.xml">
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
       <SubType>Designer</SubType>
     </AndroidResource>
