@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:minHeight="55dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp">
+
+    <LinearLayout
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:weightSum="100">
+        <TextView
+            android:id="@+id/txtSizeName"
+            android:text="3X"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="51"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:gravity="bottom|left"
+        />
+        <TextView
+            android:id="@+id/txtSizeStatus"
+            android:text="not yet added"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="49"
+            android:textSize="12sp"
+            android:gravity="top|left"
+        />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imgArrow"
+        android:src="@drawable/abc_ic_arrow_drop_right_black_24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+    />
+ 
+</RelativeLayout>

@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:minWidth="25dp"
+        android:minHeight="30dp"
+        android:weightSum="100">
+  <TextView
+        android:text="Size"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="7"
+        android:layout_gravity="center_vertical"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:id="@+id/txtSize" />
+  <TextView
+        android:text="Wholesale"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="31"
+        android:layout_gravity="center_vertical"
+        android:textSize="15sp"
+        android:textAlignment="textEnd"
+        android:textStyle="bold"
+        android:id="@+id/txtWholesale" />
+  <TextView
+        android:text="Retail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="31"
+        android:layout_gravity="center_vertical"
+        android:textSize="15sp"
+        android:textAlignment="textEnd"
+        android:textStyle="bold"
+        android:id="@+id/txtRetail" />
+  <TextView
+        android:text="Runner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="31"
+        android:layout_gravity="center_vertical"
+        android:textSize="15sp"
+        android:textAlignment="textEnd"
+        android:textStyle="bold"
+        android:id="@+id/txtRunner" />
+
+</LinearLayout>

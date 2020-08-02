@@ -15,12 +15,14 @@ using Android.Widget;
 using SupportToolbar = Android.Support.V7.Widget.Toolbar;
 using SupportActionBar = Android.Support.V7.App.ActionBar;
 using SupportSearchBar = Android.Support.V7.Widget.SearchView;
+using SupportFragmentTransaction = Android.Support.V4.App.FragmentTransaction;
 using Android.Views.InputMethods;
 using Android.Bluetooth;
 using POS_ANDROID_BACUNA.Data_Classes;
 using Java.Util;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Adapters;
+using System.Linq.Dynamic.Core;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -29,7 +31,7 @@ namespace POS_ANDROID_BACUNA.Fragments
     {
         SupportToolbar mToolBar;
         Button mBtnCartTotal;
-        ImageButton mBtnClearCart;
+        ImageButton mBtnMoreOptions;
         ExpandableListView lvCartItemList;
         LinearLayout rlCheckoutCartButtonContainer;
         float mDpVal;
@@ -41,6 +43,8 @@ namespace POS_ANDROID_BACUNA.Fragments
         List<ProductsOnCart> mListDataHeader;
         Dictionary<string, List<string>> listDataChild;
         int previousGroup = -1;
+
+        bool canscroll = true;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -60,33 +64,32 @@ namespace POS_ANDROID_BACUNA.Fragments
             rlCheckoutCartButtonContainer = FindViewById<LinearLayout>(Resource.Id.rlCheckoutCartButtonContainer);
             mBtnCartTotal = FindViewById<Button>(Resource.Id.btnCheckoutCartTotal);
             mBtnCartTotal.Click += MBtnCartTotal_Click;
-            SetCheckoutButtonTotal(mBtnCartTotal,this);
-            mBtnClearCart = FindViewById<ImageButton>(Resource.Id.btnCheckoutCartClear);
-            mBtnClearCart.Click += MBtnClearCart_Click;
+            SetCheckoutButtonTotal(mBtnCartTotal, this);
+            mBtnMoreOptions = FindViewById<ImageButton>(Resource.Id.btnCheckoutCartClear);
+            mBtnMoreOptions.Click += MBtnMoreOptions_Click;
 
             // Prepare list data
             FnGetListData();
-
-            //Bind list
-            listAdapter = new CheckoutCartItemListAdapter(this, mListDataHeader, listDataChild);
-            lvCartItemList.SetAdapter(listAdapter);
+            FnSetUpListView();
             FnClickEvents();
 
             Window.DecorView.Post(() =>
             {
                 SetRecyclerViewLayoutHeight(lvCartItemList, mToolBar);
-                //scroll to bottom. this causes bugs when item from bottom is clicked when list is long enough to scroll 
-                //android:transcriptMode="alwaysScroll" put to expandable listview
-                //if (listAdapter.GroupCount > maxNoOfRowsDisplayed())
-                //{
-                //    lvCartItemList.StackFromBottom = true;
-                //}
-                //else
-                //{
-                //    lvCartItemList.StackFromBottom = false;
-                //}
-                //lvCartItemList.SetSelection(listAdapter.GroupCount - 1); scroll to bottom but only works on click
             });
+
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            Window.DecorView.PostDelayed(() =>
+            {
+                if (canscroll)
+                {
+                    lvCartItemList.SmoothScrollToPosition(listAdapter.GroupCount);
+                }
+            }, 100);
         }
 
         private void MBtnCartTotal_Click(object sender, EventArgs e)
@@ -113,7 +116,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             });
 
             alert.Show();
-            
+
         }
 
         public int maxNoOfRowsDisplayed()
@@ -125,7 +128,48 @@ namespace POS_ANDROID_BACUNA.Fragments
             return retVal;
         }
 
-        private void MBtnClearCart_Click(object sender, EventArgs e)
+        private void MBtnMoreOptions_Click(object sender, EventArgs e)
+        {
+            ShowMoreOptionsDialogFragment();
+        }
+
+        private void ShowMoreOptionsDialogFragment()
+        {
+            //show dialog here
+            SupportFragmentTransaction transaction = SupportFragmentManager.BeginTransaction();
+            MoreOptionsDialogFragment moreOptionsDialog = new MoreOptionsDialogFragment(this);
+            moreOptionsDialog.SetStyle((int)DialogFragmentStyle.Normal, Resource.Style.Dialog_FullScreen);
+            //moreOptionsDialog.SetStyle(Convert.ToInt32(DialogFragmentStyle.Normal), Resource.Style.Dialog_FullScreen);
+            //pass current selected price type t
+            var args = new Bundle();
+            args.PutString("caller", "CheckoutFragmentCartActivity");
+            moreOptionsDialog.Arguments = args;
+            moreOptionsDialog.Show(transaction, "moreOptionsDialogFragment");
+        }
+
+        public void ShowSortCartItemsBy()
+        {
+            SupportFragmentTransaction transaction = SupportFragmentManager.BeginTransaction();
+            SortCartItemsDialogFragment dialogFrag = new SortCartItemsDialogFragment(this);
+            dialogFrag.Show(transaction, "sortCartItemsDialogFragment");
+        }
+
+        public void FnSetUpListView()
+        {
+            //Bind list
+            listAdapter = new CheckoutCartItemListAdapter(this, mListDataHeader, listDataChild);
+            lvCartItemList.SetAdapter(listAdapter);
+        }
+        public void SortCartItems(string _queryString)
+        {
+            mListDataHeader = GlobalVariables.globalProductsOnCart.AsQueryable()
+                .OrderBy(_queryString).ToList();
+            FnSetUpListView();
+            listAdapter.NotifyDataSetChanged();
+            lvCartItemList.SmoothScrollToPosition(listAdapter.GroupCount);
+        }
+
+        public void ClearCart()
         {
             Android.App.AlertDialog.Builder builder = new Android.App.AlertDialog.Builder(this);
             Android.App.AlertDialog alert = builder.Create();
@@ -184,17 +228,6 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             mListDataHeader = new List<ProductsOnCart>();
             listDataChild = new Dictionary<string, List<string>>();
-
-
-            //var xAnonymousGroupData =
-            //    from product in mListDataHeader
-            //    group product by product.productName into productGroup
-            //    select new
-            //    {
-            //        ProductId = productGroup.Key,
-            //        TotalQty = productGroup.Sum(x => x.productId)
-            //    };
-
             mListDataHeader = GlobalVariables.globalProductsOnCart;
 
             // Adding child data
@@ -261,6 +294,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             base.OnActivityResult(requestCode, resultCode, data);
             if (requestCode == 4)
             {
+                canscroll = false;
                 mDialogShown = false;
                 if (GlobalVariables.mHasSelectedCustomerOnCheckout == true)
                 {
@@ -274,6 +308,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             }
             else if (requestCode == 5)
             {
+                canscroll = false;
                 //refresh grid
                 listAdapter.NotifyDataSetChanged();
                 SetCheckoutButtonTotal(mBtnCartTotal, this);
@@ -289,9 +324,14 @@ namespace POS_ANDROID_BACUNA.Fragments
             }
             else if (requestCode == 6 | requestCode == 7)
             {
+                canscroll = false;
                 //refresh grid
                 listAdapter.NotifyDataSetChanged();
                 SetCheckoutButtonTotal(mBtnCartTotal, this);
+            }
+            else if (requestCode == 20)//add note
+            {
+
             }
         }
 

@@ -50,9 +50,8 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:layout_centerInParent="true"
-            android:src="@drawable/trashcan_icon"
+            android:src="@drawable/more_icon"
             android:layout_marginRight="5dp"
-            android:tint="@android:color/holo_red_light"
             android:background="?android:attr/colorPrimary"
         />
 

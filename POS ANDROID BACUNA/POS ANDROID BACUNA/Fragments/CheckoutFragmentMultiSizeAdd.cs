@@ -220,6 +220,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                 string productName = "";
                 decimal productRetailPrice = 0.00M;
                 int productCategoryId = 1;
+                int parentProductId = 1;
 
                 //get from db here where item id
                 foreach (var item in GlobalVariables.globalProductList)
@@ -229,6 +230,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                         productName = item.productName;
                         productRetailPrice = item.productRetailPrice;
                         productCategoryId = item.productCategoryId;
+                        parentProductId = item.parentProductId;
                     }
                 }
 
@@ -242,7 +244,8 @@ namespace POS_ANDROID_BACUNA.Fragments
                     productCategoryId = productCategoryId,
                     productSubTotalPrice = _itemQty * productRetailPrice,
                     productDiscountAmount = 0.00M,
-                    productDiscountPercentage = 0.00M
+                    productDiscountPercentage = 0.00M,
+                    parentProductId = parentProductId
                 });
             }
         }
@@ -386,6 +389,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         protected override void OnPause()
         {
+            GlobalVariables.mIsCheckoutFragmentMultiSizeAddOpened = false;
             base.OnPause();
             OverridePendingTransition(0, 0);//removeanimation
         }

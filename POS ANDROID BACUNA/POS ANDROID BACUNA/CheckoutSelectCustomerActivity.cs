@@ -29,6 +29,7 @@ namespace POS_ANDROID_BACUNA
         private List<Customers> mItems;
         private ListView mListView;
         private SupportSearchBar searchBar;
+        private SupportToolbar toolBar;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -36,39 +37,69 @@ namespace POS_ANDROID_BACUNA
 
             SetContentView(Resource.Layout.checkout_select_customer);
 
-            var toolBar = FindViewById<SupportToolbar>(Resource.Id.toolBar);
-            SetSupportActionBar(toolBar);
+            FnSetUpControls();
+            FnSetUpToolbar();
+            FnSetUpEvents();
+            FnPopulateCustomers("");
 
+            //SearchBar
+            searchBar.OnActionViewExpanded(); //show edit mode of searchview
+            searchBar.ClearFocus(); //clear focus and hide keyboard
+        }
+
+        private void FnSetUpEvents()
+        {
+            mBtnSelectCustomer.Click += MBtnSelectCustomer_Click;
+            mListView.ItemClick += MListView_ItemClick;
+            searchBar.Click += delegate (object sender, EventArgs e) { SearchBar_Click(sender, e, searchBar); };
+            searchBar.QueryTextChange += SearchBar_QueryTextChange;
+        }
+
+        private void SearchBar_QueryTextChange(object sender, SupportSearchBar.QueryTextChangeEventArgs e)
+        {
+            string queryString = e.NewText.ToLower().Trim();
+            FnPopulateCustomers(queryString);
+            mListView.Invalidate();
+        }
+
+        private void FnSetUpToolbar()
+        {
+            SetSupportActionBar(toolBar);
             SupportActionBar ab = SupportActionBar;
             //ab.SetHomeAsUpIndicator(Resource.Drawable.left_icon_thin);
             ab.SetDisplayShowHomeEnabled(true);
             ab.SetDisplayHomeAsUpEnabled(true);
             ab.SetTitle(Resource.String.select_customer);
+        }
 
-            //SearchBar
+        private void FnSetUpControls()
+        {
+            toolBar = FindViewById<SupportToolbar>(Resource.Id.toolBar);
+            mBtnSelectCustomer = FindViewById<Button>(Resource.Id.btnSelectCustomer);
+            mListView = FindViewById<ListView>(Resource.Id.lvCustomers);
             searchBar = FindViewById<SupportSearchBar>(Resource.Id.searchBar);
             searchBar.QueryHint = "Search customers";
-            searchBar.Click += delegate (object sender, EventArgs e) { SearchBar_Click(sender, e, searchBar); };
-            searchBar.OnActionViewExpanded(); //show edit mode of searchview
-            searchBar.ClearFocus(); //clear focus and hide keyboard
+        }
 
-            mBtnSelectCustomer = FindViewById<Button>(Resource.Id.btnSelectCustomer);
-            mBtnSelectCustomer.Click += MBtnSelectCustomer_Click;
-
-            //populate listview
-            mListView = FindViewById<ListView>(Resource.Id.myListView);
+        private void FnPopulateCustomers(string _queryString)
+        {
             mItems = new List<Customers>();
-            mItems.Add(new Customers() { FirstName = "Jeffrey", LastName = "Bacuna", Age = "24", Gender = "Male" });
-            mItems.Add(new Customers() { FirstName = "Joan", LastName = "Bacuna", Age = "21", Gender = "Female" });
-            mItems.Add(new Customers() { FirstName = "Justine", LastName = "Bacuna", Age = "18", Gender = "Male" });
-            mItems.Add(new Customers() { FirstName = "Melinda", LastName = "Bacuna", Age = "56", Gender = "Female" });
-            mItems.Add(new Customers() { FirstName = "Generoso", LastName = "Bacuna", Age = "55", Gender = "Male" });
+            mItems.Add(new Customers() { FullName = "Jeffrey Bacuna", FirstName = "Jeffrey", LastName = "Bacuna", Age = "24", Gender = "Male" });
+            mItems.Add(new Customers() { FullName = "Joan Bacuna", FirstName = "Joan", LastName = "Bacuna", Age = "21", Gender = "Female" });
+            mItems.Add(new Customers() { FullName = "Justine Bacuna", FirstName = "Justine", LastName = "Bacuna", Age = "18", Gender = "Male" });
+            mItems.Add(new Customers() { FullName = "Melinda Bacuna", FirstName = "Melinda", LastName = "Bacuna", Age = "56", Gender = "Female" });
+            mItems.Add(new Customers() { FullName = "Generoso Bacuna", FirstName = "Generoso", LastName = "Bacuna", Age = "55", Gender = "Male" });
 
+            GlobalVariables.globalCustomersList = mItems;
+
+            if (_queryString != "")
+            {
+                mItems = mItems
+                    .Where(x => x.FullName.ToLower().Contains(_queryString))
+                    .ToList();
+            }
             CustomersListViewAdapter adapter = new CustomersListViewAdapter(this, mItems);
-
             mListView.Adapter = adapter;
-
-            mListView.ItemClick += MListView_ItemClick;
         }
 
         private void SearchBar_Click(object sender, EventArgs e, SupportSearchBar s)
@@ -85,13 +116,6 @@ namespace POS_ANDROID_BACUNA
             searchBar.ClearFocus();
 
             return base.OnTouchEvent(e);
-        }
-
-        //unused because clearFocus already closes the keyboard
-        void closeKeyBoard()
-        {
-            InputMethodManager imm = (InputMethodManager)GetSystemService(Context.InputMethodService);
-            imm.HideSoftInputFromWindow(searchBar.WindowToken, 0);
         }
 
         private void MListView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
@@ -125,14 +149,18 @@ namespace POS_ANDROID_BACUNA
                 case Android.Resource.Id.Home:
                     Finish();
                     return true;
+                case Resource.Id.add_new_item:
+                    //add customer
+                    return true;
                 default:
                     return base.OnOptionsItemSelected(item);
             }
         }
 
-        protected override void OnDestroy()
+        public override bool OnCreateOptionsMenu(IMenu menu)
         {
-            base.OnDestroy();
+            MenuInflater.Inflate(Resource.Menu.toolbar_menu_products_categories_search, menu);
+            return base.OnCreateOptionsMenu(menu);
         }
 
     }

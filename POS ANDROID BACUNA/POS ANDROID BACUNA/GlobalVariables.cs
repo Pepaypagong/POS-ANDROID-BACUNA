@@ -20,6 +20,11 @@ namespace POS_ANDROID_BACUNA.Data_Classes
         public static List<Product> globalProductsCart = new List<Product>();
         public static List<ProductsOnCart> globalProductsOnCart = new List<ProductsOnCart>();
         public static List<Product> globalProductList = new List<Product>();
+        public static List<ParentProducts> globalParentProductList = new List<ParentProducts>(); //temporary placeholder
+        public static List<ProductCategories> globalProductCategoryList = new List<ProductCategories>();
+        public static List<Customers> globalCustomersList = new List<Customers>();
+        public static List<Options> globalOptionList = new List<Options>();
+        public static List<OrderFields> globalSortingFieldList = new List<OrderFields>(); //sorting cart items
 
         public static SupportFragment mCheckoutFragmentCurrentInstance;
 
@@ -43,5 +48,14 @@ namespace POS_ANDROID_BACUNA.Data_Classes
         public static bool mIsFromRemoveItem; //flag for collapsing cart list on activity result
 
         public static bool mIsCashDiscountSelected = true; //for text watcher of discount on text changed;
+
+        public static bool mIsCreateProductSizeClicked = false;
+        public static List<NewProduct> newProductSizesList = new List<NewProduct>(); //temporary placeholder
+        public static List<ParentProductCopyHolder> parentProductCopyHolder = new List<ParentProductCopyHolder>();
+        public static List<NewProductCopyHolder> newProductCopyHolder = new List<NewProductCopyHolder>();
+
+        public static bool mIsProductsFragmentEditItemOpened = false; //prevent double click on ProductsFragmentItemEditItem
+
+        public static List<int> productsToDeleteOnEditMode = new List<int>(); //list of product size id deleted from newProductSizeList
     }
 }

@@ -12,12 +12,15 @@ using Android.Widget;
 
 namespace POS_ANDROID_BACUNA.Data_Classes
 {
-    class ParentProducts
+    public class ParentProducts
     {
         public int parentProductId { get; set; }
         public string parentProductName { get; set; }
         public int categoryId { get; set; }
         public string categoryName { get; set; }
         public string productColorBg { get; set; }
+        public System.Drawing.Image productImage { get; set; }
+        public string productAlias { get; set; }
+        public string productDescription { get; set; }
     }
 }

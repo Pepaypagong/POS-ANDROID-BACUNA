@@ -1,0 +1,23 @@
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar 
+        android:id="@+id/toolbarSearchCategories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F8F8F8">
+    </android.support.v7.widget.Toolbar>
+
+    <TextView
+        android:clickable="true"
+        android:focusableInTouchMode="true"
+        android:layout_centerInParent="true"
+        android:text="CATEGORIES FRAG"
+        android:textSize="30sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

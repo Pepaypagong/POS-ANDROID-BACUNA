@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-    <Button
-        android:id="@+id/BtnTest"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Test"
-        android:layout_marginTop="50dp"/>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <TextView
+        android:layout_above="@id/viewDivider"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:text="Customers"
+        android:textSize="50sp"
+        fontPath="fonts/Roboto-BoldItalic.ttf"
+    />
+    <View
+        android:id="@+id/viewDivider"
+        android:layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"/>
+    <TextView
+        android:layout_below="@id/viewDivider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Fragment"
         android:textSize="50sp"
         fontPath="fonts/Roboto-BoldItalic.ttf"
     />

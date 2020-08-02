@@ -41,7 +41,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         GridLayout mGridNumpad;
         string mPesoSign = "\u20b1";
 
-        int changeQtyMaxLength = 7;
+        int changeQtyMaxLength = 4;
         int changePriceMaxLength = 14;
 
         bool isInitialPriceChange = true;

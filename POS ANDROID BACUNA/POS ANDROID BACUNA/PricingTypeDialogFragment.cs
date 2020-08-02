@@ -35,8 +35,13 @@ namespace POS_ANDROID_BACUNA
             mRadioWholesale = view.FindViewById<RadioButton>(Resource.Id.radioWholesale);
             mRadioRunner = view.FindViewById<RadioButton>(Resource.Id.radioRunner);
 
+            mRadioRetail.Text = "RT - Retail";
+            mRadioWholesale.Text = "WS - Wholesale";
+            mRadioRunner.Text = "RUNR - Runner";
+
             mCloseButton = view.FindViewById<ImageButton>(Resource.Id.btnPricingTypeClose);
             mSaveButton = view.FindViewById<Button>(Resource.Id.btnPricingTypeSave);
+            mSaveButton.Text = "SELECT";
             mCloseButton.Click += MCloseButton_Click;
 
             mPricingTypeRadioGrp = view.FindViewById<RadioGroup>(Resource.Id.radioGrpPricingType);
@@ -47,7 +52,7 @@ namespace POS_ANDROID_BACUNA
                 mCheckedRadioButton = view.FindViewById<RadioButton>(mPricingTypeRadioGrp.CheckedRadioButtonId);
 
                 //set text on main act
-                ((MainActivity)this.Activity).SetToolBarMenuTextFromFragment(mCheckedRadioButton.Text);
+                ((MainActivity)this.Activity).SetToolBarMenuTextFromFragment(SelectedPrice(mCheckedRadioButton.Text));
                 this.Dismiss();
             };
 
@@ -57,20 +62,40 @@ namespace POS_ANDROID_BACUNA
             return view;
         }
 
+        private string SelectedPrice(string _radioText)
+        {
+            string retval = "X";
+
+            if (_radioText == "RT - Retail")
+            {
+                retval = "RT";
+            }
+            else if (_radioText == "WS - Wholesale")
+            {
+                retval = "WS";
+            }
+            else if (_radioText == "RUNR - Runner")
+            {
+                retval = "RUNR";
+            }
+
+            return retval;
+        }
+
         private void setCurrentCheckedPricingType(string currentSelectedPriceType)
         {
             //set current selected pricing type
-            if (currentSelectedPriceType == mRadioRetail.Text)
+            if (currentSelectedPriceType == "RT")
             {
                 //set checked to retail
                 mPricingTypeRadioGrp.Check(Resource.Id.radioRetail);
             }
-            else if (currentSelectedPriceType == mRadioWholesale.Text)
+            else if (currentSelectedPriceType == "WS")
             {
                 //set checked to wholesale
                 mPricingTypeRadioGrp.Check(Resource.Id.radioWholesale);
             }
-            else if (currentSelectedPriceType == mRadioRunner.Text)
+            else if (currentSelectedPriceType == "RUNR")
             {
                 //set  checked to runner
                 mPricingTypeRadioGrp.Check(Resource.Id.radioRunner);

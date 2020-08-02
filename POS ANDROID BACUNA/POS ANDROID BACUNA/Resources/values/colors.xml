@@ -10,4 +10,8 @@
     <color name="colorLightBlack">#4F5662</color>
     <color name="colorBlurred">#B0B5BE</color>
     <color name="colorBlurredBackground">#FAFAFA</color>
+    <color name="colorBlurredBackground2">#F7F7F7</color>
+    <color name="colorTextDisabled">#737373</color>
+    <color name="colorTextEnabled">#000000</color>
+    <color name="lightGray">#e8e9ea</color>
 </resources>

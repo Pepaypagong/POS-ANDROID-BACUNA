@@ -1,0 +1,74 @@
+﻿
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        app:popupTheme="@style/AppTheme"
+        app:itemIconTint="?attr/colorPrimaryDark"
+    />
+
+    <RelativeLayout
+        android:id="@+id/rlContents"
+        android:layout_below="@id/toolbarTitle"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <EditText
+            android:id="@+id/etCategory"
+            android:textSize="25sp"
+            android:maxLength="20"
+            android:layout_centerVertical="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/txtMaxCharLabel"
+            android:textSize="16sp"
+            android:textColor="@color/colorBlurred"
+            android:text="Max. 20 characters"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/etCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/llCreateProductButtonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/btnCreateProduct"
+            android:layout_width="match_parent"
+            android:minHeight="50dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/buttoncheckoutroundbordernoitem"
+            android:text="SAVE"
+            android:textColor="?android:attr/colorAccent"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_gravity="center_horizontal"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:layout_centerInParent="true"
+        />
+    </LinearLayout>
+
+</RelativeLayout>

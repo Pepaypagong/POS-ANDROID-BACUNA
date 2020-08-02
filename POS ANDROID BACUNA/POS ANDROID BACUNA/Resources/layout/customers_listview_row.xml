@@ -1,41 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:minWidth="25px"
-    android:minHeight="25px"
+    android:layout_height="wrap_content"
+    android:minWidth="50dp"
+    android:minHeight="30dp"
     android:paddingLeft="5dp"
-    android:paddingTop="2dp"
-    android:paddingBottom="2dp"
-    android:weightSum="100">
-  <TextView
-      android:text="First Name"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_weight="25"
-      android:textSize="17sp"
-      android:id="@+id/txtFirstName" />
-  <TextView
-      android:text="Last Name"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_weight="25"
-        android:textSize="17sp"
-      android:id="@+id/txtLastName" />
-  <TextView
-      android:text="Age"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_weight="25"
-        android:textSize="17sp"
-      android:id="@+id/txtAge" />
-  <TextView
-      android:text="Gender"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_weight="25"
-        android:textSize="17sp"
-      android:id="@+id/txtGender" />
-
-</LinearLayout>
+    android:paddingRight="5dp"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp">
+    <TextView
+        android:id="@+id/txtCustomerName"
+        android:textSize="16sp"
+        android:textColor="@color/colorTextEnabled"
+        android:textStyle="bold"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="2dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/txtAvgPurchaseAmt"
+        android:text="Hasn't made a purchase"
+        android:textColor="@color/colorTextDisabled"
+        android:textSize="14sp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/txtCustomerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/txtSalesCount"
+        android:text="3 sales"
+        android:textColor="@color/colorTextDisabled"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textAlignment="textEnd"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <ImageView
+        android:id="@+id/imgLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/txtSalesCount"
+        android:src="@drawable/abc_ic_arrow_drop_right_black_24dp"/>
+</RelativeLayout>

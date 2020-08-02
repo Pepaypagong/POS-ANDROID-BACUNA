@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:id="@+id/rlTitle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorLightBlack"
+        android:layout_marginBottom="2dp">
+        <TextView 
+            android:id="@+id/txtTitle"
+            android:layout_centerVertical="true"
+            android:textSize="18sp"
+            android:textColor="#ffffff"
+            android:textStyle="normal"
+            android:layout_marginLeft="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="More options"/>
+        <ImageButton
+            android:id="@+id/imgClose"
+            android:backgroundTint="@color/mtrl_btn_transparent_bg_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+    </RelativeLayout>
+    <ListView
+        android:id="@+id/lvOptions"
+        android:minHeight="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp"
+        android:layout_below="@id/rlTitle"
+    />
+</RelativeLayout>

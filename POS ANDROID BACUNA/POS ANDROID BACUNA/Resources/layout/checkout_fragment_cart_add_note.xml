@@ -1,0 +1,83 @@
+﻿
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        app:popupTheme="@style/AppThemeRedMenuColor"
+        android:theme="@style/AppThemeRedMenuColor"
+        app:itemIconTint="?attr/colorPrimaryDark"
+    />
+
+    <RelativeLayout
+        android:id="@+id/rlContents"
+        android:layout_below="@id/toolbarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <EditText
+            android:id="@+id/etDescription"
+            android:hint="Description"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_below="@id/toolbarTitle"
+            android:textSize="18sp"
+            android:backgroundTint="@color/transparent"
+            android:textAlignment="textStart"
+            android:gravity="top"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </RelativeLayout>
+    
+    <LinearLayout
+        android:id="@+id/llSaveButtonContainer"
+        android:orientation="vertical"
+        android:background="@color/colorBlurredBackground2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:layout_alignParentBottom="true">
+        <View
+            android:layout_height="1dp"
+            android:layout_width="match_parent"
+            android:background="@color/lightGray"
+        />
+        <CheckBox
+            android:id="@+id/cnShowNoteOnReceipt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show note on the receipt"
+            android:textSize="16sp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="15dp"
+        />
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:minHeight="50dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/buttonCheckoutRoundBorderWithItem"
+            android:text="SAVE"
+            android:textColor="?android:attr/colorPrimary"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_gravity="center_horizontal"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:layout_centerInParent="true"
+        />
+    </LinearLayout>
+
+</RelativeLayout>

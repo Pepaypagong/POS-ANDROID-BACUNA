@@ -36,7 +36,7 @@ namespace POS_ANDROID_BACUNA
         private SettingsFragment mSettingsFragment;
         private Stack<SupportFragment> mStackFragment;
         private IMenu mCurrentToolBarMenu;
-        private string mCurrentSelectedPriceType = "Retail";
+        private string mCurrentSelectedPriceType = "RT";
         static bool mDialogShown = false;  // flag for stopping double click
 
         protected override void AttachBaseContext(Context @base)
@@ -97,6 +97,60 @@ namespace POS_ANDROID_BACUNA
 
             //pass to global variable the instance of the checkout fragment
             GlobalVariables.mCheckoutFragmentCurrentInstance = mCheckoutFragment;
+            CreateOptions();
+        }
+
+        private void CreateOptions()
+        {
+            GlobalVariables.globalOptionList
+                .Add(new Options() { 
+                    OptionId = 1, 
+                    OptionText = "Add note", 
+                    TextColorResourceId = Resource.Color.colorLightBlack, 
+                    ShowArrow = true,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Modify",
+                    TargetActivity = "CheckoutFragmentCartAddNoteActivity",
+                    RequestCode = 19,
+                    IsDialog = false
+                });
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 2,
+                    OptionText = "Add Discount",
+                    TextColorResourceId = Resource.Color.colorLightBlack,
+                    ShowArrow = true,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Modify",
+                    TargetActivity = "CheckoutFragmentCartNumpadDiscountActivity",
+                    RequestCode = 20,
+                    IsDialog = false
+                });
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 3,
+                    OptionText = "Sort cart items",
+                    TextColorResourceId = Resource.Color.colorLightBlack,
+                    ShowArrow = true,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Modify",
+                    TargetActivity = "CheckoutFragmentCartAddNoteActivity",
+                    RequestCode = 21,
+                    IsDialog = true
+                });
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 4,
+                    OptionText = "Clear cart",
+                    TextColorResourceId = Resource.Color.colorRed,
+                    ShowArrow = false,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Delete",
+                    IsDialog = false
+                });
         }
 
         private void MDrawerLayout_DrawerOpened(object sender, DrawerLayout.DrawerOpenedEventArgs e)
@@ -121,7 +175,7 @@ namespace POS_ANDROID_BACUNA
                         break;
                     case (Resource.Id.nav_products):
                         ShowFragment(mProductsFragment);
-                        ab.SetTitle(Resource.String.products_title);
+                        ab.Title = "PRODUCTS (" + GlobalVariables.globalProductList.Count.ToString() + ")";
                         break;
                     case (Resource.Id.nav_customers):
                         ShowFragment(mCustomersFragment);
@@ -341,5 +395,12 @@ namespace POS_ANDROID_BACUNA
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+
+        public void SetProductCountTitle()
+        {
+            SupportActionBar supportActionBar = SupportActionBar;
+            supportActionBar.Title = "PRODUCTS (" + GlobalVariables.globalProductList.Count.ToString() + ")";
+        }
+
     }
 }

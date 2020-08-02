@@ -16,6 +16,9 @@ namespace POS_ANDROID_BACUNA
     {
         private List<Customers> mItems;
         private Context mContext;
+        private TextView mTxtCustomerName;
+        private TextView mTxtAvgPurchaseAmt;
+        private TextView mTxtSalesCount;
 
         public CustomersListViewAdapter(Context context, List<Customers> items)
         {
@@ -45,19 +48,20 @@ namespace POS_ANDROID_BACUNA
                 row = LayoutInflater.From(mContext).Inflate(Resource.Layout.customers_listview_row, null, false);
             }
 
-            TextView txtFirstName = row.FindViewById<TextView>(Resource.Id.txtFirstName);
-            txtFirstName.Text = mItems[position].FirstName;
+            FnSetControls(row);
 
-            TextView txtLastName = row.FindViewById<TextView>(Resource.Id.txtLastName);
-            txtLastName.Text = mItems[position].LastName;
-
-            TextView txtAge = row.FindViewById<TextView>(Resource.Id.txtAge);
-            txtAge.Text = mItems[position].Age;
-
-            TextView txtGender = row.FindViewById<TextView>(Resource.Id.txtGender);
-            txtGender.Text = mItems[position].Gender;
+            mTxtCustomerName.Text = mItems[position].FirstName + " " + mItems[position].LastName;
+            mTxtAvgPurchaseAmt.Text = "Hasn't made a purchase";
+            mTxtSalesCount.Text = "3 Sales";
 
             return row;
+        }
+
+        private void FnSetControls(View _view)
+        {
+            mTxtCustomerName = _view.FindViewById<TextView>(Resource.Id.txtCustomerName);
+            mTxtAvgPurchaseAmt = _view.FindViewById<TextView>(Resource.Id.txtAvgPurchaseAmt);
+            mTxtSalesCount = _view.FindViewById<TextView>(Resource.Id.txtSalesCount);
         }
     }
 }

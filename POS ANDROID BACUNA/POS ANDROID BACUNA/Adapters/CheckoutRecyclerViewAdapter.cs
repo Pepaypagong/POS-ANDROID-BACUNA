@@ -20,6 +20,7 @@ namespace POS_ANDROID_BACUNA.Adapters
 {
     class CheckoutRecyclerViewAdapter : RecyclerView.Adapter
     {
+        private SupportFragment mSupportFragment;
         RecyclerView mRecyclerView;
         CardView mCardViewRowItem;
         CardView mCardViewItemHolder;
@@ -34,7 +35,9 @@ namespace POS_ANDROID_BACUNA.Adapters
         Button mBtnCheckoutButton;
         Context mCheckoutContext;
 
-        public CheckoutRecyclerViewAdapter(float dpVal, int gridHeight, List<Product> products, List<ParentProducts> parentProducts, bool isGrid, RecyclerView recyclerView, Button btnCheckoutButton, Context checkoutContext, bool showSizes)
+        public CheckoutRecyclerViewAdapter(float dpVal, int gridHeight, List<Product> products,
+            List<ParentProducts> parentProducts, bool isGrid, RecyclerView recyclerView, 
+            Button btnCheckoutButton, Context checkoutContext, bool showSizes, SupportFragment supportFragment)
         {
             mGridHeight = gridHeight;
             mDpVal = dpVal;
@@ -46,6 +49,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             mBtnCheckoutButton = btnCheckoutButton;
             mCheckoutContext = checkoutContext;
             mShowSizes = showSizes;
+            mSupportFragment = supportFragment;
         }
 
         public class MyViewHolder : RecyclerView.ViewHolder
@@ -57,7 +61,9 @@ namespace POS_ANDROID_BACUNA.Adapters
             public LinearLayout mItemBackgroudHolderGrid { get; set; }
             public CardView mItemBackgroudHolderListView { get; set; }
             public ImageView mItemImage { get; set; }
-
+            public TextView mItemAlias { get; set; }
+            public TextView mQtyOncart { get; set; }
+            public FrameLayout mAliasContainer { get; set; }
             public MyViewHolder(View view) : base(view)
             {
                 mMainView = view;
@@ -80,9 +86,12 @@ namespace POS_ANDROID_BACUNA.Adapters
             }
 
             ImageView imgItemImage = itemView.FindViewById<ImageView>(Resource.Id.imageView);
+            TextView txtProductAlias = itemView.FindViewById<TextView>(Resource.Id.txtItemAlias);
             TextView txtProductId = itemView.FindViewById<TextView>(Resource.Id.txtProductId);
             TextView txtProductName = itemView.FindViewById<TextView>(Resource.Id.txtProductName);
             TextView txtProductPrice = itemView.FindViewById<TextView>(Resource.Id.txtProductPrice);
+            TextView txtQtyOnCart = itemView.FindViewById<TextView>(Resource.Id.txtQtyOncart);
+            FrameLayout flAliasContainer = itemView.FindViewById<FrameLayout>(Resource.Id.flAliasContainer);
 
 
             MyViewHolder view = new MyViewHolder(itemView)
@@ -92,7 +101,10 @@ namespace POS_ANDROID_BACUNA.Adapters
                 mProductPrice = txtProductPrice,
                 mItemBackgroudHolderGrid = mllItemHolder,
                 mItemBackgroudHolderListView = mCardViewItemHolder,
-                mItemImage = imgItemImage
+                mItemImage = imgItemImage,
+                mItemAlias = txtProductAlias,
+                mQtyOncart = txtQtyOnCart,
+                mAliasContainer = flAliasContainer
             };
 
             int _topMargin = DpToPixel(2);
@@ -154,6 +166,73 @@ namespace POS_ANDROID_BACUNA.Adapters
             {
                 //set item image here
             }
+
+            myHolder.mItemAlias.Text = mShowSizes ? mProducts[position].productAlias : mParentProducts[position].productAlias;
+
+            int qtyOnCart = 0;
+            if (mShowSizes)
+            {
+                qtyOnCart = GlobalVariables.globalProductsOnCart
+                    .Where(x => x.productId == mProducts[position].productId)
+                    .Sum(x => x.productCountOnCart);
+            }
+            else
+            {
+                qtyOnCart = GlobalVariables.globalProductsOnCart
+                    .Where(x => x.parentProductId == mParentProducts[position].parentProductId)
+                    .Sum(x => x.productCountOnCart);
+            }
+
+            //show qty on cart on view
+            if (mIsGrid)
+            {
+                ShowCurrentQuantityOnCartGridOnBind(myHolder.mQtyOncart, myHolder.mAliasContainer,qtyOnCart);
+            }
+            else
+            {
+                ShowCurrentQuantityOnCartListOnBind(myHolder.mProductName, myHolder.mQtyOncart, qtyOnCart);
+            }
+        }
+
+        private void ShowCurrentQuantityOnCartListOnBind(TextView _mProductName, TextView _mQtyOncart, int _qtyOnCart)
+        {
+            if (_qtyOnCart > 0)
+            {
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MatchParent, 0, 50f);
+                _mProductName.Gravity = GravityFlags.Bottom;
+                _mProductName.LayoutParameters = layoutParams;
+                _mQtyOncart.LayoutParameters = layoutParams;
+                _mQtyOncart.Text = "on cart " + _qtyOnCart.ToString();
+            }
+            else
+            {
+                LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MatchParent, 0, 100f);
+                LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MatchParent, 0, 0f);
+
+                _mProductName.Gravity = GravityFlags.Center;
+                _mProductName.LayoutParameters = layoutParams1;
+                _mQtyOncart.LayoutParameters = layoutParams2;
+                _mQtyOncart.Text = "on cart " + _qtyOnCart.ToString();
+            }
+        }
+
+        private void ShowCurrentQuantityOnCartGridOnBind(TextView _mQtyOncart, FrameLayout _mAliasContainer, int _qtyOnCart)
+        {
+            if (_qtyOnCart > 0)
+            {
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MatchParent, 0, 16f);
+                _mQtyOncart.LayoutParameters = layoutParams;
+                _mQtyOncart.Text = "on cart " + _qtyOnCart.ToString() + " ";
+                LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MatchParent, 0, 50f);
+                _mAliasContainer.LayoutParameters = layoutParams2;
+            }
+            else
+            {
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MatchParent, 0, 0f);
+                _mQtyOncart.LayoutParameters = layoutParams;
+                LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MatchParent, 0, 66f);
+                _mAliasContainer.LayoutParameters = layoutParams2;
+            }
         }
 
         private void MMainView_Click(object sender, EventArgs e)
@@ -196,11 +275,52 @@ namespace POS_ANDROID_BACUNA.Adapters
                     productCategoryId = 1,
                     productSubTotalPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
                     productDiscountAmount = 0.00M,
-                    productDiscountPercentage = 0.00M
-                }); 
+                    productDiscountPercentage = 0.00M,
+                    parentProductId = mProducts[position].parentProductId
+                });
             }
             //update checkoutbutton.
             mCheckoutFragment.SetCheckoutButtonTotal(mBtnCheckoutButton, mCheckoutContext);
+
+            var clickedProductRow = GlobalVariables.globalProductsOnCart.Where(o => o.productId == mProducts[position].productId).ToList();
+            if (mIsGrid)
+            {
+                ShowCurrentQuantityOnCartGrid(sender, clickedProductRow[0].productCountOnCart);
+            }
+            else
+            {
+                ShowCurrentQuantityOnCartList(sender, clickedProductRow[0].productCountOnCart);
+            }
+        }
+
+        private void ShowCurrentQuantityOnCartList(object _sender, int _itemQty)
+        {
+            //find the view clicked
+            var clickedView = (View)_sender;
+            TextView txtProductName = clickedView.FindViewById<TextView>(Resource.Id.txtProductName);
+            TextView txtQtyOnCart = clickedView.FindViewById<TextView>(Resource.Id.txtQtyOncart);
+
+            //change properties of view
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MatchParent, 0, 50f);
+            txtProductName.Gravity = GravityFlags.Bottom;
+            txtProductName.LayoutParameters = layoutParams;
+            txtQtyOnCart.LayoutParameters = layoutParams;
+            txtQtyOnCart.Text = "on cart " + _itemQty.ToString();
+        }
+
+        private void ShowCurrentQuantityOnCartGrid(object _sender, int _itemQty)
+        {
+            //find the view clicked
+            var clickedView = (View)_sender;
+            TextView txtQtyOnCart = clickedView.FindViewById<TextView>(Resource.Id.txtQtyOncart);
+            FrameLayout flAliasContainer = clickedView.FindViewById<FrameLayout>(Resource.Id.flAliasContainer);
+
+            //change properties of view
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MatchParent, 0, 16f);
+            txtQtyOnCart.LayoutParameters = layoutParams;
+            txtQtyOnCart.Text = "on cart " + _itemQty.ToString() + " ";
+            LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MatchParent, 0, 50f);
+            flAliasContainer.LayoutParameters = layoutParams2;
         }
 
         private void ParentProduct_Click(object sender, EventArgs e)
@@ -216,9 +336,13 @@ namespace POS_ANDROID_BACUNA.Adapters
                 GlobalVariables.mCurrentSelectedItemNameMultiSize = prodName.Text;
                 GlobalVariables.mCurrentSelectedItemIdMultiSize = Convert.ToInt32(prodId.Text);
 
-                Intent intent = new Intent(mCheckoutContext, typeof(CheckoutFragmentMultiSizeAdd));
+                Intent intent = new Intent(mSupportFragment.Context, typeof(CheckoutFragmentMultiSizeAdd));
                 intent.AddFlags(ActivityFlags.NoAnimation);
-                ((Activity)mCheckoutContext).StartActivityForResult(intent, 8); //callback not working used global var instead to prevent double click
+                mSupportFragment.StartActivityForResult(intent, 8);
+
+                //Intent intent = new Intent(mCheckoutContext, typeof(CheckoutFragmentMultiSizeAdd));
+                //intent.AddFlags(ActivityFlags.NoAnimation);
+                //((Activity)mCheckoutContext).StartActivityForResult(intent, 8); //callback not working used global var instead to prevent double click
             }
         }
 
