@@ -176,6 +176,8 @@ namespace POS_ANDROID_BACUNA.Fragments
                 //refreshGrid
                 SetGridLayout(mLayoutInflater, mViewGroup, mIsGrid);
                 mRecyclerViewItemsList.Invalidate();
+                //refresh main activity toolbar
+                ((MainActivity)this.Activity).RefreshMenu();
             }
             else if (requestCode == 8)
             {

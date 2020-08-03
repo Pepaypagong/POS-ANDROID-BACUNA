@@ -23,6 +23,7 @@ namespace POS_ANDROID_BACUNA.Data_Classes
         public static List<ParentProducts> globalParentProductList = new List<ParentProducts>(); //temporary placeholder
         public static List<ProductCategories> globalProductCategoryList = new List<ProductCategories>();
         public static List<Customers> globalCustomersList = new List<Customers>();
+        public static List<Runners> globalRunnersList = new List<Runners>();
         public static List<Options> globalOptionList = new List<Options>();
         public static List<OrderFields> globalSortingFieldList = new List<OrderFields>(); //sorting cart items
 
@@ -30,6 +31,8 @@ namespace POS_ANDROID_BACUNA.Data_Classes
 
         public static bool mIsPrinterSet = false;
         public static BluetoothDevice mSelectedDevice;
+
+        public static string mCurrentSelectedPricingType = "RT";
         public static View mCurrentSelectedCustomerButtonLayout = null;
         public static string mCurrentSelectedCustomerOnCheckout = "";
         public static bool mHasSelectedCustomerOnCheckout = false;

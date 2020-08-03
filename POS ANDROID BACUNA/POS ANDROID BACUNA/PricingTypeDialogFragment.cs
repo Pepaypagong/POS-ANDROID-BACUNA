@@ -5,13 +5,16 @@ using Android.Support.V4.App;
 using Android.Widget;
 using Newtonsoft.Json;
 using Android.Content;
+using System;
+using POS_ANDROID_BACUNA.Data_Classes;
+using POS_ANDROID_BACUNA.Fragments;
 
 namespace POS_ANDROID_BACUNA
 {
 
     public class PricingTypeDialogFragment : DialogFragment
     {
-
+        private View mMainView;
         private ImageButton mCloseButton;
         private Button mSaveButton;
         private RadioButton mRadioRetail;
@@ -19,6 +22,8 @@ namespace POS_ANDROID_BACUNA
         private RadioButton mRadioRunner;
         private RadioButton mCheckedRadioButton;
         private RadioGroup mPricingTypeRadioGrp;
+        private string mCallerActivity;
+        private string mCurrentPricingType;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -28,38 +33,85 @@ namespace POS_ANDROID_BACUNA
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreateView(inflater, container, savedInstanceState);
-            var view = inflater.Inflate(Resource.Layout.pricingType_dialogFragment, container, false);
+            mMainView = inflater.Inflate(Resource.Layout.pricingType_dialogFragment, container, false);
 
-            //get the ids of the radio buttons
+            FnGetData();
+            FnSetupControls(mMainView);
+            FnSetupEvents();
+
+            //check the radio button that is currently selected from main activity
+            setCurrentCheckedPricingType(mCurrentPricingType);
+
+            return mMainView;
+        }
+
+        private void MSaveButton_Click(object sender, EventArgs e)
+        {
+            mCheckedRadioButton = mMainView.FindViewById<RadioButton>(mPricingTypeRadioGrp.CheckedRadioButtonId);
+            //set text on main act
+            if (mCallerActivity == "MainActivity")
+            {
+                ((MainActivity)this.Activity).SetToolBarMenuTextFromFragment(SelectedPrice(mCheckedRadioButton.Text), ResetSelectedCustomer());
+            }
+            else if (mCallerActivity == "CheckoutFragmentCartActivity")
+            {
+                ((CheckoutFragmentCartActivity)this.Activity).
+                    SetToolBarMenuTextFromDialogFragment(SelectedPrice(mCheckedRadioButton.Text), ResetSelectedCustomer());
+            }
+            GlobalVariables.mCurrentSelectedPricingType = SelectedPrice(mCheckedRadioButton.Text);
+            this.Dismiss();
+        }
+
+        private void FnSetupEvents()
+        {
+            mCloseButton.Click += MCloseButton_Click;
+            mSaveButton.Click += MSaveButton_Click;
+        }
+
+        private void FnSetupControls(View view)
+        {
+            mCloseButton = view.FindViewById<ImageButton>(Resource.Id.btnPricingTypeClose);
+            mSaveButton = view.FindViewById<Button>(Resource.Id.btnPricingTypeSave);
             mRadioRetail = view.FindViewById<RadioButton>(Resource.Id.radioRetail);
             mRadioWholesale = view.FindViewById<RadioButton>(Resource.Id.radioWholesale);
             mRadioRunner = view.FindViewById<RadioButton>(Resource.Id.radioRunner);
+            mPricingTypeRadioGrp = view.FindViewById<RadioGroup>(Resource.Id.radioGrpPricingType);
 
             mRadioRetail.Text = "RT - Retail";
             mRadioWholesale.Text = "WS - Wholesale";
             mRadioRunner.Text = "RUNR - Runner";
-
-            mCloseButton = view.FindViewById<ImageButton>(Resource.Id.btnPricingTypeClose);
-            mSaveButton = view.FindViewById<Button>(Resource.Id.btnPricingTypeSave);
             mSaveButton.Text = "SELECT";
-            mCloseButton.Click += MCloseButton_Click;
+        }
 
-            mPricingTypeRadioGrp = view.FindViewById<RadioGroup>(Resource.Id.radioGrpPricingType);
+        private void FnGetData()
+        {
+            mCurrentPricingType = Arguments.GetString("currentPricingType");
+            mCallerActivity = Arguments.GetString("callerActivity");
+        }
 
-            mSaveButton.Click += (object sender, System.EventArgs e) =>
+        private bool ResetSelectedCustomer()
+        {
+            bool retval = true;
+            string previous = Arguments.GetString("currentPricingType");
+            string current = SelectedPrice(mCheckedRadioButton.Text);
+
+            if (previous == current)
             {
-                //on click select the checked radio button
-                mCheckedRadioButton = view.FindViewById<RadioButton>(mPricingTypeRadioGrp.CheckedRadioButtonId);
+                retval = false;
+            }
+            else if(previous != current)
+            {
+                if ((previous == "RT" && current == "WS")||(previous == "WS" && current == "RT"))
+                {
+                    retval = false; 
+                }
+                else
+                {
+                    retval = true;
+                }
+            }
 
-                //set text on main act
-                ((MainActivity)this.Activity).SetToolBarMenuTextFromFragment(SelectedPrice(mCheckedRadioButton.Text));
-                this.Dismiss();
-            };
-
-            //check the radio button that is currently selected from main activity
-            setCurrentCheckedPricingType(Arguments.GetString("currentPricingType"));
-
-            return view;
+            return retval;
         }
 
         private string SelectedPrice(string _radioText)
@@ -116,7 +168,15 @@ namespace POS_ANDROID_BACUNA
 
         public override void OnDestroy()
         {
-            ((MainActivity)this.Activity).PricingTypeDialogFragmentOnActivityResult();
+            if (mCallerActivity == "MainActivity")
+            {
+                ((MainActivity)this.Activity).PricingTypeDialogFragmentOnActivityResult();
+            }
+            else if (mCallerActivity == "CheckoutFragmentCartActivity")
+            {
+                ((CheckoutFragmentCartActivity)this.Activity).PricingTypeDialogFragmentOnActivityResult();
+            }
+            
             base.OnDestroy();
         }
 

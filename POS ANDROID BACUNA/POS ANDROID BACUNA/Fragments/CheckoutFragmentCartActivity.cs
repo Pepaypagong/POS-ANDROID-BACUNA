@@ -23,6 +23,7 @@ using Java.Util;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Adapters;
 using System.Linq.Dynamic.Core;
+using Android.Graphics.Drawables;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -77,6 +78,33 @@ namespace POS_ANDROID_BACUNA.Fragments
             {
                 SetRecyclerViewLayoutHeight(lvCartItemList, mToolBar);
             });
+
+        }
+        public void SetToolBarMenuTextFromDialogFragment(string _selectedPricingType, bool resetSelectedCustomer)
+        {
+            if (resetSelectedCustomer)
+            {
+                GlobalVariables.mHasSelectedCustomerOnCheckout = false;
+                GlobalVariables.mCurrentSelectedCustomerOnCheckout = "";
+                IMenuItem customerMenuItem = mCurrentToolbarMenu.FindItem(Resource.Id.menuItem_customer_cart);
+                removeActionLayout(customerMenuItem);
+            }
+            IMenuItem item = mCurrentToolbarMenu.FindItem(Resource.Id.menuItem_pricingType);
+            item.SetTitle(_selectedPricingType);
+            SetToolbarMenuIconTint(_selectedPricingType);
+        }
+        public void SetToolbarMenuIconTint(string _pricingType)
+        {
+            IMenuItem item = mCurrentToolbarMenu.FindItem(Resource.Id.menuItem_customer_cart);
+            Drawable drawable = item.Icon;
+            if (drawable != null)
+            {
+                drawable.Mutate();
+                drawable.SetColorFilter(_pricingType == "RUNR" ?
+                    ColorHelper.ResourceIdToColor(Resource.Color.orange, this) :
+                    ColorHelper.ResourceIdToColor(Resource.Color.colorAccent, this)
+                    , PorterDuff.Mode.SrcAtop);
+            }
 
         }
 
@@ -145,6 +173,11 @@ namespace POS_ANDROID_BACUNA.Fragments
             args.PutString("caller", "CheckoutFragmentCartActivity");
             moreOptionsDialog.Arguments = args;
             moreOptionsDialog.Show(transaction, "moreOptionsDialogFragment");
+        }
+
+        internal void PricingTypeDialogFragmentOnActivityResult()
+        {
+            mDialogShown = false; //flag to enable dialog show
         }
 
         public void ShowSortCartItemsBy()
@@ -244,13 +277,16 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             mCurrentToolbarMenu = menu;
             MenuInflater.Inflate(Resource.Menu.toolbar_menu_checkout_cart, menu);
-
+            IMenuItem item = menu.FindItem(Resource.Id.menuItem_pricingType);
+            item.SetTitle(GlobalVariables.mCurrentSelectedPricingType);
             IMenuItem selectedCustomerItem = menu.FindItem(Resource.Id.menuItem_customer_cart);
             selectedCustomerItem.SetActionView(GetButtonLayout(selectedCustomerItem));
             if (GlobalVariables.mHasSelectedCustomerOnCheckout)
             {
-                subscribeCustomLayoutToClick(selectedCustomerItem);
+                //subscribeCustomLayoutToClick(selectedCustomerItem);
+                ChangeSelectCustomerIcon(GlobalVariables.mCurrentSelectedCustomerOnCheckout);
             }
+            SetToolbarMenuIconTint(GlobalVariables.mCurrentSelectedPricingType);
             return base.OnCreateOptionsMenu(menu);
         }
 
@@ -276,11 +312,27 @@ namespace POS_ANDROID_BACUNA.Fragments
                 case Android.Resource.Id.Home:
                     Finish();
                     return true;
+                case Resource.Id.menuItem_pricingType:
+                    if (!mDialogShown) //avoid double click
+                    {
+                        mDialogShown = true;
+                        //show dialog here
+                        SupportFragmentTransaction transaction = SupportFragmentManager.BeginTransaction();
+                        PricingTypeDialogFragment pricingTypeDialog = new PricingTypeDialogFragment();
+                        //pass current selected price type t
+                        var args = new Bundle();
+                        args.PutString("currentPricingType", GlobalVariables.mCurrentSelectedPricingType);
+                        args.PutString("callerActivity", "CheckoutFragmentCartActivity");
+                        pricingTypeDialog.Arguments = args;
+                        pricingTypeDialog.Show(transaction, "pricingTypeDialogFragment");
+                    }
+                    return true;
                 case Resource.Id.menuItem_customer_cart:
                     if (!mDialogShown)
                     {
                         mDialogShown = true;
                         Intent intent = new Intent(this, typeof(CheckoutSelectCustomerActivity));
+                        intent.PutExtra("isCustomer", GlobalVariables.mCurrentSelectedPricingType == "RUNR" ? false : true);
                         StartActivityForResult(intent, 4);
                     }
                     return true;
@@ -347,13 +399,27 @@ namespace POS_ANDROID_BACUNA.Fragments
 
             LayoutInflater inflater = (LayoutInflater)this.GetSystemService(Context.LayoutInflaterService);
             View buttonView = inflater.Inflate(Resource.Layout.checkout_fragment_customer_name_button, null);
+            LinearLayout borderContainer = buttonView.FindViewById<LinearLayout>(Resource.Id.llBorderContainer);
             TextView txtCustomerNameButtonTitle = buttonView.FindViewById<TextView>(Resource.Id.txtCustomerName);
+            ImageView imgIcon = buttonView.FindViewById<ImageView>(Resource.Id.imgCustomerIcon);
             txtCustomerNameButtonTitle.Text = customerName;
+
+            SetActionLayoutColor(borderContainer, imgIcon, txtCustomerNameButtonTitle);
             item.SetActionView(buttonView);
             subscribeCustomLayoutToClick(item);
 
             //set current selected customer button layout
             GlobalVariables.mCurrentSelectedCustomerButtonLayout = buttonView;
+        }
+        public void SetActionLayoutColor(LinearLayout _borderContainer, ImageView _imgIcon, TextView _txtCustomerNameButtonTitle)
+        {
+            _txtCustomerNameButtonTitle.SetTextColor(GetColorStateList(GlobalVariables.mCurrentSelectedPricingType == "RUNR" ?
+                Resource.Color.orange : Resource.Color.colorAccent));
+            _imgIcon.SetColorFilter(GlobalVariables.mCurrentSelectedPricingType == "RUNR" ?
+                        ColorHelper.ResourceIdToColor(Resource.Color.orange, this) :
+                        ColorHelper.ResourceIdToColor(Resource.Color.colorAccent, this));
+            _borderContainer.Background = GetDrawable(GlobalVariables.mCurrentSelectedPricingType == "RUNR" ?
+                Resource.Drawable.roundborderOrange : Resource.Drawable.roundborder);
         }
 
         public void subscribeCustomLayoutToClick(IMenuItem item)

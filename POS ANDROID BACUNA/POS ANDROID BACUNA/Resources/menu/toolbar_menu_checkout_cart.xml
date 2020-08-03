@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
   <item
+    android:id="@+id/menuItem_pricingType"
+    app:showAsAction="ifRoom"
+    android:title="Retail" />
+  <item
     android:id="@+id/menuItem_customer_cart"
     android:icon="@drawable/newCustomer_icon"
     app:showAsAction="ifRoom"

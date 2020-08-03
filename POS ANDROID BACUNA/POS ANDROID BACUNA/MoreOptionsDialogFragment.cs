@@ -33,7 +33,63 @@ namespace POS_ANDROID_BACUNA
 
         public override void OnCreate(Bundle savedInstanceState)
         {
+            CreateOptions();
             base.OnCreate(savedInstanceState);
+        }
+
+        private void CreateOptions()
+        {
+            GlobalVariables.globalOptionList.Clear();
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 1,
+                    OptionText = "Add note",
+                    TextColorResourceId = Resource.Color.colorLightBlack,
+                    ShowArrow = true,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Modify",
+                    TargetActivity = "CheckoutFragmentCartAddNoteActivity",
+                    RequestCode = 19,
+                    IsDialog = false
+                });
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 2,
+                    OptionText = "Add Discount",
+                    TextColorResourceId = Resource.Color.colorLightBlack,
+                    ShowArrow = true,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Modify",
+                    TargetActivity = "CheckoutFragmentCartNumpadDiscountActivity",
+                    RequestCode = 20,
+                    IsDialog = false
+                });
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 3,
+                    OptionText = "Sort cart items",
+                    TextColorResourceId = Resource.Color.colorLightBlack,
+                    ShowArrow = true,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Modify",
+                    TargetActivity = "CheckoutFragmentCartAddNoteActivity",
+                    RequestCode = 21,
+                    IsDialog = true
+                });
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 4,
+                    OptionText = "Clear cart",
+                    TextColorResourceId = Resource.Color.colorRed,
+                    ShowArrow = false,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Delete",
+                    IsDialog = false
+                });
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

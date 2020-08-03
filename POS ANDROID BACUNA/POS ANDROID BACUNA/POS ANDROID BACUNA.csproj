@@ -67,6 +67,7 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adapters\CustomersListViewAdapter.cs" />
     <Compile Include="Adapters\MoreOptionsListAdapter.cs" />
     <Compile Include="Adapters\ProductsItemSelectCategoryAdapter.cs" />
     <Compile Include="Adapters\ProductsSelectSizesAdapter.cs" />
@@ -78,9 +79,10 @@
     <Compile Include="CheckoutSelectCustomerActivity.cs" />
     <Compile Include="ColorHelper.cs" />
     <Compile Include="CurrencyTextWatcher.cs" />
+    <Compile Include="Data Classes\Runners.cs" />
     <Compile Include="Data Classes\Customers.cs" />
     <Compile Include="BluetoothDevicesListViewAdapter.cs" />
-    <Compile Include="Adapters\CustomersListViewAdapter.cs" />
+    <Compile Include="Adapters\RunnersListViewAdapter.cs" />
     <Compile Include="Data Classes\ConnectedBluetoothDevice.cs" />
     <Compile Include="Data Classes\NewProductCopyHolder.cs" />
     <Compile Include="Data Classes\Options.cs" />
@@ -617,6 +619,9 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\more_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\roundborderOrange.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

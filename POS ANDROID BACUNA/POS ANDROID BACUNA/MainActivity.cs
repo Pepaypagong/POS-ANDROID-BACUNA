@@ -21,6 +21,7 @@ using Android.Support.V4.App;
 using Newtonsoft.Json;
 using Android.Views.InputMethods;
 using POS_ANDROID_BACUNA.Data_Classes;
+using Android.Graphics.Drawables;
 
 namespace POS_ANDROID_BACUNA
 {
@@ -97,60 +98,6 @@ namespace POS_ANDROID_BACUNA
 
             //pass to global variable the instance of the checkout fragment
             GlobalVariables.mCheckoutFragmentCurrentInstance = mCheckoutFragment;
-            CreateOptions();
-        }
-
-        private void CreateOptions()
-        {
-            GlobalVariables.globalOptionList
-                .Add(new Options() { 
-                    OptionId = 1, 
-                    OptionText = "Add note", 
-                    TextColorResourceId = Resource.Color.colorLightBlack, 
-                    ShowArrow = true,
-                    CallerClassName = "CheckoutFragmentCartActivity",
-                    Action = "Modify",
-                    TargetActivity = "CheckoutFragmentCartAddNoteActivity",
-                    RequestCode = 19,
-                    IsDialog = false
-                });
-            GlobalVariables.globalOptionList
-                .Add(new Options()
-                {
-                    OptionId = 2,
-                    OptionText = "Add Discount",
-                    TextColorResourceId = Resource.Color.colorLightBlack,
-                    ShowArrow = true,
-                    CallerClassName = "CheckoutFragmentCartActivity",
-                    Action = "Modify",
-                    TargetActivity = "CheckoutFragmentCartNumpadDiscountActivity",
-                    RequestCode = 20,
-                    IsDialog = false
-                });
-            GlobalVariables.globalOptionList
-                .Add(new Options()
-                {
-                    OptionId = 3,
-                    OptionText = "Sort cart items",
-                    TextColorResourceId = Resource.Color.colorLightBlack,
-                    ShowArrow = true,
-                    CallerClassName = "CheckoutFragmentCartActivity",
-                    Action = "Modify",
-                    TargetActivity = "CheckoutFragmentCartAddNoteActivity",
-                    RequestCode = 21,
-                    IsDialog = true
-                });
-            GlobalVariables.globalOptionList
-                .Add(new Options()
-                {
-                    OptionId = 4,
-                    OptionText = "Clear cart",
-                    TextColorResourceId = Resource.Color.colorRed,
-                    ShowArrow = false,
-                    CallerClassName = "CheckoutFragmentCartActivity",
-                    Action = "Delete",
-                    IsDialog = false
-                });
         }
 
         private void MDrawerLayout_DrawerOpened(object sender, DrawerLayout.DrawerOpenedEventArgs e)
@@ -279,6 +226,7 @@ namespace POS_ANDROID_BACUNA
                         //pass current selected price type t
                         var args = new Bundle();
                         args.PutString("currentPricingType", mCurrentSelectedPriceType);
+                        args.PutString("callerActivity", "MainActivity");
                         pricingTypeDialog.Arguments = args;
                         pricingTypeDialog.Show(transaction, "pricingTypeDialogFragment");
                     }
@@ -288,6 +236,7 @@ namespace POS_ANDROID_BACUNA
                     {
                         mDialogShown = true;
                         Intent intent = new Intent(this, typeof(CheckoutSelectCustomerActivity));
+                        intent.PutExtra("isCustomer", mCurrentSelectedPriceType == "RUNR" ? false : true);
                         StartActivityForResult(intent, 1);
                     }
                     return true;
@@ -301,12 +250,18 @@ namespace POS_ANDROID_BACUNA
             mDialogShown = false; //flag to enable dialog show 
         }
 
+        public void RefreshMenu()
+        {
+            InvalidateOptionsMenu();
+        }
+
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             mCurrentToolBarMenu = menu;
 
             if (mCurrentFragment == mCheckoutFragment)
             {
+                mCurrentSelectedPriceType = GlobalVariables.mCurrentSelectedPricingType;
                 MenuInflater.Inflate(Resource.Menu.toolbar_menu_checkout, menu);
                 //code here to set the selected price type
                 IMenuItem item = menu.FindItem(Resource.Id.toolbarMenu_pricingType);
@@ -314,6 +269,12 @@ namespace POS_ANDROID_BACUNA
                 //set the action layout for the selected customer
                 IMenuItem selectedCustomerItem = menu.FindItem(Resource.Id.toolbarMenu_customer);
                 selectedCustomerItem.SetActionView(GlobalVariables.mCurrentSelectedCustomerButtonLayout);
+                if (GlobalVariables.mHasSelectedCustomerOnCheckout)
+                {
+                    //subscribeCustomLayoutToClick(selectedCustomerItem);
+                    ChangeSelectCustomerIcon(GlobalVariables.mCurrentSelectedCustomerOnCheckout);
+                }
+                SetToolbarMenuIconTint(mCurrentSelectedPriceType);
             }
             else if (mCurrentFragment == mProductsFragment)
             {
@@ -323,11 +284,34 @@ namespace POS_ANDROID_BACUNA
             return base.OnCreateOptionsMenu(menu);
         }
 
-        public void SetToolBarMenuTextFromFragment(string menuText)
+        public void SetToolBarMenuTextFromFragment(string menuText, bool resetSelectedCustomer)
         {
+            if (resetSelectedCustomer)
+            {
+                GlobalVariables.mHasSelectedCustomerOnCheckout = false;
+                GlobalVariables.mCurrentSelectedCustomerOnCheckout = "";
+                IMenuItem customerMenuItem = mCurrentToolBarMenu.FindItem(Resource.Id.toolbarMenu_customer);
+                removeActionLayout(customerMenuItem);
+            }
             IMenuItem item = mCurrentToolBarMenu.FindItem(Resource.Id.toolbarMenu_pricingType);
             item.SetTitle(menuText);
             mCurrentSelectedPriceType = menuText;
+            SetToolbarMenuIconTint(menuText);
+        }
+
+        public void SetToolbarMenuIconTint(string _pricingType)
+        {
+            IMenuItem item = mCurrentToolBarMenu.FindItem(Resource.Id.toolbarMenu_customer);
+            Drawable drawable = item.Icon;
+            if (drawable != null)
+            {
+                drawable.Mutate();
+                drawable.SetColorFilter(_pricingType == "RUNR"?
+                    ColorHelper.ResourceIdToColor(Resource.Color.orange, this):
+                    ColorHelper.ResourceIdToColor(Resource.Color.colorAccent, this)
+                    , PorterDuff.Mode.SrcAtop);
+            }
+            
         }
 
         public void ChangeSelectCustomerIcon(string customerName)
@@ -336,13 +320,28 @@ namespace POS_ANDROID_BACUNA
 
             LayoutInflater inflater = (LayoutInflater)this.GetSystemService(Context.LayoutInflaterService);
             View buttonView = inflater.Inflate(Resource.Layout.checkout_fragment_customer_name_button, null);
+            LinearLayout borderContainer = buttonView.FindViewById<LinearLayout>(Resource.Id.llBorderContainer);
             TextView txtCustomerNameButtonTitle = buttonView.FindViewById<TextView>(Resource.Id.txtCustomerName);
+            ImageView imgIcon = buttonView.FindViewById<ImageView>(Resource.Id.imgCustomerIcon);
             txtCustomerNameButtonTitle.Text = customerName;
+
+            SetActionLayoutColor(borderContainer, imgIcon, txtCustomerNameButtonTitle);
             item.SetActionView(buttonView);
             subscribeCustomLayoutToClick(item);
-
+           
             //set current selected customer button layout
             GlobalVariables.mCurrentSelectedCustomerButtonLayout = buttonView;
+        }
+
+        public void SetActionLayoutColor(LinearLayout _borderContainer, ImageView _imgIcon, TextView _txtCustomerNameButtonTitle)
+        {
+            _txtCustomerNameButtonTitle.SetTextColor(GetColorStateList(mCurrentSelectedPriceType == "RUNR" ? 
+                Resource.Color.orange : Resource.Color.colorAccent));
+            _imgIcon.SetColorFilter(mCurrentSelectedPriceType == "RUNR" ?
+                        ColorHelper.ResourceIdToColor(Resource.Color.orange, this) :
+                        ColorHelper.ResourceIdToColor(Resource.Color.colorAccent, this));
+            _borderContainer.Background = GetDrawable(mCurrentSelectedPriceType == "RUNR" ? 
+                Resource.Drawable.roundborderOrange : Resource.Drawable.roundborder);
         }
 
         public void subscribeCustomLayoutToClick(IMenuItem item)
