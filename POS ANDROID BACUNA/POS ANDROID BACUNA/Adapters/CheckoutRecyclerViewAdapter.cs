@@ -34,10 +34,11 @@ namespace POS_ANDROID_BACUNA.Adapters
         CheckoutFragment mCheckoutFragment;
         Button mBtnCheckoutButton;
         Context mCheckoutContext;
+        string mCurrentSelectedPricingType;
 
         public CheckoutRecyclerViewAdapter(float dpVal, int gridHeight, List<Product> products,
             List<ParentProducts> parentProducts, bool isGrid, RecyclerView recyclerView, 
-            Button btnCheckoutButton, Context checkoutContext, bool showSizes, SupportFragment supportFragment)
+            Button btnCheckoutButton, Context checkoutContext, bool showSizes, SupportFragment supportFragment, string pricingType)
         {
             mGridHeight = gridHeight;
             mDpVal = dpVal;
@@ -50,6 +51,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             mCheckoutContext = checkoutContext;
             mShowSizes = showSizes;
             mSupportFragment = supportFragment;
+            mCurrentSelectedPricingType = pricingType;
         }
 
         public class MyViewHolder : RecyclerView.ViewHolder
@@ -149,7 +151,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             myHolder.mProductId.Text = mShowSizes ? mProducts[position].productId.ToString(): mParentProducts[position].parentProductId.ToString();
             myHolder.mProductName.Text = mShowSizes ? mProducts[position].productName : mParentProducts[position].parentProductName;
             //condition here to display price based on transaction pricing type 
-            myHolder.mProductPrice.Text = mShowSizes ? "\u20b1 " +String.Format("{0:n}",mProducts[position].productRetailPrice) : "";
+            myHolder.mProductPrice.Text = mShowSizes ? "\u20b1 " +String.Format("{0:n}", GetProductPrice(position)) : "";
 
             if (mIsGrid)
             {
@@ -192,6 +194,25 @@ namespace POS_ANDROID_BACUNA.Adapters
             {
                 ShowCurrentQuantityOnCartListOnBind(myHolder.mProductName, myHolder.mQtyOncart, qtyOnCart);
             }
+        }
+
+        private decimal GetProductPrice(int position)
+        {
+            decimal retval = 0;
+            if (mCurrentSelectedPricingType == "RT")
+            {
+                retval = mProducts[position].productRetailPrice;
+            }
+            else if (mCurrentSelectedPricingType == "WS")
+            {
+                retval = mProducts[position].productWholesalePrice;
+            }
+            else //runner
+            {
+                retval = mProducts[position].productRunnerPrice;
+            }
+            
+            return retval;
         }
 
         private void ShowCurrentQuantityOnCartListOnBind(TextView _mProductName, TextView _mQtyOncart, int _qtyOnCart)
@@ -238,16 +259,6 @@ namespace POS_ANDROID_BACUNA.Adapters
         private void MMainView_Click(object sender, EventArgs e)
         {
             int position = mRecyclerView.GetChildAdapterPosition((View)sender);
-
-            //add to cart
-            GlobalVariables.globalProductsCart.Add(new Product()
-            {
-                productId = mProducts[position].productId,
-                productName = mProducts[position].productName,
-                productRetailPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
-                productColorBg = mProducts[position].productColorBg
-            });
-
             bool alreadyExists = GlobalVariables.globalProductsOnCart.Any(x => x.productId == mProducts[position].productId);
 
             if (alreadyExists)
@@ -269,11 +280,11 @@ namespace POS_ANDROID_BACUNA.Adapters
                 {
                     productId = mProducts[position].productId,
                     productName = mProducts[position].productName,
-                    productOrigPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
-                    productPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
+                    productOrigPrice = GetProductPrice(position),
+                    productPrice = GetProductPrice(position),
                     productCountOnCart = 1,
                     productCategoryId = 1,
-                    productSubTotalPrice = Convert.ToDecimal(mProducts[position].productRetailPrice),
+                    productSubTotalPrice = GetProductPrice(position),
                     productDiscountAmount = 0.00M,
                     productDiscountPercentage = 0.00M,
                     parentProductId = mProducts[position].parentProductId

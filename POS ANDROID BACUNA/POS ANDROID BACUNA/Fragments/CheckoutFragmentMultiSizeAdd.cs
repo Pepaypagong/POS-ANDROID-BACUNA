@@ -72,7 +72,8 @@ namespace POS_ANDROID_BACUNA.Fragments
             mRvSizes.SetLayoutManager(mLayoutManager);
             mRvSizes.HasFixedSize = true;
 
-            _checkoutMultiAddListRecyclerViewAdapter = new CheckoutMultiAddListRecyclerViewAdapter(PopulateParentProductSizes(), mRvSizes, mBtnCheckoutMultiAddAddToCart, this);
+            _checkoutMultiAddListRecyclerViewAdapter = new CheckoutMultiAddListRecyclerViewAdapter(PopulateParentProductSizes(), 
+                mRvSizes, mBtnCheckoutMultiAddAddToCart, this, GlobalVariables.mCurrentSelectedPricingType);
             mMultiAddAdapter = _checkoutMultiAddListRecyclerViewAdapter;
             mRvSizes.SetAdapter(mMultiAddAdapter);   
         }
@@ -144,7 +145,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
                     if (itemChecked.Checked)
                     {
-                        AddItemsToCart(Convert.ToInt32(itemId.Text), Convert.ToInt32(itemQuantity.Text));
+                        AddItemsToCart(Convert.ToInt32(itemId.Text), Convert.ToInt32(itemQuantity.Text), Convert.ToDecimal(itemSelectedPrice.Text));
                     }
                 }
 
@@ -197,7 +198,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             return retVal;
         }
 
-        private void AddItemsToCart(int _itemId, int _itemQty)
+        private void AddItemsToCart(int _itemId, int _itemQty, decimal _itemPrice)
         {
             bool alreadyExists = GlobalVariables.globalProductsOnCart.Any(x => x.productId == _itemId);
 
@@ -207,7 +208,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                 {
                     if (item.productId == _itemId)
                     {
-                        item.productPrice = item.productOrigPrice; //update price on click to reset the price on cart
+                        item.productPrice = _itemPrice; //update price on click to reset the price on cart
                         item.productDiscountAmount = 0.00M; //reset discount amt to 0 if already on cart
                         item.productDiscountPercentage = 0.00M; //reset discount percentage to 0 if already on cart
                         item.productCountOnCart = item.productCountOnCart + _itemQty;
@@ -238,11 +239,11 @@ namespace POS_ANDROID_BACUNA.Fragments
                 {
                     productId = _itemId,
                     productName = productName,
-                    productOrigPrice = productRetailPrice,
-                    productPrice = productRetailPrice,
+                    productOrigPrice = _itemPrice,
+                    productPrice = _itemPrice,
                     productCountOnCart = _itemQty,
                     productCategoryId = productCategoryId,
-                    productSubTotalPrice = _itemQty * productRetailPrice,
+                    productSubTotalPrice = _itemQty * _itemPrice,
                     productDiscountAmount = 0.00M,
                     productDiscountPercentage = 0.00M,
                     parentProductId = parentProductId

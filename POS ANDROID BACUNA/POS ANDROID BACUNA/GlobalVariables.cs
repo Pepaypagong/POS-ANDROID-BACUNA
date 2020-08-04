@@ -17,7 +17,6 @@ namespace POS_ANDROID_BACUNA.Data_Classes
 {
     public static class GlobalVariables
     {
-        public static List<Product> globalProductsCart = new List<Product>();
         public static List<ProductsOnCart> globalProductsOnCart = new List<ProductsOnCart>();
         public static List<Product> globalProductList = new List<Product>();
         public static List<ParentProducts> globalParentProductList = new List<ParentProducts>(); //temporary placeholder

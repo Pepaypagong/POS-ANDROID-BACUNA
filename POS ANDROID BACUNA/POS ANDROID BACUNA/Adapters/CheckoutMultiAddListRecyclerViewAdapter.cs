@@ -28,10 +28,11 @@ namespace POS_ANDROID_BACUNA.Adapters
         Context mCheckoutMultiAddContext;
         bool mIsAllChecked = false;
         string mAllItemsQty = "0";
+        string mCurrentPricingType;
 
         public CheckoutMultiAddListRecyclerViewAdapter(List<Product> products, RecyclerView recyclerView, 
             //Button _minus6, Button _minus1, Button _plus1, Button _plus6, Button _plus12, TextView _txtProductQuantity, 
-            Button btnAddToCart, Context checkoutmultiaddcontext)
+            Button btnAddToCart, Context checkoutmultiaddcontext, string pricingType)
         {
             mProducts = products;
             mRecyclerView = recyclerView;
@@ -46,6 +47,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             mCheckoutFragment = new CheckoutFragment();
             mBtnAddToCart = btnAddToCart;
             mCheckoutMultiAddContext = checkoutmultiaddcontext;
+            mCurrentPricingType = pricingType;
         }
 
         public class MyViewHolder : RecyclerView.ViewHolder
@@ -103,11 +105,29 @@ namespace POS_ANDROID_BACUNA.Adapters
             subscribeEvents(myHolder);
 
             myHolder.mTxtItemId.Text = mProducts[position].productId.ToString();
-            myHolder.mTxtItemPrice.Text = mProducts[position].productRetailPrice.ToString();
-            myHolder.mProductSizeAndPrice.Text = "Size " + mProducts[position].productSize.ToString() + "\n \u20b1 " + String.Format("{0:n}", mProducts[position].productRetailPrice);
+            myHolder.mTxtItemPrice.Text = GetProductPrice(position).ToString();
+            myHolder.mProductSizeAndPrice.Text = "Size " + mProducts[position].productSize.ToString() + "\n \u20b1 " + String.Format("{0:n}", GetProductPrice(position));
 
             //set if item is checked
             myHolder.mProductSizeAndPrice.Checked = mIsAllChecked ? true : false;
+        }
+        private decimal GetProductPrice(int position)
+        {
+            decimal retval = 0;
+            if (mCurrentPricingType == "RT")
+            {
+                retval = mProducts[position].productRetailPrice;
+            }
+            else if (mCurrentPricingType == "WS")
+            {
+                retval = mProducts[position].productWholesalePrice;
+            }
+            else //runner
+            {
+                retval = mProducts[position].productRunnerPrice;
+            }
+
+            return retval;
         }
 
         void subscribeEvents(MyViewHolder _myHolder)

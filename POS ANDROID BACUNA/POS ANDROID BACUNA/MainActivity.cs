@@ -245,9 +245,11 @@ namespace POS_ANDROID_BACUNA
             }
         }
 
-        public void PricingTypeDialogFragmentOnActivityResult()
+        public void PricingTypeDialogFragmentOnActivityResult(bool _clearCart)
         {
             mDialogShown = false; //flag to enable dialog show 
+            CheckoutFragment fragment = (CheckoutFragment)SupportFragmentManager.FindFragmentByTag("CheckoutFragment");
+            fragment.RefreshPricingType(_clearCart);
         }
 
         public void RefreshMenu()

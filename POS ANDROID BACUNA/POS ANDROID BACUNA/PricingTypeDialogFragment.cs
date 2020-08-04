@@ -48,6 +48,35 @@ namespace POS_ANDROID_BACUNA
         private void MSaveButton_Click(object sender, EventArgs e)
         {
             mCheckedRadioButton = mMainView.FindViewById<RadioButton>(mPricingTypeRadioGrp.CheckedRadioButtonId);
+            if (mCurrentPricingType != SelectedPrice(mCheckedRadioButton.Text) && 
+                GlobalVariables.globalProductsOnCart.Count > 0)
+            {
+                Android.App.AlertDialog.Builder builder = new Android.App.AlertDialog.Builder(this.Context);
+                Android.App.AlertDialog alert = builder.Create();
+                alert.SetTitle("Warning");
+                alert.SetMessage("Changing the price type will clear the cart. Continue?");
+
+                alert.SetButton2("CANCEL", (c, ev) =>
+                {
+                    //cancel button
+                });
+
+                alert.SetButton("YES", (c, ev) =>
+                {
+                    SelectPricingType();
+                    this.Dismiss();
+                });
+                alert.Show();
+            }
+            else
+            {
+                SelectPricingType();
+                this.Dismiss();
+            }
+        }
+
+        private void SelectPricingType()
+        {
             //set text on main act
             if (mCallerActivity == "MainActivity")
             {
@@ -59,7 +88,6 @@ namespace POS_ANDROID_BACUNA
                     SetToolBarMenuTextFromDialogFragment(SelectedPrice(mCheckedRadioButton.Text), ResetSelectedCustomer());
             }
             GlobalVariables.mCurrentSelectedPricingType = SelectedPrice(mCheckedRadioButton.Text);
-            this.Dismiss();
         }
 
         private void FnSetupEvents()
@@ -170,14 +198,20 @@ namespace POS_ANDROID_BACUNA
         {
             if (mCallerActivity == "MainActivity")
             {
-                ((MainActivity)this.Activity).PricingTypeDialogFragmentOnActivityResult();
+                ((MainActivity)this.Activity).PricingTypeDialogFragmentOnActivityResult(ClearCart());
             }
             else if (mCallerActivity == "CheckoutFragmentCartActivity")
             {
-                ((CheckoutFragmentCartActivity)this.Activity).PricingTypeDialogFragmentOnActivityResult();
+                ((CheckoutFragmentCartActivity)this.Activity).PricingTypeDialogFragmentOnActivityResult(ClearCart());
             }
             
             base.OnDestroy();
+        }
+
+        private bool ClearCart()
+        {
+            //prev pricing type and new selected pricing type
+            return mCurrentPricingType == GlobalVariables.mCurrentSelectedPricingType ? false : true;
         }
 
     }

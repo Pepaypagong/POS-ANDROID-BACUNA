@@ -80,6 +80,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             });
 
         }
+
         public void SetToolBarMenuTextFromDialogFragment(string _selectedPricingType, bool resetSelectedCustomer)
         {
             if (resetSelectedCustomer)
@@ -137,7 +138,6 @@ namespace POS_ANDROID_BACUNA.Fragments
                 PrintText(GlobalVariables.mSelectedDevice, toPrint("20200201", "BACUNA RTW", "BEELINE BUILDING, BRGY. BACLARAN", "PARANAQUE CITY, PHILIPPINES", "09174897988",
                 "JEFFREY BACUNA", GlobalVariables.mCurrentSelectedCustomerOnCheckout,
                 "Please come again, thank you :)"));
-                GlobalVariables.globalProductsCart.Clear();
                 GlobalVariables.globalProductsOnCart.Clear();
                 GlobalVariables.mIsAllCollapsed = true;
                 Finish();
@@ -175,9 +175,15 @@ namespace POS_ANDROID_BACUNA.Fragments
             moreOptionsDialog.Show(transaction, "moreOptionsDialogFragment");
         }
 
-        internal void PricingTypeDialogFragmentOnActivityResult()
+        internal void PricingTypeDialogFragmentOnActivityResult(bool _clearCart)
         {
             mDialogShown = false; //flag to enable dialog show
+            if (_clearCart)
+            {
+                GlobalVariables.globalProductsOnCart.Clear();
+                GlobalVariables.mIsAllCollapsed = true;
+                Finish();
+            }
         }
 
         public void ShowSortCartItemsBy()
@@ -216,7 +222,6 @@ namespace POS_ANDROID_BACUNA.Fragments
 
             alert.SetButton("YES", (c, ev) =>
             {
-                GlobalVariables.globalProductsCart.Clear();
                 GlobalVariables.globalProductsOnCart.Clear();
                 GlobalVariables.mIsAllCollapsed = true;
                 Finish();

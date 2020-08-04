@@ -110,7 +110,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                     SetItemListContainerHeight(mGridHolder, toolbar),
                     PopulateProductData2(queryString),
                     PopulateParentProducts(queryString), mIsGrid, mRecyclerViewItemsList, mBtnCheckoutButton,
-                    Context, mShowSizes, this));
+                    Context, mShowSizes, this, GlobalVariables.mCurrentSelectedPricingType));
             mRecyclerViewItemsList.Invalidate();
         }
 
@@ -288,7 +288,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                     SetItemListContainerHeight(mGridHolder, toolbar), 
                     PopulateProductData2(""),
                     PopulateParentProducts(""),mIsGrid,mRecyclerViewItemsList,mBtnCheckoutButton, 
-                    Context, mShowSizes, this));
+                    Context, mShowSizes, this, GlobalVariables.mCurrentSelectedPricingType));
             });
         }
         
@@ -552,6 +552,26 @@ namespace POS_ANDROID_BACUNA.Fragments
                 txtShowSize.SetBackgroundResource(0);
                 mShowSizes = true;
             }
+        }
+
+        public void RefreshPricingType(bool _clearCart)
+        {
+            //clear on cart items if pricing type is changed
+            if (_clearCart)
+            {
+                GlobalVariables.globalProductsOnCart.Clear();
+                SetCheckoutButtonTotal(mBtnCheckoutButton, Context);//refresh total button
+            }
+            //refresh list
+            string queryString = "";
+            searchViewSearchItems.SetQuery("", false);
+            searchViewSearchItems.ClearFocus();
+            mRecyclerViewItemsList.SetAdapter(new CheckoutRecyclerViewAdapter(mDpVal,
+                        SetItemListContainerHeight(mGridHolder, toolbar),
+                        PopulateProductData2(queryString),
+                        PopulateParentProducts(queryString), mIsGrid, mRecyclerViewItemsList, mBtnCheckoutButton,
+                        Context, mShowSizes, this, GlobalVariables.mCurrentSelectedPricingType));
+            mRecyclerViewItemsList.Invalidate();
         }
 
         //public class ViewClickListener : Java.Lang.Object, View.IOnTouchListener
