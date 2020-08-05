@@ -63,26 +63,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         }
         private List<ProductSizes> PopulateProductSizes(string _queryString)
         {
-            var sizes = new List<ProductSizes>();
-            sizes.Add(new ProductSizes() { productSizeId = 1, productSizeName = "3X"});
-            sizes.Add(new ProductSizes() { productSizeId = 2, productSizeName = "2X" });
-            sizes.Add(new ProductSizes() { productSizeId = 3, productSizeName = "XL" });
-            sizes.Add(new ProductSizes() { productSizeId = 4, productSizeName = "L" });
-            sizes.Add(new ProductSizes() { productSizeId = 5, productSizeName = "M" });
-            sizes.Add(new ProductSizes() { productSizeId = 6, productSizeName = "S" });
-            sizes.Add(new ProductSizes() { productSizeId = 7, productSizeName = "24" });
-            sizes.Add(new ProductSizes() { productSizeId = 8, productSizeName = "22" });
-            sizes.Add(new ProductSizes() { productSizeId = 9, productSizeName = "20" });
-            sizes.Add(new ProductSizes() { productSizeId = 10, productSizeName = "18" });
-            sizes.Add(new ProductSizes() { productSizeId = 11, productSizeName = "16" });
-            sizes.Add(new ProductSizes() { productSizeId = 12, productSizeName = "14" });
-            sizes.Add(new ProductSizes() { productSizeId = 13, productSizeName = "12" });
-            sizes.Add(new ProductSizes() { productSizeId = 14, productSizeName = "10" });
-            sizes.Add(new ProductSizes() { productSizeId = 15, productSizeName = "8" });
-            sizes.Add(new ProductSizes() { productSizeId = 16, productSizeName = "6" });
-            sizes.Add(new ProductSizes() { productSizeId = 17, productSizeName = "4" });
-            sizes.Add(new ProductSizes() { productSizeId = 18, productSizeName = "2" });
-            sizes.Add(new ProductSizes() { productSizeId = 19, productSizeName = "0" });
+            var sizes = GlobalVariables.globalSizesList;
             if (_queryString != "")
             {
                 mProductSizes = sizes

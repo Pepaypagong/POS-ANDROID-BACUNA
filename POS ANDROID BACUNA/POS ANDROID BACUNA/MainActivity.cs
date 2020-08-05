@@ -98,6 +98,7 @@ namespace POS_ANDROID_BACUNA
 
             //pass to global variable the instance of the checkout fragment
             GlobalVariables.mCheckoutFragmentCurrentInstance = mCheckoutFragment;
+            PopulateDatabase.PopulateAll();
         }
 
         private void MDrawerLayout_DrawerOpened(object sender, DrawerLayout.DrawerOpenedEventArgs e)

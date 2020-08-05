@@ -219,8 +219,10 @@ namespace POS_ANDROID_BACUNA.Fragments
             else
             {
                 string productName = "";
-                decimal productRetailPrice = 0.00M;
                 int productCategoryId = 1;
+                string productCategory = "";
+                int productSizeId = 1;
+                string productSize = "";
                 int parentProductId = 1;
 
                 //get from db here where item id
@@ -229,8 +231,10 @@ namespace POS_ANDROID_BACUNA.Fragments
                     if (item.productId == _itemId)
                     {
                         productName = item.productName;
-                        productRetailPrice = item.productRetailPrice;
                         productCategoryId = item.productCategoryId;
+                        productCategory = item.productCategory;
+                        productSizeId = item.productSizeId;
+                        productSize = item.productSize;
                         parentProductId = item.parentProductId;
                     }
                 }
@@ -243,12 +247,33 @@ namespace POS_ANDROID_BACUNA.Fragments
                     productPrice = _itemPrice,
                     productCountOnCart = _itemQty,
                     productCategoryId = productCategoryId,
+                    productCategory = productCategory,
+                    productSizeId = productSizeId,
+                    productSize = productSize,
+                    sizeRank = GetSizeRank(productSizeId),
                     productSubTotalPrice = _itemQty * _itemPrice,
                     productDiscountAmount = 0.00M,
                     productDiscountPercentage = 0.00M,
-                    parentProductId = parentProductId
+                    parentProductId = parentProductId,
+                    parentProductName = GetParentProductName(parentProductId)
                 });
             }
+        }
+
+        private int GetSizeRank(int _productSizeId)
+        {
+            return GlobalVariables.globalSizesList
+                    .Where(x => x.productSizeId == _productSizeId)
+                    .Select(x => x.sizeRank)
+                    .FirstOrDefault();
+        }
+
+        private string GetParentProductName(int _parentProductId)
+        {
+            return GlobalVariables.globalParentProductList
+                .Where(x => x.parentProductId == _parentProductId)
+                .Select(x => x.parentProductName)
+                .FirstOrDefault();
         }
 
         public string ComputeQuantity(string _value, bool _isToAdd)

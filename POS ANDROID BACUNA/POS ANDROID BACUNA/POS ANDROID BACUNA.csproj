@@ -123,6 +123,7 @@
     <Compile Include="MainActivity.cs" />
     <Compile Include="ColorSelectorDialogFragment.cs" />
     <Compile Include="MoreOptionsDialogFragment.cs" />
+    <Compile Include="PopulateDatabase.cs" />
     <Compile Include="PricingTypeDialogFragment.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

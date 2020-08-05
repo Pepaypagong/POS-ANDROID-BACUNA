@@ -283,11 +283,16 @@ namespace POS_ANDROID_BACUNA.Adapters
                     productOrigPrice = GetProductPrice(position),
                     productPrice = GetProductPrice(position),
                     productCountOnCart = 1,
-                    productCategoryId = 1,
+                    productCategoryId = mProducts[position].productCategoryId,
+                    productCategory = mProducts[position].productCategory,
+                    productSizeId = mProducts[position].productSizeId,
+                    productSize = mProducts[position].productSize,
+                    sizeRank = GetSizeRank(mProducts[position].productSizeId),
                     productSubTotalPrice = GetProductPrice(position),
                     productDiscountAmount = 0.00M,
                     productDiscountPercentage = 0.00M,
-                    parentProductId = mProducts[position].parentProductId
+                    parentProductId = mProducts[position].parentProductId,
+                    parentProductName = GetParentProductName(mProducts[position].parentProductId)
                 });
             }
             //update checkoutbutton.
@@ -302,6 +307,22 @@ namespace POS_ANDROID_BACUNA.Adapters
             {
                 ShowCurrentQuantityOnCartList(sender, clickedProductRow[0].productCountOnCart);
             }
+        }
+
+        private int GetSizeRank(int _productSizeId) 
+        {
+            return GlobalVariables.globalSizesList
+                    .Where(x => x.productSizeId == _productSizeId)
+                    .Select(x => x.sizeRank)
+                    .FirstOrDefault();
+        }
+
+        private string GetParentProductName(int _parentProductId)
+        {
+            return GlobalVariables.globalParentProductList
+                .Where(x => x.parentProductId == _parentProductId)
+                .Select(x => x.parentProductName)
+                .FirstOrDefault();
         }
 
         private void ShowCurrentQuantityOnCartList(object _sender, int _itemQty)

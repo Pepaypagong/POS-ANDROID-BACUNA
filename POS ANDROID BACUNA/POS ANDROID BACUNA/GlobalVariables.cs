@@ -21,6 +21,7 @@ namespace POS_ANDROID_BACUNA.Data_Classes
         public static List<Product> globalProductList = new List<Product>();
         public static List<ParentProducts> globalParentProductList = new List<ParentProducts>(); //temporary placeholder
         public static List<ProductCategories> globalProductCategoryList = new List<ProductCategories>();
+        public static List<ProductSizes> globalSizesList = new List<ProductSizes>();
         public static List<Customers> globalCustomersList = new List<Customers>();
         public static List<Runners> globalRunnersList = new List<Runners>();
         public static List<Options> globalOptionList = new List<Options>();

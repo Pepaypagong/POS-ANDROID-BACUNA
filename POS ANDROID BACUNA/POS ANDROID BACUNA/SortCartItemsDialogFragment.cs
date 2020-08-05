@@ -54,9 +54,9 @@ namespace POS_ANDROID_BACUNA
         {
             mOrderFields = new List<OrderFields>();
             mOrderFields.Add(new OrderFields() { FieldId = 1, FieldRank = 0, FieldName = "Product name", 
-                fieldNameOnDb = "productId", IsChecked = false, IsDesc = true});
+                fieldNameOnDb = "parentProductName", IsChecked = false, IsDesc = true});
             mOrderFields.Add(new OrderFields() { FieldId = 2, FieldRank = 0, FieldName = "Size", 
-                fieldNameOnDb = "productSizeId", IsChecked = false, IsDesc = true });
+                fieldNameOnDb = "sizeRank", IsChecked = false, IsDesc = true });
             mOrderFields.Add(new OrderFields() { FieldId = 3, FieldRank = 0, FieldName = "Subtotal Amount", 
                 fieldNameOnDb = "productSubTotalPrice", IsChecked = false, IsDesc = true });
             mOrderFields.Add(new OrderFields() { FieldId = 4, FieldRank = 0, FieldName = "Quantity", 
