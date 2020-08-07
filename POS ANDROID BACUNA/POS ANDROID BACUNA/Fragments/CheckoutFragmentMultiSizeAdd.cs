@@ -38,13 +38,12 @@ namespace POS_ANDROID_BACUNA.Fragments
         TextView mTxtAllPlus1;
         TextView mTxtAllPlus6;
         TextView mTxtAllPlus12;
-
+        List<MultiSizeAddProductsHolder> mProductHolder;
         RecyclerView mRvSizes;
         RecyclerView.LayoutManager mLayoutManager;
         RecyclerView.Adapter mMultiAddAdapter;
-        CheckoutMultiAddListRecyclerViewAdapter _checkoutMultiAddListRecyclerViewAdapter;
+        CheckoutMultiAddListRecyclerViewAdapter _Adapter;
         LinearLayout mllCheckoutCartButtonContainer;
-        ImageButton mBtnCheckoutMultiAddClear;
         Button mBtnCheckoutMultiAddAddToCart;
         float mDpVal;
 
@@ -63,7 +62,13 @@ namespace POS_ANDROID_BACUNA.Fragments
                 SetRecyclerViewLayoutHeight(mRvSizes, mRlSizesHeader);
             });
         }
-
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.toolbar_menu_checkout_multi_add, menu);
+            IMenuItem item = menu.FindItem(Resource.Id.menuItem_pricingType);
+            item.SetTitle(GlobalVariables.mCurrentSelectedPricingType);
+            return base.OnCreateOptionsMenu(menu);
+        }
         private void SetListLayout()
         {
             //Create Layout Manager
@@ -72,28 +77,54 @@ namespace POS_ANDROID_BACUNA.Fragments
             mRvSizes.SetLayoutManager(mLayoutManager);
             mRvSizes.HasFixedSize = true;
 
-            _checkoutMultiAddListRecyclerViewAdapter = new CheckoutMultiAddListRecyclerViewAdapter(PopulateParentProductSizes(), 
-                mRvSizes, mBtnCheckoutMultiAddAddToCart, this, GlobalVariables.mCurrentSelectedPricingType);
-            mMultiAddAdapter = _checkoutMultiAddListRecyclerViewAdapter;
+            _Adapter = new CheckoutMultiAddListRecyclerViewAdapter(InitialDataLoad(), this);
+            mMultiAddAdapter = _Adapter;
             mRvSizes.SetAdapter(mMultiAddAdapter);   
         }
 
-        private List<Product> PopulateParentProductSizes()
+        private List<MultiSizeAddProductsHolder> InitialDataLoad()
         {
             int selectedParentProductId = GlobalVariables.mCurrentSelectedItemIdMultiSize;
-            List<Product> mProducts = new List<Product>();
-
-            //get from global product list
-            mProducts = GlobalVariables.globalProductList;
-
-            //filter by product id
-            mProducts = mProducts.Where(o => o.parentProductId == selectedParentProductId).ToList();
-
-            return mProducts;
+            List<Product> products = GlobalVariables.globalProductList
+                .Where(o => o.parentProductId == selectedParentProductId)
+                .OrderBy(o => o.productSizeId) //3x -> S
+                .ToList();
+            mProductHolder = new List<MultiSizeAddProductsHolder>();
+            foreach (var item in products)
+            {
+                mProductHolder.Add(new MultiSizeAddProductsHolder()
+                {
+                    productId = item.productId,
+                    isSelected = false,
+                    productSize = item.productSize,
+                    productPrice = GetProductPrice(GlobalVariables.mCurrentSelectedPricingType, products, item.productId),
+                    quantity = 0
+                });
+            }
+            return mProductHolder;
+        }
+        private decimal GetProductPrice(string mCurrentSelectedPricingType, List<Product> products, int productId)
+        {
+            decimal retval = 0;
+            var productsEnum = products.Where(x => x.productId == productId);
+            if (mCurrentSelectedPricingType == "RT")
+            {
+                retval = productsEnum.Select(x=>x.productRetailPrice).FirstOrDefault();
+            }
+            else if (mCurrentSelectedPricingType == "WS")
+            {
+                retval = productsEnum.Select(x => x.productWholesalePrice).FirstOrDefault();
+            }
+            else //runner
+            {
+                retval = productsEnum.Select(x => x.productRunnerPrice).FirstOrDefault();
+            }
+            return retval;
         }
         private void FnSetControlClickEvents()
         {
             mCbSelectAll.Click += MCbSelectAll_Click;
+            mCbSelectAll.CheckedChange += MCbSelectAll_CheckedChange;
             mTxtAll0.Click += MTxtAll0_Click;
             mTxtAllMinus1.Click += MTxtAllMinus1_Click;
             mTxtAllPlus1.Click += MTxtAllPlus1_Click;
@@ -103,52 +134,20 @@ namespace POS_ANDROID_BACUNA.Fragments
             mBtnCheckoutMultiAddAddToCart.Click += MBtnCheckoutMultiAddAddToCart_Click;
         }
 
-        private void ChangeAllQuantityValues(string _newValue)
+        private void MCbSelectAll_CheckedChange(object sender, CompoundButton.CheckedChangeEventArgs e)
         {
-            //iterate the recyclerview items
-            for (int i = 0; i < mRvSizes.GetAdapter().ItemCount; i++)
-            {
-                View holder = mLayoutManager.FindViewByPosition(i);
-                TextView txtQuantity = holder.FindViewById<TextView>(Resource.Id.txtQty);
-                txtQuantity.Text = _newValue;
-            }
-        }
-
-        private void CheckUncheckAllItems(bool _isToCheck)
-        {
-            //iterate the recyclerview items
-            for (int i = 0; i < mRvSizes.GetAdapter().ItemCount; i++)
-            {
-                View holder = mLayoutManager.FindViewByPosition(i);
-                CheckBox checkBox = holder.FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
-                checkBox.Checked = _isToCheck ? true : false;
-            }
+            mCbSelectAll.Text = e.IsChecked ? "UNSELECT ALL SIZES" : "SELECT ALL SIZES";
         }
 
         private void MBtnCheckoutMultiAddAddToCart_Click(object sender, EventArgs e)
         {
-            if (IsAnItemChecked() & IsItemTotalQtyGreaterThan0())
+            mProductHolder = _Adapter.GetUpdatedData();
+            if (mProductHolder.Exists(x => x.isSelected == true))
             {
-                TextView itemId;
-                TextView itemSelectedPrice;
-                TextView itemQuantity;
-                CheckBox itemChecked;
-
-                //iterate the recyclerview items
-                for (int i = 0; i < mRvSizes.GetAdapter().ItemCount; i++)
+                foreach (var item in mProductHolder.Where(x=>x.isSelected == true))
                 {
-                    View holder = mLayoutManager.FindViewByPosition(i);
-                    itemId = holder.FindViewById<TextView>(Resource.Id.txtItemId);
-                    itemSelectedPrice = holder.FindViewById<TextView>(Resource.Id.txtItemPrice);
-                    itemQuantity = holder.FindViewById<TextView>(Resource.Id.txtQty);
-                    itemChecked = holder.FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
-
-                    if (itemChecked.Checked)
-                    {
-                        AddItemsToCart(Convert.ToInt32(itemId.Text), Convert.ToInt32(itemQuantity.Text), Convert.ToDecimal(itemSelectedPrice.Text));
-                    }
+                    AddItemsToCart(item.productId, item.quantity, item.productPrice);
                 }
-
                 //close view then update total button
                 Finish();
             }
@@ -156,46 +155,6 @@ namespace POS_ANDROID_BACUNA.Fragments
             {
                 DialogMessageService.MessageBox(this,"No item selected","Please select item(s) to add to cart.");
             }
-        }
-
-        private bool IsAnItemChecked()
-        {
-            CheckBox itemChecked;
-            bool anItemIsChecked = false;
-
-            //iterate the recyclerview items
-            for (int i = 0; i < mRvSizes.GetAdapter().ItemCount; i++)
-            {
-                View holder = mLayoutManager.FindViewByPosition(i);
-                itemChecked = holder.FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
-
-                if (itemChecked.Checked)
-                {
-                    anItemIsChecked = true;
-                }
-            }
-
-            return anItemIsChecked;
-        }
-
-        private bool IsItemTotalQtyGreaterThan0()
-        {
-            TextView txtQty;
-            bool retVal = false;
-
-            //iterate the recyclerview items
-            for (int i = 0; i < mRvSizes.GetAdapter().ItemCount; i++)
-            {
-                View holder = mLayoutManager.FindViewByPosition(i);
-                txtQty = holder.FindViewById<TextView>(Resource.Id.txtQty);
-
-                if (txtQty.Text != "0")
-                {
-                    retVal = true;
-                }
-            }
-
-            return retVal;
         }
 
         private void AddItemsToCart(int _itemId, int _itemQty, decimal _itemPrice)
@@ -309,43 +268,68 @@ namespace POS_ANDROID_BACUNA.Fragments
         private void MTxtAllPlus12_Click(object sender, EventArgs e)
         {
             mTxtAllQuantity.Text = ComputeQuantity("12", true);
-            ChangeAllQuantityValues(mTxtAllQuantity.Text);
+            if (!mCbSelectAll.Checked)
+            {
+                mCbSelectAll.Checked = true;
+                mTxtAllQuantity.Text = "12";
+            }
+            _Adapter.ChangeAllItemQuantity(Convert.ToInt32(mTxtAllQuantity.Text));
         }
 
         private void MTxtAllPlus6_Click(object sender, EventArgs e)
         {
             mTxtAllQuantity.Text = ComputeQuantity("6", true);
-            ChangeAllQuantityValues(mTxtAllQuantity.Text);
+            if (!mCbSelectAll.Checked)
+            {
+                mCbSelectAll.Checked = true;
+                mTxtAllQuantity.Text = "6";
+            }
+            _Adapter.ChangeAllItemQuantity(Convert.ToInt32(mTxtAllQuantity.Text));
         }
 
         private void MTxtAllPlus1_Click(object sender, EventArgs e)
         {
             mTxtAllQuantity.Text = ComputeQuantity("1", true);
-            ChangeAllQuantityValues(mTxtAllQuantity.Text);
+            if (!mCbSelectAll.Checked)
+            {
+                mCbSelectAll.Checked = true;
+                mTxtAllQuantity.Text = "1";
+            }
+            _Adapter.ChangeAllItemQuantity(Convert.ToInt32(mTxtAllQuantity.Text));
         }
 
         private void MTxtAllMinus1_Click(object sender, EventArgs e)
         {
             mTxtAllQuantity.Text = ComputeQuantity("1", false);
-            ChangeAllQuantityValues(mTxtAllQuantity.Text);
+            if (mTxtAllQuantity.Text == "0")
+            {
+                mCbSelectAll.Checked = false;
+            }
+            _Adapter.ChangeAllItemQuantity(Convert.ToInt32(mTxtAllQuantity.Text));
         }
 
         private void MTxtAll0_Click(object sender, EventArgs e)
         {
             mTxtAllQuantity.Text = "0";
-            CheckUncheckAllItems(false);
-            ChangeAllQuantityValues(mTxtAllQuantity.Text);
-            mCbSelectAll.Text = "Select All";
+            _Adapter.ChangeAllItemQuantity(0);
             mCbSelectAll.Checked = false;
         }
 
         private void MCbSelectAll_Click(object sender, EventArgs e)
         {
-            //CheckUncheckAllItems(mCbSelectAll.Checked);
-            mCbSelectAll.Text =  mCbSelectAll.Checked ? "Unselect All" : "Select All";
-            Toast.MakeText(this, mCbSelectAll.Checked ? "Checked All" : "Unchecked All", ToastLength.Long).Show();
-            _checkoutMultiAddListRecyclerViewAdapter.CheckAllItems(mCbSelectAll.Checked);
-            mMultiAddAdapter.NotifyDataSetChanged();
+            _Adapter.CheckAllItems(mCbSelectAll.Checked);
+            if (mCbSelectAll.Checked)
+            {
+                if (mTxtAllQuantity.Text == "0")
+                {
+                    mTxtAllQuantity.Text = "1";
+                }
+            }
+            else
+            {
+                mTxtAllQuantity.Text = "0";
+            }
+            _Adapter.ChangeAllItemQuantity(Convert.ToInt32(mTxtAllQuantity.Text));
         }
 
         private void FnSetControls()
@@ -361,7 +345,6 @@ namespace POS_ANDROID_BACUNA.Fragments
 
             mRvSizes = FindViewById<RecyclerView>(Resource.Id.rvSizes);
             mllCheckoutCartButtonContainer = FindViewById<LinearLayout>(Resource.Id.llCheckoutCartButtonContainer);
-            mBtnCheckoutMultiAddClear = FindViewById<ImageButton>(Resource.Id.btnCheckoutMultiAddClear);
             mBtnCheckoutMultiAddAddToCart = FindViewById<Button>(Resource.Id.btnCheckoutMultiAddAddToCart);
         }
 
@@ -422,6 +405,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         protected override void OnDestroy()
         {
+            //refresh button total
             GlobalVariables.mIsCheckoutFragmentMultiSizeAddOpened = false;
             CheckoutFragment fragment_obj = (CheckoutFragment)GlobalVariables.mCheckoutFragmentCurrentInstance;
             fragment_obj.SetCheckoutButtonTotal(fragment_obj.mBtnCheckoutButton,fragment_obj.Context);

@@ -79,6 +79,7 @@
     <Compile Include="CheckoutSelectCustomerActivity.cs" />
     <Compile Include="ColorHelper.cs" />
     <Compile Include="CurrencyTextWatcher.cs" />
+    <Compile Include="Data Classes\MultiSizeAddProductsHolder.cs" />
     <Compile Include="Data Classes\Runners.cs" />
     <Compile Include="Data Classes\Customers.cs" />
     <Compile Include="BluetoothDevicesListViewAdapter.cs" />
@@ -623,6 +624,12 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\roundborderOrange.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\toolbar_menu_checkout_multi_add.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

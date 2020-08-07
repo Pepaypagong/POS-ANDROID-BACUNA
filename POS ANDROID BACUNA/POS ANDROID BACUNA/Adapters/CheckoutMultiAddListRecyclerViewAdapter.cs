@@ -20,34 +20,14 @@ namespace POS_ANDROID_BACUNA.Adapters
 {
     class CheckoutMultiAddListRecyclerViewAdapter : RecyclerView.Adapter
     {
-        RecyclerView mRecyclerView;
-        private List<Product> mProducts;
-
-        CheckoutFragment mCheckoutFragment;
-        Button mBtnAddToCart;
+        private List<MultiSizeAddProductsHolder> mProducts;
         Context mCheckoutMultiAddContext;
-        bool mIsAllChecked = false;
-        string mAllItemsQty = "0";
-        string mCurrentPricingType;
 
-        public CheckoutMultiAddListRecyclerViewAdapter(List<Product> products, RecyclerView recyclerView, 
-            //Button _minus6, Button _minus1, Button _plus1, Button _plus6, Button _plus12, TextView _txtProductQuantity, 
-            Button btnAddToCart, Context checkoutmultiaddcontext, string pricingType)
+        public CheckoutMultiAddListRecyclerViewAdapter(List<MultiSizeAddProductsHolder> products,
+            Context checkoutmultiaddcontext)
         {
             mProducts = products;
-            mRecyclerView = recyclerView;
-
-            //mMinus6 = _minus6;
-            //mMinus1 = _minus1;
-            //mPlus1 = _plus1;
-            //mPlus6 =_plus6;
-            //mPlus12 = _plus12;
-            //mProductQuantity = _txtProductQuantity;
-
-            mCheckoutFragment = new CheckoutFragment();
-            mBtnAddToCart = btnAddToCart;
             mCheckoutMultiAddContext = checkoutmultiaddcontext;
-            mCurrentPricingType = pricingType;
         }
 
         public class MyViewHolder : RecyclerView.ViewHolder
@@ -56,6 +36,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             public TextView mTxtItemId { get; set; }
             public TextView mTxtItemPrice { get; set; }
             public CheckBox mProductSizeAndPrice { get; set; }
+            public TextView mTxtItemQuantity { get; set; }
             public TextView mTxtQtyToZero { get; set; }
             public TextView mTxtQtyMinus1 { get; set; }
             public TextView mTxtQuantity { get; set; }
@@ -75,10 +56,11 @@ namespace POS_ANDROID_BACUNA.Adapters
             TextView mTxtItemId = itemView.FindViewById<TextView>(Resource.Id.txtItemId);
             TextView mTxtItemPrice = itemView.FindViewById<TextView>(Resource.Id.txtItemPrice);
             CheckBox cbProductSizeAndPrice = itemView.FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
+            TextView mTxtItemQuantity = itemView.FindViewById<TextView>(Resource.Id.txtQty);
             TextView mTxtQtyToZero = itemView.FindViewById<TextView>(Resource.Id.txtQtyToZero);
-            TextView mTxtQtyMinus1 = itemView.FindViewById<TextView>(Resource.Id.txtQtyMinus1); 
+            TextView mTxtQtyMinus1 = itemView.FindViewById<TextView>(Resource.Id.txtQtyMinus1);
             TextView mTxtQuantity = itemView.FindViewById<TextView>(Resource.Id.txtQty);
-            TextView mTxtQtyPlus1 = itemView.FindViewById<TextView>(Resource.Id.txtQtyPlus1); 
+            TextView mTxtQtyPlus1 = itemView.FindViewById<TextView>(Resource.Id.txtQtyPlus1);
             TextView mTxtQtyPlus6 = itemView.FindViewById<TextView>(Resource.Id.txtQtyPlus6);
             TextView mTxtQtyPlus12 = itemView.FindViewById<TextView>(Resource.Id.txtQtyPlus12);
 
@@ -87,11 +69,12 @@ namespace POS_ANDROID_BACUNA.Adapters
                 mTxtItemId = mTxtItemId,
                 mTxtItemPrice = mTxtItemPrice,
                 mProductSizeAndPrice = cbProductSizeAndPrice,
+                mTxtItemQuantity = mTxtItemQuantity,
                 mTxtQtyToZero = mTxtQtyToZero,
                 mTxtQtyMinus1 = mTxtQtyMinus1,
-                mTxtQuantity = mTxtQuantity, 
-                mTxtQtyPlus1 = mTxtQtyPlus1, 
-                mTxtQtyPlus6 = mTxtQtyPlus6, 
+                mTxtQuantity = mTxtQuantity,
+                mTxtQtyPlus1 = mTxtQtyPlus1,
+                mTxtQtyPlus6 = mTxtQtyPlus6,
                 mTxtQtyPlus12 = mTxtQtyPlus12
             };
 
@@ -105,35 +88,28 @@ namespace POS_ANDROID_BACUNA.Adapters
             subscribeEvents(myHolder);
 
             myHolder.mTxtItemId.Text = mProducts[position].productId.ToString();
-            myHolder.mTxtItemPrice.Text = GetProductPrice(position).ToString();
-            myHolder.mProductSizeAndPrice.Text = "Size " + mProducts[position].productSize.ToString() + "\n \u20b1 " + String.Format("{0:n}", GetProductPrice(position));
-
+            myHolder.mTxtItemPrice.Text = mProducts[position].productPrice.ToString();
+            myHolder.mProductSizeAndPrice.Text = "Size " + mProducts[position].productSize.ToString()
+                + " @ \u20b1" + String.Format("{0:n}", mProducts[position].productPrice);
+            myHolder.mTxtItemQuantity.Text = mProducts[position].quantity.ToString();
             //set if item is checked
-            myHolder.mProductSizeAndPrice.Checked = mIsAllChecked ? true : false;
+            myHolder.mProductSizeAndPrice.Checked = mProducts[position].isSelected;
+            SetCheckboxColor(mProducts[position].isSelected, myHolder.mProductSizeAndPrice);
         }
-        private decimal GetProductPrice(int position)
-        {
-            decimal retval = 0;
-            if (mCurrentPricingType == "RT")
-            {
-                retval = mProducts[position].productRetailPrice;
-            }
-            else if (mCurrentPricingType == "WS")
-            {
-                retval = mProducts[position].productWholesalePrice;
-            }
-            else //runner
-            {
-                retval = mProducts[position].productRunnerPrice;
-            }
 
-            return retval;
+        private void SetCheckboxColor(bool _isSelected, CheckBox _cbSizeAndPrice)
+        {
+            _cbSizeAndPrice.SetTextColor(_isSelected ?
+                ColorHelper.ResourceIdToColor(Resource.Color.colorTextEnabled, mCheckoutMultiAddContext) :
+                ColorHelper.ResourceIdToColor(Resource.Color.colorBlurred, mCheckoutMultiAddContext));
+            _cbSizeAndPrice.ButtonTintList = mCheckoutMultiAddContext.GetColorStateList(_isSelected ?
+                Resource.Color.colorAccent : Resource.Color.colorBlurred);
         }
 
         void subscribeEvents(MyViewHolder _myHolder)
         {
-            _myHolder.mMainView.Click -= MMainView_Click;//unsubscibe to avoid multiple firing of clicks
-            _myHolder.mMainView.Click += MMainView_Click; //set click event for row
+            //_myHolder.mMainView.Click -= MMainView_Click;//unsubscibe to avoid multiple firing of clicks
+            //_myHolder.mMainView.Click += MMainView_Click; //set click event for row
 
             _myHolder.mProductSizeAndPrice.Click -= MProductSizeAndPrice_Click;
             _myHolder.mProductSizeAndPrice.Click += MProductSizeAndPrice_Click;
@@ -187,58 +163,39 @@ namespace POS_ANDROID_BACUNA.Adapters
             return retVal;
         }
 
+        private void ChangeQuantityEvent(object _sender, string _quantity, bool _toAdd)
+        {
+            TextView txtQuantity = GetMainParent((TextView)_sender).FindViewById<TextView>(Resource.Id.txtQty);
+            TextView txtProductId = GetMainParent((TextView)_sender).FindViewById<TextView>(Resource.Id.txtItemId);
+            txtQuantity.Text = ComputeQuantity(_quantity, _toAdd, txtQuantity);
+            ChangeRowItemQuantity(Convert.ToInt32(txtProductId.Text), Convert.ToInt32(txtQuantity.Text));
+        }
         private void MTxtQtyPlus12_Click(object sender, EventArgs e)
         {
-            CheckBox checkbox = GetMainParent((TextView)sender).FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
-            TextView txtQuantity = GetMainParent((TextView)sender).FindViewById<TextView>(Resource.Id.txtQty);
-
-            checkbox.Checked = true;
-            txtQuantity.Text = ComputeQuantity("12",true, txtQuantity);
+            ChangeQuantityEvent(sender, "12", true);
         }
 
         private void MTxtQtyPlus6_Click(object sender, EventArgs e)
         {
-            CheckBox checkbox = GetMainParent((TextView)sender).FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
-            TextView txtQuantity = GetMainParent((TextView)sender).FindViewById<TextView>(Resource.Id.txtQty);
-
-            checkbox.Checked = true;
-            txtQuantity.Text = ComputeQuantity("6", true, txtQuantity);
+            ChangeQuantityEvent(sender, "6", true);
         }
 
         private void MTxtQtyPlus1_Click(object sender, EventArgs e)
         {
-            CheckBox checkbox = GetMainParent((TextView)sender).FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
-            TextView txtQuantity = GetMainParent((TextView)sender).FindViewById<TextView>(Resource.Id.txtQty);
-
-            checkbox.Checked = true;
-            txtQuantity.Text = ComputeQuantity("1", true, txtQuantity);
+            ChangeQuantityEvent(sender, "1", true);
         }
 
         private void MTxtQtyMinus1_Click(object sender, EventArgs e)
         {
-            CheckBox checkbox = GetMainParent((TextView)sender).FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
-            TextView txtQuantity = GetMainParent((TextView)sender).FindViewById<TextView>(Resource.Id.txtQty);
-
-            if (txtQuantity.Text == "1")
-            {
-                checkbox.Checked = false;
-                txtQuantity.Text = ComputeQuantity("1", false, txtQuantity);
-            }
-            else if(txtQuantity.Text != "0")
-            {
-                checkbox.Checked = true;
-                txtQuantity.Text = ComputeQuantity("1", false, txtQuantity);
-            }
-            
+            ChangeQuantityEvent(sender, "1", false);
         }
 
         private void MTxtQtyToZero_Click(object sender, EventArgs e)
         {
-            CheckBox checkbox = GetMainParent((TextView)sender).FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
             TextView txtQuantity = GetMainParent((TextView)sender).FindViewById<TextView>(Resource.Id.txtQty);
-
-            checkbox.Checked = false;
+            TextView txtProductId = GetMainParent((TextView)sender).FindViewById<TextView>(Resource.Id.txtItemId);
             txtQuantity.Text = "0";
+            ChangeRowItemQuantity(Convert.ToInt32(txtProductId.Text), Convert.ToInt32(txtQuantity.Text));
         }
 
         private void MProductSizeAndPrice_Click(object sender, EventArgs e)
@@ -248,6 +205,7 @@ namespace POS_ANDROID_BACUNA.Adapters
 
             CheckBox checkbox = parent.FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
             TextView txtQuantity = parent.FindViewById<TextView>(Resource.Id.txtQty);
+            TextView txtProductId = parent.FindViewById<TextView>(Resource.Id.txtItemId);
 
             if (checkbox.Checked)
             {
@@ -256,12 +214,18 @@ namespace POS_ANDROID_BACUNA.Adapters
                     txtQuantity.Text = "1";
                 }
             }
+            else
+            {
+                txtQuantity.Text = "0";
+            }
+            ChangeRowItemQuantity(Convert.ToInt32(txtProductId.Text), Convert.ToInt32(txtQuantity.Text));
         }
 
         private void MMainView_Click(object sender, EventArgs e)
         {
             CheckBox checkbox = ((ViewGroup)sender).FindViewById<CheckBox>(Resource.Id.cbSizeAndPrice);
             TextView txtQuantity = ((ViewGroup)sender).FindViewById<TextView>(Resource.Id.txtQty);
+            TextView txtProductId = ((ViewGroup)sender).FindViewById<TextView>(Resource.Id.txtItemId);
 
             if (!checkbox.Checked)
             {
@@ -269,22 +233,45 @@ namespace POS_ANDROID_BACUNA.Adapters
                 if (txtQuantity.Text == "0")
                 {
                     txtQuantity.Text = "1";
-                }    
+                }
             }
             else
             {
                 checkbox.Checked = false;
+                txtQuantity.Text = "0";
             }
+            ChangeRowItemQuantity(Convert.ToInt32(txtProductId.Text), Convert.ToInt32(txtQuantity.Text));
         }
 
         public void CheckAllItems(bool _isChecked)
         {
-            mIsAllChecked = _isChecked ? true : false;
+            foreach (var item in mProducts)
+            {
+                item.isSelected = _isChecked;
+            }
+            this.NotifyDataSetChanged();
         }
-
-        public void ChangeAllItemQty()
-        { 
-            
+        public void ChangeAllItemQuantity(int _newQuantity)
+        {
+            foreach (var item in mProducts)
+            {
+                item.isSelected = _newQuantity == 0 ? false : true;
+                item.quantity = _newQuantity;
+            }
+            this.NotifyDataSetChanged();
+        }
+        public List<MultiSizeAddProductsHolder> GetUpdatedData()
+        {
+            return mProducts;
+        }
+        public void ChangeRowItemQuantity(int _productId, int _newQuantity)
+        {
+            foreach (var item in mProducts.Where(x => x.productId == _productId))
+            {
+                item.isSelected = _newQuantity == 0 ? false : true;
+                item.quantity = _newQuantity;
+            }
+            this.NotifyDataSetChanged();
         }
 
         public override int ItemCount
