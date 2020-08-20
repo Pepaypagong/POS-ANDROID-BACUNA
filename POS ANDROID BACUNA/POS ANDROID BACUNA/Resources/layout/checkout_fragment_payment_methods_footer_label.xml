@@ -1,0 +1,37 @@
+
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rlLabel"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="70dp"
+    android:paddingLeft="60dp"
+    android:paddingRight="60dp">
+    <TextView
+        android:id="@+id/txtLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/viewMiddle"
+        android:layout_centerHorizontal="true"
+        android:text="Test asdasd asd asdasdasd asdasd asd asdasd asd as"
+        android:gravity="center"
+        android:textSize="17sp"
+        android:textColor="@color/colorLightBlack"/>
+    <View
+        android:id="@+id/viewMiddle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+    />
+    <ImageView
+        android:id="@+id/imgDown"
+        android:layout_height="100dp"
+        android:layout_width="100dp"
+        android:layout_below="@id/viewMiddle"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/down_arrow_icon"
+        android:tint="@color/colorLightBlack"
+    />
+</RelativeLayout>

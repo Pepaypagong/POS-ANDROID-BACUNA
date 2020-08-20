@@ -123,6 +123,19 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void MBtnCartTotal_Click(object sender, EventArgs e)
         {
+            //PrintReceipt();
+            if (!mDialogShown)
+            {
+                mDialogShown = true;
+                Intent intent = new Intent(this, typeof(CheckoutFragmentPaymentActivity));
+                double totalSaleAmount = Convert.ToDouble(GlobalVariables.globalProductsOnCart.Sum(x => x.productSubTotalPrice));
+                intent.PutExtra("TotalSaleAmount", totalSaleAmount);
+                StartActivityForResult(intent, 22);
+            }
+        }
+
+        private void PrintReceipt()
+        {
             Android.App.AlertDialog.Builder builder = new Android.App.AlertDialog.Builder(this);
             Android.App.AlertDialog alert = builder.Create();
             alert.SetTitle("Confirm Transaction");
@@ -141,10 +154,10 @@ namespace POS_ANDROID_BACUNA.Fragments
                 GlobalVariables.globalProductsOnCart.Clear();
                 GlobalVariables.mIsAllCollapsed = true;
                 Finish();
+
             });
 
             alert.Show();
-
         }
 
         public int maxNoOfRowsDisplayed()
@@ -386,9 +399,41 @@ namespace POS_ANDROID_BACUNA.Fragments
                 listAdapter.NotifyDataSetChanged();
                 SetCheckoutButtonTotal(mBtnCartTotal, this);
             }
+            else if (requestCode == 19)//global discount
+            {
+
+            }
             else if (requestCode == 20)//add note
             {
 
+            }
+            else if (requestCode == 22)//payment
+            {
+                mDialogShown = false;
+                if (GlobalVariables.mHasSelectedCustomerOnCheckout == true)
+                {
+                    ChangeSelectCustomerIcon(GlobalVariables.mCurrentSelectedCustomerOnCheckout);
+                }
+                else
+                {
+                    IMenuItem item = mCurrentToolbarMenu.FindItem(Resource.Id.menuItem_customer_cart);
+                    removeActionLayout(item);
+                }
+                try
+                {
+                    bool isStartNewTransaction = data.GetBooleanExtra("isStartNewTransaction", false);
+                    if (isStartNewTransaction)
+                    {
+                        var result = new Intent();
+                        result.PutExtra("isStartNewTransaction", isStartNewTransaction);
+                        SetResult(Result.Ok, result);
+                        Finish();
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
             }
         }
 

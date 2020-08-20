@@ -115,7 +115,10 @@ namespace POS_ANDROID_BACUNA.Fragments
                 "Date:" + boldStart + DateTime.Now.ToString("MMM d, yyyy h:mm tt")  + boldEnd, //date now String.Format("MMM d, yyyy h:mm tt",DateTime.Now)
                 _cashierName, //CASHIER NAME
                 "Customer:" + boldStart + _customerName + boldEnd, //CustomerName
-                line //line divider
+                line, //line divider
+                "[(Size) Item name]  [Orig. Amt.]",
+                "[Qty]*[Price]  [Discounted Amt.]",
+                line
             };
 
             List<ProductsOnCart> cartItems = GlobalVariables.globalProductsOnCart;

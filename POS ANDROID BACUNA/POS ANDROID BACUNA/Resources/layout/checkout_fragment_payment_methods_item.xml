@@ -1,0 +1,39 @@
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="50dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp">
+    <ImageView
+        android:id="@+id/imgRemove"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft = "true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/remove_icon"
+        android:tint="@color/colorLightBlack"/>
+    <TextView
+        android:id="@+id/txtPaymentType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/imgRemove"
+        android:layout_marginLeft="15dp"
+        android:layout_centerVertical="true"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorLightBlack"/>
+    <TextView
+        android:id="@+id/txtPaymentAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorLightBlack"/>
+    <TextView
+        android:id="@+id/txtPaymentId"
+        android:layout_width="0dp"
+        android:layout_height="0dp"/>
+</RelativeLayout>
