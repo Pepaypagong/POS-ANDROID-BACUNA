@@ -12,9 +12,10 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using SupportFragment = Android.Support.V4.App.Fragment;
-using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
+using ProductsModel = POS_ANDROID_BACUNA.Data_Classes.ProductsModel;
 using POS_ANDROID_BACUNA.Data_Classes;
 using POS_ANDROID_BACUNA.Fragments;
+using POS_ANDROID_BACUNA.SQLite;
 
 namespace POS_ANDROID_BACUNA.Adapters
 {
@@ -27,17 +28,18 @@ namespace POS_ANDROID_BACUNA.Adapters
         LinearLayout mllItemHolder;
         int mGridHeight;
         float mDpVal;
-        private List<Product> mProducts;
-        private List<ParentProducts> mParentProducts;
+        private List<ProductsModel> mProducts;
+        private List<ParentProductsModel> mParentProducts;
         bool mShowSizes;
         bool mIsGrid;
         CheckoutFragment mCheckoutFragment;
         Button mBtnCheckoutButton;
         Context mCheckoutContext;
         string mCurrentSelectedPricingType;
+        ParentProductsDataAccess mParentProductsDataAccess;
 
-        public CheckoutRecyclerViewAdapter(float dpVal, int gridHeight, List<Product> products,
-            List<ParentProducts> parentProducts, bool isGrid, RecyclerView recyclerView, 
+        public CheckoutRecyclerViewAdapter(float dpVal, int gridHeight, List<ProductsModel> products,
+            List<ParentProductsModel> parentProducts, bool isGrid, RecyclerView recyclerView, 
             Button btnCheckoutButton, Context checkoutContext, bool showSizes, SupportFragment supportFragment, string pricingType)
         {
             mGridHeight = gridHeight;
@@ -52,6 +54,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             mShowSizes = showSizes;
             mSupportFragment = supportFragment;
             mCurrentSelectedPricingType = pricingType;
+            mParentProductsDataAccess = new ParentProductsDataAccess();
         }
 
         public class MyViewHolder : RecyclerView.ViewHolder
@@ -148,40 +151,40 @@ namespace POS_ANDROID_BACUNA.Adapters
                 myHolder.mMainView.Click += ParentProduct_Click; //set click event for row
             }
 
-            myHolder.mProductId.Text = mShowSizes ? mProducts[position].productId.ToString(): mParentProducts[position].parentProductId.ToString();
-            myHolder.mProductName.Text = mShowSizes ? mProducts[position].productName : mParentProducts[position].parentProductName;
+            myHolder.mProductId.Text = mShowSizes ? mProducts[position].Id.ToString(): mParentProducts[position].Id.ToString();
+            myHolder.mProductName.Text = mShowSizes ? mProducts[position].ProductName : mParentProducts[position].ParentProductName;
             //condition here to display price based on transaction pricing type 
             myHolder.mProductPrice.Text = mShowSizes ? "\u20b1 " +String.Format("{0:n}", GetProductPrice(position)) : "";
 
             if (mIsGrid)
             {
                 myHolder.mItemBackgroudHolderGrid.SetBackgroundColor
-                    (Android.Graphics.Color.ParseColor("#" + (mShowSizes ? mProducts[position].productColorBg: mParentProducts[position].productColorBg)));
+                    (Android.Graphics.Color.ParseColor("#" + (mShowSizes ? mProducts[position].ProductColorBg: mParentProducts[position].ProductColorBg)));
             }
             else
             {
                 myHolder.mItemBackgroudHolderListView.SetCardBackgroundColor
-                    (Android.Graphics.Color.ParseColor("#" + (mShowSizes ? mProducts[position].productColorBg : mParentProducts[position].productColorBg)));
+                    (Android.Graphics.Color.ParseColor("#" + (mShowSizes ? mProducts[position].ProductColorBg : mParentProducts[position].ProductColorBg)));
             }
 
-            if (mProducts[position].productImage != null)
+            if (mProducts[position].ProductImage != null)
             {
                 //set item image here
             }
 
-            myHolder.mItemAlias.Text = mShowSizes ? mProducts[position].productAlias : mParentProducts[position].productAlias;
+            myHolder.mItemAlias.Text = mShowSizes ? mProducts[position].ProductAlias : mParentProducts[position].ProductAlias;
 
             int qtyOnCart = 0;
             if (mShowSizes)
             {
                 qtyOnCart = GlobalVariables.globalProductsOnCart
-                    .Where(x => x.productId == mProducts[position].productId)
+                    .Where(x => x.productId == mProducts[position].Id)
                     .Sum(x => x.productCountOnCart);
             }
             else
             {
                 qtyOnCart = GlobalVariables.globalProductsOnCart
-                    .Where(x => x.parentProductId == mParentProducts[position].parentProductId)
+                    .Where(x => x.parentProductId == mParentProducts[position].Id)
                     .Sum(x => x.productCountOnCart);
             }
 
@@ -201,15 +204,15 @@ namespace POS_ANDROID_BACUNA.Adapters
             decimal retval = 0;
             if (mCurrentSelectedPricingType == "RT")
             {
-                retval = mProducts[position].productRetailPrice;
+                retval = mProducts[position].ProductRetailPrice;
             }
             else if (mCurrentSelectedPricingType == "WS")
             {
-                retval = mProducts[position].productWholesalePrice;
+                retval = mProducts[position].ProductWholesalePrice;
             }
             else //runner
             {
-                retval = mProducts[position].productRunnerPrice;
+                retval = mProducts[position].ProductRunnerPrice;
             }
             
             return retval;
@@ -259,13 +262,13 @@ namespace POS_ANDROID_BACUNA.Adapters
         private void MMainView_Click(object sender, EventArgs e)
         {
             int position = mRecyclerView.GetChildAdapterPosition((View)sender);
-            bool alreadyExists = GlobalVariables.globalProductsOnCart.Any(x => x.productId == mProducts[position].productId);
+            bool alreadyExists = GlobalVariables.globalProductsOnCart.Any(x => x.productId == mProducts[position].Id);
 
             if (alreadyExists)
             {
                 foreach (var item in GlobalVariables.globalProductsOnCart)
                 {
-                    if (item.productId == mProducts[position].productId)
+                    if (item.productId == mProducts[position].Id)
                     {
                         item.productPrice = item.productOrigPrice; //update price on click to reset the price on cart
                         item.productDiscountAmount = 0.00M; //reset discount amt to 0 if already on cart
@@ -278,27 +281,27 @@ namespace POS_ANDROID_BACUNA.Adapters
             else {
                 GlobalVariables.globalProductsOnCart.Add(new ProductsOnCart()
                 {
-                    productId = mProducts[position].productId,
-                    productName = mProducts[position].productName,
+                    productId = mProducts[position].Id,
+                    productName = mProducts[position].ProductName,
                     productOrigPrice = GetProductPrice(position),
                     productPrice = GetProductPrice(position),
                     productCountOnCart = 1,
-                    productCategoryId = mProducts[position].productCategoryId,
-                    productCategory = mProducts[position].productCategory,
-                    productSizeId = mProducts[position].productSizeId,
-                    productSize = mProducts[position].productSize,
-                    sizeRank = GetSizeRank(mProducts[position].productSizeId),
+                    productCategoryId = mProducts[position].ProductCategoryId,
+                    productCategory = mProducts[position].ProductCategory,
+                    productSizeId = mProducts[position].ProductSizeId,
+                    productSize = mProducts[position].ProductSize,
+                    sizeRank = GetSizeRank(mProducts[position].ProductSizeId),
                     productSubTotalPrice = GetProductPrice(position),
                     productDiscountAmount = 0.00M,
                     productDiscountPercentage = 0.00M,
-                    parentProductId = mProducts[position].parentProductId,
-                    parentProductName = GetParentProductName(mProducts[position].parentProductId)
+                    parentProductId = mProducts[position].ParentProductId,
+                    parentProductName = mParentProductsDataAccess.SelectRecord(mProducts[position].ParentProductId)[0].ParentProductName
                 });
             }
             //update checkoutbutton.
             mCheckoutFragment.SetCheckoutButtonTotal(mBtnCheckoutButton, mCheckoutContext);
 
-            var clickedProductRow = GlobalVariables.globalProductsOnCart.Where(o => o.productId == mProducts[position].productId).ToList();
+            var clickedProductRow = GlobalVariables.globalProductsOnCart.Where(o => o.productId == mProducts[position].Id).ToList();
             if (mIsGrid)
             {
                 ShowCurrentQuantityOnCartGrid(sender, clickedProductRow[0].productCountOnCart);
@@ -309,20 +312,12 @@ namespace POS_ANDROID_BACUNA.Adapters
             }
         }
 
-        private int GetSizeRank(int _productSizeId) 
+        private int GetSizeRank(int _productSizeId)
         {
             return GlobalVariables.globalSizesList
-                    .Where(x => x.productSizeId == _productSizeId)
-                    .Select(x => x.sizeRank)
+                    .Where(x => x.ProductSizeId == _productSizeId)
+                    .Select(x => x.SizeRank)
                     .FirstOrDefault();
-        }
-
-        private string GetParentProductName(int _parentProductId)
-        {
-            return GlobalVariables.globalParentProductList
-                .Where(x => x.parentProductId == _parentProductId)
-                .Select(x => x.parentProductName)
-                .FirstOrDefault();
         }
 
         private void ShowCurrentQuantityOnCartList(object _sender, int _itemQty)
@@ -382,7 +377,7 @@ namespace POS_ANDROID_BACUNA.Adapters
         {
             get
             {
-                return mShowSizes ? mProducts.Count : mParentProducts.Count;
+                return mShowSizes ? mProducts != null ? mProducts.Count : 0 : mParentProducts != null ? mParentProducts.Count : 0;
             }
         }
 

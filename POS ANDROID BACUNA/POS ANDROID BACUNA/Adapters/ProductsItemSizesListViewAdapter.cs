@@ -47,16 +47,16 @@ namespace POS_ANDROID_BACUNA
             }
 
             TextView txtSize = row.FindViewById<TextView>(Resource.Id.txtSize);
-            txtSize.Text = mItems[position].productSize;
+            txtSize.Text = mItems[position].ProductSize;
 
             TextView txtWholesale = row.FindViewById<TextView>(Resource.Id.txtWholesale);
-            txtWholesale.Text = pesoSign + String.Format("{0:n}", mItems[position].productWholesalePrice);
+            txtWholesale.Text = pesoSign + String.Format("{0:n}", mItems[position].ProductWholesalePrice);
 
             TextView txtRetail = row.FindViewById<TextView>(Resource.Id.txtRetail);
-            txtRetail.Text = pesoSign + String.Format("{0:n}", mItems[position].productRetailPrice);
+            txtRetail.Text = pesoSign + String.Format("{0:n}", mItems[position].ProductRetailPrice);
 
             TextView txtRunner = row.FindViewById<TextView>(Resource.Id.txtRunner);
-            txtRunner.Text = pesoSign + String.Format("{0:n}", mItems[position].productRunnerPrice);
+            txtRunner.Text = pesoSign + String.Format("{0:n}", mItems[position].ProductRunnerPrice);
 
             return row;
         }

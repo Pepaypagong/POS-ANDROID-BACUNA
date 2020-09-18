@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 using Android.Views.InputMethods;
 using POS_ANDROID_BACUNA.Data_Classes;
 using Android.Graphics.Drawables;
+using POS_ANDROID_BACUNA.SQLite;
 
 namespace POS_ANDROID_BACUNA
 {
@@ -39,7 +40,9 @@ namespace POS_ANDROID_BACUNA
         private IMenu mCurrentToolBarMenu;
         private string mCurrentSelectedPriceType = "RT";
         static bool mDialogShown = false;  // flag for stopping double click
-
+        private ParentProductsDataAccess mParentProductsDataAccess;
+        private ProductsDataAccess mProductsDataAccess;
+        private CategoriesDataAccess mCategoriesDataAccess;
         protected override void AttachBaseContext(Context @base)
         {
             base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base)); //custom font
@@ -99,6 +102,17 @@ namespace POS_ANDROID_BACUNA
             //pass to global variable the instance of the checkout fragment
             GlobalVariables.mCheckoutFragmentCurrentInstance = mCheckoutFragment;
             PopulateDatabase.PopulateAll();
+            FnSetUpData();
+        }
+
+        private void FnSetUpData()
+        {
+            mParentProductsDataAccess = new ParentProductsDataAccess();
+            mParentProductsDataAccess.CreateTable();
+            mProductsDataAccess = new ProductsDataAccess();
+            mProductsDataAccess.CreateTable();
+            mCategoriesDataAccess = new CategoriesDataAccess();
+            mCategoriesDataAccess.CreateTable();
         }
 
         private void MDrawerLayout_DrawerOpened(object sender, DrawerLayout.DrawerOpenedEventArgs e)
@@ -119,18 +133,24 @@ namespace POS_ANDROID_BACUNA
                 {
                     case (Resource.Id.nav_checkout):
                         ShowFragment(mCheckoutFragment);
+                        mCheckoutFragment.PeformRefresh();
                         ab.SetTitle(Resource.String.checkout_title);
                         break;
                     case (Resource.Id.nav_products):
                         ShowFragment(mProductsFragment);
-                        ab.Title = "PRODUCTS (" + GlobalVariables.globalProductList.Count.ToString() + ")";
+                        var productlist = mProductsDataAccess.SelectTable();
+                        int productCount = productlist != null ? productlist.Count : 0;
+                        ab.Title = "PRODUCTS (" + productCount.ToString() + ")";
                         break;
                     case (Resource.Id.nav_customers):
                         ShowFragment(mCustomersFragment);
+                        //refresh list here
                         ab.SetTitle(Resource.String.customers_title);
                         break;
                     case (Resource.Id.nav_transactions):
                         ShowFragment(mTransactionsFragment);
+                        //refresh list here
+                        mTransactionsFragment.RedrawView();
                         ab.SetTitle(Resource.String.transactions_title);
                         break;
                     case (Resource.Id.nav_settings):
@@ -241,6 +261,14 @@ namespace POS_ANDROID_BACUNA
                         StartActivityForResult(intent, 1);
                     }
                     return true;
+                case Resource.Id.menuItem_AddNewCustomer: 
+                    if (!mDialogShown)//customers fragment
+                    {
+                        mDialogShown = true;
+                        Intent intent = new Intent(this, typeof(CustomersFragmentAddCustomerActivity));
+                        StartActivityForResult(intent, 33);
+                    }
+                    return true;
                 default:
                     return base.OnOptionsItemSelected(item);
             }
@@ -282,6 +310,10 @@ namespace POS_ANDROID_BACUNA
             else if (mCurrentFragment == mProductsFragment)
             {
                 MenuInflater.Inflate(Resource.Menu.toolbar_menu_products, menu);
+            }
+            else if (mCurrentFragment == mCustomersFragment)
+            {
+                MenuInflater.Inflate(Resource.Menu.toolbar_menu_customers, menu);
             }
 
             return base.OnCreateOptionsMenu(menu);
@@ -363,10 +395,16 @@ namespace POS_ANDROID_BACUNA
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
-            if (requestCode == 1)
+            if (requestCode == 1) //select customer
             {
                 mDialogShown = false;
                 SetSelectedCustomerIconAppearance();
+            }
+            else if (requestCode == 33)//customers fragment add new 
+            {
+                mDialogShown = false;
+                mCustomersFragment.searchViewSearchCustomers.SetQuery("", false);
+                mCustomersFragment.FnSetCustomersList("");
             }
         }
 
@@ -401,7 +439,7 @@ namespace POS_ANDROID_BACUNA
         public void SetProductCountTitle()
         {
             SupportActionBar supportActionBar = SupportActionBar;
-            supportActionBar.Title = "PRODUCTS (" + GlobalVariables.globalProductList.Count.ToString() + ")";
+            supportActionBar.Title = "PRODUCTS (" + mProductsDataAccess.SelectTable().Count.ToString() + ")";
         }
 
     }

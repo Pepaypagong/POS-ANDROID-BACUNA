@@ -16,36 +16,36 @@ namespace POS_ANDROID_BACUNA
     public class DataClassHelper
     {
         //coverts the data from product to new product and viceversa
-        public static List<Product> ToProduct(List<NewProduct> _newProduct)
+        public static List<ProductsModel> ToProduct(List<NewProduct> _newProduct)
         {
-            var retVal = new List<Product>();
+            var retVal = new List<ProductsModel>();
 
             foreach (var item in _newProduct)
             {
-                retVal.Add(new Product
+                retVal.Add(new ProductsModel
                 {
-                    productId = item.productId,
-                    productName = item.productName,
-                    parentProductId = item.parentProductId,
-                    productCategoryId = item.productCategoryId,
-                    productCategory = item.productCategory,
-                    productSizeId = item.productSizeId,
-                    productSize = item.productSize,
-                    productCode = item.productCode,
-                    productCost = item.productCost,
-                    productRetailPrice = item.productRetailPrice,
-                    productWholesalePrice = item.productWholesalePrice,
-                    productRunnerPrice = item.productRunnerPrice,
-                    productColorBg = item.productColorBg,
-                    productImage = item.productImage,
-                    productAlias = item.productAlias
+                    Id = item.ProductId,
+                    ProductName = item.ProductName,
+                    ParentProductId = item.ParentProductId,
+                    ProductCategoryId = item.ProductCategoryId,
+                    ProductCategory = item.ProductCategory,
+                    ProductSizeId = item.ProductSizeId,
+                    ProductSize = item.ProductSize,
+                    ProductCode = item.ProductCode,
+                    ProductCost = item.ProductCost,
+                    ProductRetailPrice = item.ProductRetailPrice,
+                    ProductWholesalePrice = item.ProductWholesalePrice,
+                    ProductRunnerPrice = item.ProductRunnerPrice,
+                    ProductColorBg = item.ProductColorBg,
+                    ProductImage = item.ProductImage,
+                    ProductAlias = item.ProductAlias
                 });
             }
 
             return retVal;
         }
 
-        public static List<NewProduct> ToNewProduct(List<Product> _product)
+        public static List<NewProduct> ToNewProduct(List<ProductsModel> _product)
         {
             var retVal = new List<NewProduct>();
 
@@ -53,21 +53,21 @@ namespace POS_ANDROID_BACUNA
             {
                 retVal.Add(new NewProduct
                 {
-                    productId = item.productId,
-                    productName = item.productName,
-                    parentProductId = item.parentProductId,
-                    productCategoryId = item.productCategoryId,
-                    productCategory = item.productCategory,
-                    productSizeId = item.productSizeId,
-                    productSize = item.productSize,
-                    productCode = item.productCode,
-                    productCost = item.productCost,
-                    productRetailPrice = item.productRetailPrice,
-                    productWholesalePrice = item.productWholesalePrice,
-                    productRunnerPrice = item.productRunnerPrice,
-                    productColorBg = item.productColorBg,
-                    productImage = item.productImage,
-                    productAlias = item.productAlias
+                    ProductId = item.Id,
+                    ProductName = item.ProductName,
+                    ParentProductId = item.ParentProductId,
+                    ProductCategoryId = item.ProductCategoryId,
+                    ProductCategory = item.ProductCategory,
+                    ProductSizeId = item.ProductSizeId,
+                    ProductSize = item.ProductSize,
+                    ProductCode = item.ProductCode,
+                    ProductCost = item.ProductCost,
+                    ProductRetailPrice = item.ProductRetailPrice,
+                    ProductWholesalePrice = item.ProductWholesalePrice,
+                    ProductRunnerPrice = item.ProductRunnerPrice,
+                    ProductColorBg = item.ProductColorBg,
+                    ProductImage = item.ProductImage,
+                    ProductAlias = item.ProductAlias
                 });
             }
            
@@ -82,21 +82,21 @@ namespace POS_ANDROID_BACUNA
             {
                 retVal.Add(new NewProduct
                 {
-                    productId = item.productId,
-                    productName = item.productName,
-                    parentProductId = item.parentProductId,
-                    productCategoryId = item.productCategoryId,
-                    productCategory = item.productCategory,
-                    productSizeId = item.productSizeId,
-                    productSize = item.productSize,
-                    productCode = item.productCode,
-                    productCost = item.productCost,
-                    productRetailPrice = item.productRetailPrice,
-                    productWholesalePrice = item.productWholesalePrice,
-                    productRunnerPrice = item.productRunnerPrice,
-                    productColorBg = item.productColorBg,
-                    productImage = item.productImage,
-                    productAlias = item.productAlias
+                    ProductId = item.ProductId,
+                    ProductName = item.ProductName,
+                    ParentProductId = item.ParentProductId,
+                    ProductCategoryId = item.ProductCategoryId,
+                    ProductCategory = item.ProductCategory,
+                    ProductSizeId = item.ProductSizeId,
+                    ProductSize = item.ProductSize,
+                    ProductCode = item.ProductCode,
+                    ProductCost = item.ProductCost,
+                    ProductRetailPrice = item.ProductRetailPrice,
+                    ProductWholesalePrice = item.ProductWholesalePrice,
+                    ProductRunnerPrice = item.ProductRunnerPrice,
+                    ProductColorBg = item.ProductColorBg,
+                    ProductImage = item.ProductImage,
+                    ProductAlias = item.ProductAlias
                 });
             }
 

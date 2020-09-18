@@ -24,6 +24,8 @@ using Android.Graphics;
 using POS_ANDROID_BACUNA.Adapters;
 using Android.Graphics.Drawables;
 using Android.Text;
+using POS_ANDROID_BACUNA.SQLite;
+using SQLitePCL;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -57,17 +59,21 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         bool isEdit = false;
         int editParentProductId;
-        List<ParentProducts> mSelectedParentProductRow;
+        List<ParentProductsModel> mSelectedParentProductRow;
         //List<NewProduct> mProducts;
 
         int PRODUCT_ALIAS_MAX_LENGTH = 7;
         int PRODUCT_NAME_MAX_LENGTH = 25;
+
+        ProductsDataAccess mProductsDataAccess;
+        ParentProductsDataAccess mParentProductsDataAccess;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.products_fragment_items_new_product);
             mDpVal = this.Resources.DisplayMetrics.Density;
+            FnSetUpData();
             FnGetData();
             FnSetUpToolBar();
             FnSetControls();
@@ -81,29 +87,35 @@ namespace POS_ANDROID_BACUNA.Fragments
             });
         }
 
+        private void FnSetUpData()
+        {
+            mParentProductsDataAccess = new ParentProductsDataAccess();
+            mProductsDataAccess = new ProductsDataAccess();
+        }
+
         private void FnShowSelectedData(int _parentProductId)
         {
-            mSelectedParentProductRow = GlobalVariables.globalParentProductList.Where(x => x.parentProductId == _parentProductId).ToList();
+            mSelectedParentProductRow = mParentProductsDataAccess.SelectRecord(_parentProductId);
 
-            mEditTextProductName.Text = mSelectedParentProductRow[0].parentProductName;
-            mCategoryId = mSelectedParentProductRow[0].categoryId;
-            mTxtProductCat.Text = mSelectedParentProductRow[0].categoryName;
+            mEditTextProductName.Text = mSelectedParentProductRow[0].ParentProductName;
+            mCategoryId = mSelectedParentProductRow[0].CategoryId;
+            mTxtProductCat.Text = mSelectedParentProductRow[0].CategoryName;
             mTxtProductCat.SetTextColor(ResourceIdToColor(Resource.Color.colorTextEnabled));
             mlblCategory.Visibility = ViewStates.Visible;
-            mTxtProductDescription.Text = mSelectedParentProductRow[0].productDescription == null? "Description" : mSelectedParentProductRow[0].productDescription;
-            mTxtProductDescription.SetTextColor(ResourceIdToColor(mSelectedParentProductRow[0].productDescription == null ? 
+            mTxtProductDescription.Text = mSelectedParentProductRow[0].ProductDescription == null? "Description" : mSelectedParentProductRow[0].ProductDescription;
+            mTxtProductDescription.SetTextColor(ResourceIdToColor(mSelectedParentProductRow[0].ProductDescription == null ? 
                 Resource.Color.colorTextDisabled : 
                 Resource.Color.colorTextEnabled));
-            mlblDescription.Visibility = mSelectedParentProductRow[0].productDescription == null ? ViewStates.Invisible : ViewStates.Visible;
-            mViewColorSelector.SetBackgroundColor(Android.Graphics.Color.ParseColor("#"+mSelectedParentProductRow[0].productColorBg));
-            mCardviewProductAppearance.SetCardBackgroundColor(Android.Graphics.Color.ParseColor("#"+mSelectedParentProductRow[0].productColorBg));
-            mEditTextProductAlias.Text = mSelectedParentProductRow[0].productAlias;
+            mlblDescription.Visibility = mSelectedParentProductRow[0].ProductDescription == null ? ViewStates.Invisible : ViewStates.Visible;
+            mViewColorSelector.SetBackgroundColor(Android.Graphics.Color.ParseColor("#"+mSelectedParentProductRow[0].ProductColorBg));
+            mCardviewProductAppearance.SetCardBackgroundColor(Android.Graphics.Color.ParseColor("#"+mSelectedParentProductRow[0].ProductColorBg));
+            mEditTextProductAlias.Text = mSelectedParentProductRow[0].ProductAlias;
 
             //product list
             GlobalVariables.newProductSizesList.Clear();
-            var productToCopy = GlobalVariables.globalProductList
-                .OrderBy(x => x.productSizeId)
-                .Where(x => x.parentProductId == _parentProductId)
+            var productToCopy = mProductsDataAccess.SelectTable()
+                .OrderBy(x => x.ProductSizeId)
+                .Where(x => x.ParentProductId == _parentProductId)
                 .ToList();
             GlobalVariables.newProductSizesList = DataClassHelper.ToNewProduct(productToCopy);
             //mProducts = GlobalVariables.newProductSizesList;
@@ -117,7 +129,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void FnSetListViewAdapter()
         {
-            mAdapter = new ProductsItemSizesListViewAdapter(this, GlobalVariables.newProductSizesList.OrderBy(x => x.productSizeId).ToList());
+            mAdapter = new ProductsItemSizesListViewAdapter(this, GlobalVariables.newProductSizesList.OrderBy(x => x.ProductSizeId).ToList());
             mLvProductSizes.Adapter = mAdapter;
         }
 
@@ -197,18 +209,18 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void PasteData(List<ParentProductCopyHolder> _sourceParentProduct, List<NewProductCopyHolder> _sourceProduct)
         {
-            mEditTextProductName.Text = _sourceParentProduct[0].parentProductName + " (Copy)";
-            mCategoryId = _sourceParentProduct[0].categoryId;
-            mTxtProductCat.Text = mCategoryId == 0 ? "Category" : _sourceParentProduct[0].categoryName;
+            mEditTextProductName.Text = _sourceParentProduct[0].ParentProductName + " (Copy)";
+            mCategoryId = _sourceParentProduct[0].CategoryId;
+            mTxtProductCat.Text = mCategoryId == 0 ? "Category" : _sourceParentProduct[0].CategoryName;
             mTxtProductCat.SetTextColor(ResourceIdToColor(Resource.Color.colorTextEnabled));
             mlblCategory.Visibility = mCategoryId == 0 ? ViewStates.Invisible : ViewStates.Visible;
-            mTxtProductDescription.Text = _sourceParentProduct[0].productDescription == null ? "Description" : _sourceParentProduct[0].productDescription;
-            mTxtProductDescription.SetTextColor(ResourceIdToColor(_sourceParentProduct[0].productDescription == null ? 
+            mTxtProductDescription.Text = _sourceParentProduct[0].ProductDescription == null ? "Description" : _sourceParentProduct[0].ProductDescription;
+            mTxtProductDescription.SetTextColor(ResourceIdToColor(_sourceParentProduct[0].ProductDescription == null ? 
                 Resource.Color.colorTextDisabled : Resource.Color.colorTextEnabled));
-            mlblDescription.Visibility = _sourceParentProduct[0].productDescription == null ? ViewStates.Invisible : ViewStates.Visible;
-            mViewColorSelector.SetBackgroundColor(Android.Graphics.Color.ParseColor("#" + _sourceParentProduct[0].productColorBg));
-            mCardviewProductAppearance.SetCardBackgroundColor(Android.Graphics.Color.ParseColor("#" + _sourceParentProduct[0].productColorBg));
-            mEditTextProductAlias.Text = _sourceParentProduct[0].productAlias;
+            mlblDescription.Visibility = _sourceParentProduct[0].ProductDescription == null ? ViewStates.Invisible : ViewStates.Visible;
+            mViewColorSelector.SetBackgroundColor(Android.Graphics.Color.ParseColor("#" + _sourceParentProduct[0].ProductColorBg));
+            mCardviewProductAppearance.SetCardBackgroundColor(Android.Graphics.Color.ParseColor("#" + _sourceParentProduct[0].ProductColorBg));
+            mEditTextProductAlias.Text = _sourceParentProduct[0].ProductAlias;
 
             //product list
             GlobalVariables.newProductSizesList.Clear();
@@ -230,24 +242,24 @@ namespace POS_ANDROID_BACUNA.Fragments
                 GetBackgroundColor(),
                 null,
                 GetDescription());
-            var productSizesList = GlobalVariables.newProductSizesList.OrderBy(x => x.productSizeId).ToList();
+            var productSizesList = GlobalVariables.newProductSizesList.OrderBy(x => x.ProductSizeId).ToList();
             for (int i = 0; i < productSizesList.Count; i++)
             {
                 CopyProduct(0, //product id 0 to flag as new product 
-                     "(" + productSizesList[i].productSize + ") " + _productName,
+                     "(" + productSizesList[i].ProductSize + ") " + _productName,
                      0, //product id 0 to flag as new parent product 
                      mCategoryId,
                      _categoryText,
-                     productSizesList[i].productSizeId,
-                     productSizesList[i].productSize,
-                     productSizesList[i].productCost,
-                     productSizesList[i].productRetailPrice,
-                     productSizesList[i].productWholesalePrice,
-                     productSizesList[i].productRunnerPrice,
+                     productSizesList[i].ProductSizeId,
+                     productSizesList[i].ProductSize,
+                     productSizesList[i].ProductCost,
+                     productSizesList[i].ProductRetailPrice,
+                     productSizesList[i].ProductWholesalePrice,
+                     productSizesList[i].ProductRunnerPrice,
                      GetBackgroundColor(),
                      null,
                      _productAlias,
-                     productSizesList[i].productCode
+                     "" //product code blank
                     );
             }
         }
@@ -257,52 +269,52 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             GlobalVariables.parentProductCopyHolder.Add(new ParentProductCopyHolder()
             {
-                parentProductName = _parentProductName,
-                categoryId = _categoryId,
-                categoryName = _categoryName,
-                productAlias = _productAlias,
-                productColorBg = _productColorBg,
-                productImage = _productImage,
-                productDescription = _productDescription
+                ParentProductName = _parentProductName,
+                CategoryId = _categoryId,
+                CategoryName = _categoryName,
+                ProductAlias = _productAlias,
+                ProductColorBg = _productColorBg,
+                ProductImage = _productImage,
+                ProductDescription = _productDescription
             });
         }
 
         private void CopyProduct(int _productId, string _productName, int _parentProductId, int _productCategoryId,
             string _productCategory, int _productSizeId, string _productSize, decimal _productCost, decimal _productRetailPrice,
-            decimal _productWholesalePrice, decimal _productRunnerPrice, string _productColorBg, System.Drawing.Image _productImage,
+            decimal _productWholesalePrice, decimal _productRunnerPrice, string _productColorBg, byte[] _productImage,
             string _productAlias, string _productCode)
         {
             GlobalVariables.newProductCopyHolder.Add(new NewProductCopyHolder()
             {
-                productId = _productId,
-                productName = _productName,
-                parentProductId = _parentProductId,
-                productCategoryId = _productCategoryId,
-                productCategory = _productCategory,
-                productSizeId = _productSizeId,
-                productSize = _productSize,
-                productCost = _productCost,
-                productRetailPrice = _productRetailPrice,
-                productWholesalePrice = _productWholesalePrice,
-                productRunnerPrice = _productRunnerPrice,
-                productColorBg = _productColorBg,
-                productImage = _productImage,
-                productAlias = _productAlias,
-                productCode = _productCode
+                ProductId = _productId,
+                ProductName = _productName,
+                ParentProductId = _parentProductId,
+                ProductCategoryId = _productCategoryId,
+                ProductCategory = _productCategory,
+                ProductSizeId = _productSizeId,
+                ProductSize = _productSize,
+                ProductCost = _productCost,
+                ProductRetailPrice = _productRetailPrice,
+                ProductWholesalePrice = _productWholesalePrice,
+                ProductRunnerPrice = _productRunnerPrice,
+                ProductColorBg = _productColorBg,
+                ProductImage = _productImage,
+                ProductAlias = _productAlias,
+                ProductCode = _productCode
             });
         }
 
         private void DeleteProduct(int _parentProductId)
         {
             //delete from parent table
-            GlobalVariables.globalParentProductList.RemoveAll(x => x.parentProductId == _parentProductId);
+            mParentProductsDataAccess.DeleteFromTable(_parentProductId);
             //delete from child table
-            GlobalVariables.globalProductList.RemoveAll(x => x.parentProductId == _parentProductId);
+            mProductsDataAccess.DeleteFromTableUsingParentProductId(_parentProductId);
         }
 
         private void MLvProductSizes_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            int sizeId = GlobalVariables.newProductSizesList.OrderBy(x => x.productSizeId).ToList()[e.Position].productSizeId;
+            int sizeId = GlobalVariables.newProductSizesList.OrderBy(x => x.ProductSizeId).ToList()[e.Position].ProductSizeId;
             if (!mDialogShown)
             {
                 mDialogShown = true;
@@ -375,139 +387,146 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void FnSaveData() 
         {
-            //save parent product to "database"
-            int parentProductId = GenerateParentProductId();
-            SaveParentProduct(parentProductId,
-                mEditTextProductName.Text.Trim(),
+            mParentProductsDataAccess.InsertIntoTable(
+                ParentProductToSave(mEditTextProductName.Text.Trim(),
                 mCategoryId,
                 mTxtProductCat.Text,
                 mEditTextProductAlias.Text,
                 GetBackgroundColor(),
                 null,
-                GetDescription());
+                GetDescription()));
             //save product sizes to "database"
-            var productSizesList = GlobalVariables.newProductSizesList.OrderBy(x => x.productSizeId).ToList();
+            var productSizesList = GlobalVariables.newProductSizesList.OrderBy(x => x.ProductSizeId).ToList();
             for (int i = 0; i < productSizesList.Count; i++)
             {
-                SaveProduct(GenerateProductId(),
-                     "(" + GlobalVariables.newProductSizesList[i].productSize + ") " + mEditTextProductName.Text.Trim(),
-                     parentProductId,
+                mProductsDataAccess.InsertIntoTable(ProductToSave(
+                    "(" + GlobalVariables.newProductSizesList[i].ProductSize + ") " + mEditTextProductName.Text.Trim(),
+                     mParentProductsDataAccess.GetLatestParentProductId(),
                      mCategoryId,
                      mTxtProductCat.Text,
-                     GlobalVariables.newProductSizesList[i].productSizeId,
-                     GlobalVariables.newProductSizesList[i].productSize,
-                     GlobalVariables.newProductSizesList[i].productCost,
-                     GlobalVariables.newProductSizesList[i].productRetailPrice,
-                     GlobalVariables.newProductSizesList[i].productWholesalePrice,
-                     GlobalVariables.newProductSizesList[i].productRunnerPrice,
+                     GlobalVariables.newProductSizesList[i].ProductSizeId,
+                     GlobalVariables.newProductSizesList[i].ProductSize,
+                     GlobalVariables.newProductSizesList[i].ProductCost,
+                     GlobalVariables.newProductSizesList[i].ProductRetailPrice,
+                     GlobalVariables.newProductSizesList[i].ProductWholesalePrice,
+                     GlobalVariables.newProductSizesList[i].ProductRunnerPrice,
                      GetBackgroundColor(),
                      null,
                      mEditTextProductAlias.Text,
-                     GlobalVariables.newProductSizesList[i].productCode
-                    );
+                     GlobalVariables.newProductSizesList[i].ProductCode
+                ));
             }
         }
 
         private void FnEditData(int _parentProductId)
         {
-            EditParentProduct(_parentProductId,
-                mEditTextProductName.Text.Trim(),
-                mCategoryId,
-                mTxtProductCat.Text,
-                mEditTextProductAlias.Text,
-                GetBackgroundColor(),
-                null,
-                GetDescription()
-                );
+            mParentProductsDataAccess.UpdateTable(
+                EditParentProduct(_parentProductId,
+                    mEditTextProductName.Text.Trim(),
+                    mCategoryId,
+                    mTxtProductCat.Text,
+                    mEditTextProductAlias.Text,
+                    GetBackgroundColor(),
+                    null,
+                    GetDescription()));
 
             if (GlobalVariables.productsToDeleteOnEditMode.Count > 0)
             {
                 foreach (var productsizeid in GlobalVariables.productsToDeleteOnEditMode)
                 {
-                    int productId = GlobalVariables.globalProductList
-                        .Where(x => x.parentProductId == _parentProductId && x.productSizeId == productsizeid)
-                        .Select(x => x.productId)
+                    int productId = mProductsDataAccess.SelectTable()
+                        .Where(x => x.ParentProductId == _parentProductId && x.ProductSizeId == productsizeid)
+                        .Select(x => x.Id)
                         .FirstOrDefault();
-
-                    GlobalVariables.globalProductList.RemoveAll(x => x.productId == productId);
+                    mProductsDataAccess.DeleteFromTable(productId);
                 }
             }
             
-            foreach (var item in GlobalVariables.newProductSizesList.OrderBy(x => x.productSizeId))
+            foreach (var item in GlobalVariables.newProductSizesList.OrderBy(x => x.ProductSizeId))
             {
                 //save new record for new sizes
-                if (item.productId == 0)
+                if (item.ProductId == 0)
                 {
-                    SaveProduct(GenerateProductId(),
-                     "(" + item.productSize + ") " + mEditTextProductName.Text.Trim(),
-                     _parentProductId,
-                     mCategoryId,
-                     mTxtProductCat.Text,
-                     item.productSizeId,
-                     item.productSize,
-                     item.productCost,
-                     item.productRetailPrice,
-                     item.productWholesalePrice,
-                     item.productRunnerPrice,
-                     GetBackgroundColor(),
-                     null,
-                     mEditTextProductAlias.Text,
-                     item.productCode
-                    );
+                    mProductsDataAccess.InsertIntoTable(
+                        ProductToSave("(" + item.ProductSize + ") " + mEditTextProductName.Text.Trim(),
+                             _parentProductId,
+                             mCategoryId,
+                             mTxtProductCat.Text,
+                             item.ProductSizeId,
+                             item.ProductSize,
+                             item.ProductCost,
+                             item.ProductRetailPrice,
+                             item.ProductWholesalePrice,
+                             item.ProductRunnerPrice,
+                             GetBackgroundColor(),
+                             null,
+                             mEditTextProductAlias.Text,
+                             item.ProductCode
+                        ));
                 }
                 else //edit for existing sizes
                 {
-                    EditProduct(item.productId,
-                     "(" + item.productSize + ") " + mEditTextProductName.Text.Trim(),
-                     mCategoryId,
-                     mTxtProductCat.Text,
-                     item.productCost,
-                     item.productRetailPrice,
-                     item.productWholesalePrice,
-                     item.productRunnerPrice,
-                     GetBackgroundColor(),
-                     null,
-                     mEditTextProductAlias.Text,
-                     item.productCode
-                    );
+                    mProductsDataAccess.UpdateTable(
+                     EditProduct(item.ProductId,
+                         "(" + item.ProductSize + ") " + mEditTextProductName.Text.Trim(),
+                         mCategoryId,
+                         mTxtProductCat.Text,
+                         item.ProductCost,
+                         item.ProductRetailPrice,
+                         item.ProductWholesalePrice,
+                         item.ProductRunnerPrice,
+                         GetBackgroundColor(),
+                         null,
+                         mEditTextProductAlias.Text,
+                         item.ProductCode
+                    ));
                 }
                 
             }
         }
-        private void EditParentProduct(int _parentProductId, string _parentProductName, int _categoryId, string _categoryName,
-            string _productAlias, string _productColorBg, System.Drawing.Image _productImage, string _productDescription)
+        private ParentProductsModel EditParentProduct(int _parentProductId, string _parentProductName, int _categoryId, string _categoryName,
+            string _productAlias, string _productColorBg, byte[] _productImage, string _productDescription)
         {
-            foreach (var item in GlobalVariables.globalParentProductList.Where(x => x.parentProductId == _parentProductId))
+
+            ParentProductsModel parentProduct = new ParentProductsModel
             {
-                item.parentProductName = _parentProductName;
-                item.categoryId = _categoryId;
-                item.categoryName = _categoryName;
-                item.productAlias = _productAlias;
-                item.productColorBg = _productColorBg;
-                item.productImage = _productImage;
-                item.productDescription = _productDescription;
-            }
+                Id = _parentProductId,
+                ParentProductName = _parentProductName,
+                CategoryId = _categoryId,
+                CategoryName = _categoryName,
+                ProductAlias = _productAlias,
+                ProductColorBg = _productColorBg,
+                ProductImage = _productImage,
+                ProductDescription = _productDescription,
+                DateModified = DateTime.Now.ToString(GlobalVariables.DATABASE_TIME_FORMAT)
+            };
+
+            return parentProduct;
         }
 
-        private void EditProduct(int _productId, string _productName, int _productCategoryId,
+        private ProductsModel EditProduct(int _productId, string _productName, int _productCategoryId,
             string _productCategory, decimal _productCost, decimal _productRetailPrice,
-            decimal _productWholesalePrice, decimal _productRunnerPrice, string _productColorBg, System.Drawing.Image _productImage,
+            decimal _productWholesalePrice, decimal _productRunnerPrice, string _productColorBg, byte[] _productImage,
             string _productAlias, string _productCode)
         {
-            foreach (var item in GlobalVariables.globalProductList.Where(x => x.productId == _productId))
+            ProductsModel Product = new ProductsModel
             {
-                item.productName = _productName;
-                item.productCategoryId = _productCategoryId;
-                item.productCategory = _productCategory;
-                item.productCost = _productCost;
-                item.productRetailPrice = _productRetailPrice;
-                item.productWholesalePrice = _productWholesalePrice;
-                item.productRunnerPrice = _productRunnerPrice;
-                item.productColorBg = _productColorBg;
-                item.productImage = _productImage;
-                item.productAlias = _productAlias;
-                item.productCode = _productCode;
-            }
+               Id = _productId,
+               ProductName = _productName,
+               ProductCategoryId = _productCategoryId,
+               ProductCategory = _productCategory,
+               ProductCost = _productCost,
+               ProductRetailPrice = _productRetailPrice,
+               ProductWholesalePrice = _productWholesalePrice,
+               ProductRunnerPrice = _productRunnerPrice,
+               ProductColorBg = _productColorBg,
+               ProductImage = _productImage,
+               ProductAlias = _productAlias,
+               ProductCode = _productCode,
+               DateModified = DateTime.Now.ToString(GlobalVariables.DATABASE_TIME_FORMAT)
+            };
+
+            return Product;
         }
 
         private bool SizesListEmpty()
@@ -538,73 +557,49 @@ namespace POS_ANDROID_BACUNA.Fragments
             return Java.Lang.Integer.ToHexString(colorId).Substring(2).ToUpper();
         }
 
-        private void SaveProduct(int _productId, string _productName, int _parentProductId, int _productCategoryId, 
+        private ProductsModel ProductToSave(string _productName, int _parentProductId, int _productCategoryId,
             string _productCategory, int _productSizeId, string _productSize, decimal _productCost, decimal _productRetailPrice,
-            decimal _productWholesalePrice, decimal _productRunnerPrice, string _productColorBg, System.Drawing.Image _productImage,
+            decimal _productWholesalePrice, decimal _productRunnerPrice, string _productColorBg, byte[] _productImage,
             string _productAlias, string _productCode)
         {
-            GlobalVariables.globalProductList.Add(new Product() { 
-                productId = _productId,
-                productName = _productName,
-                parentProductId = _parentProductId,
-                productCategoryId = _productCategoryId,
-                productCategory = _productCategory,
-                productSizeId = _productSizeId,
-                productSize = _productSize,
-                productCost = _productCost,
-                productRetailPrice = _productRetailPrice,
-                productWholesalePrice = _productWholesalePrice,
-                productRunnerPrice = _productRunnerPrice,
-                productColorBg = _productColorBg,
-                productImage = _productImage,
-                productAlias = _productAlias,
-                productCode = _productCode
-            });
+            ProductsModel Product = new ProductsModel {
+                ProductName = _productName,
+                ParentProductId = _parentProductId,
+                ProductCategoryId = _productCategoryId,
+                ProductCategory = _productCategory,
+                ProductSizeId = _productSizeId,
+                ProductSize = _productSize,
+                ProductCost = _productCost,
+                ProductRetailPrice = _productRetailPrice,
+                ProductWholesalePrice = _productWholesalePrice,
+                ProductRunnerPrice = _productRunnerPrice,
+                ProductColorBg = _productColorBg,
+                ProductImage = _productImage,
+                ProductAlias = _productAlias,
+                ProductCode = _productCode,
+                DateCreated = DateTime.Now.ToString(GlobalVariables.DATABASE_TIME_FORMAT),
+                DateModified = DateTime.Now.ToString(GlobalVariables.DATABASE_TIME_FORMAT)
+            };
+
+            return Product;
         }
 
-        private void SaveParentProduct(int _parentProductId, string _parentProductName, int _categoryId, string _categoryName,
-            string _productAlias, string _productColorBg, System.Drawing.Image _productImage, string _productDescription)
+        private ParentProductsModel ParentProductToSave(string _parentProductName, int _categoryId, string _categoryName,
+            string _productAlias, string _productColorBg, byte[] _productImage, string _productDescription)
         {
-            GlobalVariables.globalParentProductList.Add(new ParentProducts() { 
-                parentProductId = _parentProductId,
-                parentProductName = _parentProductName,
-                categoryId = _categoryId,
-                categoryName =_categoryName,
-                productAlias = _productAlias,
-                productColorBg = _productColorBg,
-                productImage = _productImage,
-                productDescription = _productDescription
-            });
-        }
-
-        private int GenerateProductId()
-        {
-            int retVal;
-            try
+            ParentProductsModel parentProduct = new ParentProductsModel
             {
-                retVal = GlobalVariables.globalProductList.Max(x => x.productId) + 1;
-            }
-            catch (Exception)
-            {
-                retVal = 1;
-            }
-
-            return retVal;
-        }
-
-        private int GenerateParentProductId()
-        {
-            int retVal;
-            try
-            {
-                retVal = GlobalVariables.globalParentProductList.Max(x => x.parentProductId) + 1;
-            }
-            catch (Exception)
-            {
-                retVal = 1;
-            }
-
-            return retVal;
+                ParentProductName = _parentProductName,
+                CategoryId = _categoryId,
+                CategoryName = _categoryName,
+                ProductColorBg = _productColorBg,
+                ProductAlias = _productAlias,
+                ProductImage = _productImage,
+                ProductDescription = _productDescription,
+                DateCreated = DateTime.Now.ToString(GlobalVariables.DATABASE_TIME_FORMAT),
+                DateModified = DateTime.Now.ToString(GlobalVariables.DATABASE_TIME_FORMAT)
+            };
+            return parentProduct;
         }
 
         private bool hasErrors()
@@ -616,11 +611,11 @@ namespace POS_ANDROID_BACUNA.Fragments
                 retVal = true;
                 mTxtInputLayputProductName.Error = "Product name cannot be blank";
             }
-            else if (ProductNameExists(productName))
+            else if (mParentProductsDataAccess.NameExists(productName))
             {
                 if (isEdit)
                 {
-                    if (mEditTextProductName.Text.Trim() == mSelectedParentProductRow[0].parentProductName)
+                    if (mEditTextProductName.Text.Trim() == mSelectedParentProductRow[0].ParentProductName)
                     {
                         retVal = false;
                     }
@@ -648,11 +643,6 @@ namespace POS_ANDROID_BACUNA.Fragments
                 retVal = false;
             }
             return retVal;
-        }
-
-        private bool ProductNameExists(string _parentProductName)
-        {
-            return GlobalVariables.globalParentProductList.Exists(x => x.parentProductName == _parentProductName);
         }
 
         private void MImgBtnAddSize_Click(object sender, EventArgs e)

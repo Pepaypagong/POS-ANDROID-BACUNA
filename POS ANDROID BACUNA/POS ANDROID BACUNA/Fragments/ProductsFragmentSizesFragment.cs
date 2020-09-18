@@ -15,7 +15,7 @@ using TabLayout = Android.Support.Design.Widget.TabLayout;
 using SearchView = Android.Support.V7.Widget.SearchView;
 using Android.Views.InputMethods;
 using Android.Support.V7.Widget;
-using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
+using Product = POS_ANDROID_BACUNA.Data_Classes.ProductsModel;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Data_Classes;
 using POS_ANDROID_BACUNA.Adapters;

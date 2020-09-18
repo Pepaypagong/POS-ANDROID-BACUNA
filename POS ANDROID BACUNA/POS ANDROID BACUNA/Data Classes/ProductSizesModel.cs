@@ -12,9 +12,10 @@ using Android.Widget;
 
 namespace POS_ANDROID_BACUNA.Data_Classes
 {
-    public class ProductCategories
+    public class ProductSizesModel
     {
-        public int productCategoryId {get;set;}
-        public string productCategoryName { get; set; }
+        public int ProductSizeId { get; set; }
+        public string ProductSizeName { get; set; }
+        public int SizeRank { get; set; }
     }
 }

@@ -23,6 +23,7 @@ using Java.Util;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Adapters;
 using Android.Graphics.Drawables;
+using POS_ANDROID_BACUNA.SQLite;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -54,6 +55,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         int selectedHourOfDay;
         int selectedMinute;
 
+        TransactionsModel mTransaction;
         string mPesoSign = "\u20b1";
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -82,13 +84,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             selectedCalendarYear = calendar.Get(CalendarField.Year);
             selectedCalendarMonth = calendar.Get(CalendarField.Month);
             selectedCalendarDayOfMonth = calendar.Get(CalendarField.DayOfMonth);
-        }
-
-        private void SetSelectedTimeNow()
-        {
-            Calendar calendar = Calendar.GetInstance(Locale.Default);
-            selectedHourOfDay = calendar.Get(CalendarField.HourOfDay);
-            selectedMinute = calendar.Get(CalendarField.Minute);
+            mSelectedTransactionDatetime = DateTime.Now;
         }
 
         private void FnSetUpToolBar()
@@ -122,7 +118,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             TimePickerDialog tpd = new TimePickerDialog(this, TimeListener, selectedHourOfDay, selectedMinute, false);
             tpd.Show();
         }
-
+        
         private DateTime GetSelectedTime(string _timeString, string _dateString)
         { 
             return Convert.ToDateTime(_dateString + " " + _timeString.ToLower());
@@ -146,6 +142,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                 selectedCalendarMonth = e.Month;
                 selectedCalendarDayOfMonth = e.DayOfMonth;
                 mTxtTransactionDate.Text = e.Date.ToString("d/MMM/yyyy").ToUpper();
+                mSelectedTransactionDatetime = e.Date;
                 SetTransactionDateTimeAppearance(false);
             }
         }
@@ -173,12 +170,35 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             if (!mDialogShown)
             {
+                SaveTransactionToDatabase();
                 Intent intent = new Intent(this, typeof(CheckoutFragmentPaymentDoneActivity));
                 intent.PutExtra("TotalSaleAmount", Convert.ToDouble(mTotalSaleAmount));
                 intent.PutExtra("ChangeAmount", 0);
                 intent.PutExtra("TransactionType", "PAYLATER");
                 StartActivityForResult(intent, 32);
             }
+        }
+
+        private void SaveTransactionToDatabase()
+        {
+            TransactionsDataAccess transactionsDataAccess = new TransactionsDataAccess();
+            mTransaction = new TransactionsModel();
+            mTransaction.TransactionDateTime = GetSelectedDateTime();
+            mTransaction.DateCreated = DateTime.Now.ToString(GlobalVariables.DATABASE_TIME_FORMAT);
+            mTransaction.DateModified = DateTime.Now.ToString(GlobalVariables.DATABASE_TIME_FORMAT);
+            mTransaction.CustomerOrRunnerId = 1; //to change
+            mTransaction.SubTotalAmount = Convert.ToDecimal(mTotalSaleAmount);
+            mTransaction.DiscountAmount = 0;
+            mTransaction.TransactionType = "PAYLATER"; //ORDER, PAYMENT, PAYLATER
+            transactionsDataAccess.InsertIntoTable(mTransaction);
+        }
+
+        private string GetSelectedDateTime()
+        {
+            string transactionDateFormatted = Convert.ToDateTime(mTxtTransactionDate.Text.ToLower()).ToString("yyyy-MM-dd");
+            string transactionTime = Convert.ToDateTime(mTxtTransactionTime.Text.ToLower()).ToString("HH:mm");
+            string transactionDateTimeFormatted = transactionDateFormatted + ' ' + transactionTime;
+            return transactionDateTimeFormatted;
         }
 
         private void FnSetControls()

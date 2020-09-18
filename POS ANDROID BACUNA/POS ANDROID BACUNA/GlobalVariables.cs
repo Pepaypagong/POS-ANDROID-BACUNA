@@ -9,7 +9,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
+using Product = POS_ANDROID_BACUNA.Data_Classes.ProductsModel;
 using Android.Bluetooth;
 using SupportFragment = Android.Support.V4.App.Fragment;
 
@@ -17,13 +17,15 @@ namespace POS_ANDROID_BACUNA.Data_Classes
 {
     public static class GlobalVariables
     {
+        public static string DATABASE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
+        public static int MAIN_FRAGMENT_VIEW_HEIGHT = 0;
         public static List<ProductsOnCart> globalProductsOnCart = new List<ProductsOnCart>();
-        public static List<Product> globalProductList = new List<Product>();
-        public static List<ParentProducts> globalParentProductList = new List<ParentProducts>(); //temporary placeholder
-        public static List<ProductCategories> globalProductCategoryList = new List<ProductCategories>();
-        public static List<ProductSizes> globalSizesList = new List<ProductSizes>();
-        public static List<Customers> globalCustomersList = new List<Customers>();
-        public static List<Runners> globalRunnersList = new List<Runners>();
+        //public static List<ProductsModel> globalProductList = new List<ProductsModel>();
+        //public static List<ParentProductsModel> globalParentProductList = new List<ParentProductsModel>(); //temporary placeholder
+        //public static List<ProductCategoriesModel> globalProductCategoryList = new List<ProductCategoriesModel>();
+        public static List<ProductSizesModel> globalSizesList = new List<ProductSizesModel>();
+        public static List<CustomersModel> globalCustomersList = new List<CustomersModel>();
+        public static List<RunnersModel> globalRunnersList = new List<RunnersModel>();
         public static List<Options> globalOptionList = new List<Options>();
         public static List<OrderFields> globalSortingFieldList = new List<OrderFields>(); //sorting cart items
 

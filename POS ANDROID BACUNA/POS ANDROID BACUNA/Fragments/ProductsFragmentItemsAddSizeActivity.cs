@@ -22,7 +22,7 @@ using POS_ANDROID_BACUNA.Data_Classes;
 using Java.Util;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Adapters;
-
+using POS_ANDROID_BACUNA.SQLite;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -56,6 +56,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         List<NewProduct> mSelectedProductRow;
 
         Button mBtnCreateSize;
+        ProductsDataAccess mProductsDataAccess;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -94,23 +95,23 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void FnShowSelectedData(int _productSizeId)
         {
-            mSelectedProductRow = GlobalVariables.newProductSizesList.Where(x => x.productSizeId == _productSizeId).ToList();
+            mSelectedProductRow = GlobalVariables.newProductSizesList.Where(x => x.ProductSizeId == _productSizeId).ToList();
 
-            mProductId = mSelectedProductRow[0].productId;
-            mProductName = mSelectedProductRow[0].productName;
-            mParentProductId = mSelectedProductRow[0].parentProductId;
-            mProductCategoryId = mSelectedProductRow[0].productCategoryId;
-            mProductCategory = mSelectedProductRow[0].productCategory;
+            mProductId = mSelectedProductRow[0].ProductId;
+            mProductName = mSelectedProductRow[0].ProductName;
+            mParentProductId = mSelectedProductRow[0].ParentProductId;
+            mProductCategoryId = mSelectedProductRow[0].ProductCategoryId;
+            mProductCategory = mSelectedProductRow[0].ProductCategory;
             mProductSizeId = _productSizeId;
-            mProductSize = mSelectedProductRow[0].productSize;
-            mEtProductCode.Text = mSelectedProductRow[0].productCode != null ? mSelectedProductRow[0].productCode : "";
-            mProductCost = mSelectedProductRow[0].productCost;
+            mProductSize = mSelectedProductRow[0].ProductSize;
+            mEtProductCode.Text = mSelectedProductRow[0].ProductCode != null ? mSelectedProductRow[0].ProductCode : "";
+            mProductCost = mSelectedProductRow[0].ProductCost;
             mEtCost.Text = mPesoSign + " " + string.Format("{0:n}", mProductCost);
-            mProductRetailPrice = mSelectedProductRow[0].productRetailPrice;
+            mProductRetailPrice = mSelectedProductRow[0].ProductRetailPrice;
             mEtRetailPrice.Text = mPesoSign + " " + string.Format("{0:n}", mProductRetailPrice); 
-            mProductWholesalePrice = mSelectedProductRow[0].productWholesalePrice;
+            mProductWholesalePrice = mSelectedProductRow[0].ProductWholesalePrice;
             mEtWholesalePrice.Text = mPesoSign + " " + string.Format("{0:n}", mProductWholesalePrice);
-            mProductRunnerPrice = mSelectedProductRow[0].productRunnerPrice;
+            mProductRunnerPrice = mSelectedProductRow[0].ProductRunnerPrice;
             mEtRunnerPrice.Text = mPesoSign + " " + string.Format("{0:n}", mProductRunnerPrice);
         }
 
@@ -122,6 +123,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void FnGetData()
         {
+            mProductsDataAccess = new ProductsDataAccess();
             mProductId = 0; //for marking new products on edit of sizes
             mProductSizeId = Intent.GetIntExtra("productSizeId", 0);
             isEdit = Intent.GetBooleanExtra("isEdit", false);
@@ -186,7 +188,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void DeleteProduct(int _productSizeId)
         {
-            GlobalVariables.newProductSizesList.RemoveAll(x => x.productSizeId == _productSizeId);
+            GlobalVariables.newProductSizesList.RemoveAll(x => x.ProductSizeId == _productSizeId);
         }
 
         private void EdittextFocusChangedEvent(object sender, View.FocusChangeEventArgs e, EditText _edittext)
@@ -277,34 +279,34 @@ namespace POS_ANDROID_BACUNA.Fragments
             string productCode, decimal productCost, decimal retailPrice,
             decimal wholesalePrice, decimal runnerPrice)
         {
-            foreach (var item in GlobalVariables.newProductSizesList.Where(x => x.productSizeId == productSizeId))
+            foreach (var item in GlobalVariables.newProductSizesList.Where(x => x.ProductSizeId == productSizeId))
             {
-                item.productCode = productCode;
-                item.productCost = productCost;
-                item.productRetailPrice = retailPrice;
-                item.productWholesalePrice = wholesalePrice;
-                item.productRunnerPrice = runnerPrice;
+                item.ProductCode = productCode;
+                item.ProductCost = productCost;
+                item.ProductRetailPrice = retailPrice;
+                item.ProductWholesalePrice = wholesalePrice;
+                item.ProductRunnerPrice = runnerPrice;
             }
         }
 
-        private void SaveNewProductSize(int productId, string productName, int parentProductId, 
-            int productCategoryId, string productCategory, int productSizeId, string productSize, 
+        private void SaveNewProductSize(int productId, string productName, int parentProductId,
+            int productCategoryId, string productCategory, int productSizeId, string productSize,
             string productCode, decimal productCost, decimal retailPrice,
             decimal wholesalePrice, decimal runnerPrice)
         {
             GlobalVariables.newProductSizesList.Add(new NewProduct { 
-                productId = productId,
-                productName = productName,
-                parentProductId = parentProductId,
-                productCategoryId = productCategoryId,
-                productCategory = productCategory,
-                productSizeId = productSizeId,
-                productSize = productSize,
-                productCode = productCode,
-                productCost = productCost,
-                productRetailPrice = retailPrice,
-                productWholesalePrice = wholesalePrice,
-                productRunnerPrice = runnerPrice
+                ProductId = productId,
+                ProductName = productName,
+                ParentProductId = parentProductId,
+                ProductCategoryId = productCategoryId,
+                ProductCategory = productCategory,
+                ProductSizeId = productSizeId,
+                ProductSize = productSize,
+                ProductCode = productCode,
+                ProductCost = productCost,
+                ProductRetailPrice = retailPrice,
+                ProductWholesalePrice = wholesalePrice,
+                ProductRunnerPrice = runnerPrice
             });
         }
 
@@ -315,7 +317,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             {
                 if (isEdit)
                 {
-                    if (mEtProductCode.Text.Trim() == mSelectedProductRow[0].productCode)
+                    if (mEtProductCode.Text.Trim() == mSelectedProductRow[0].ProductCode)
                     {
                         retVal = false;
                     }
@@ -346,11 +348,11 @@ namespace POS_ANDROID_BACUNA.Fragments
             {
                 retVal = false;
             }
-            else if (GlobalVariables.globalProductList.Exists(x => x.productCode == _productCode))
+            else if (mProductsDataAccess.ProductCodeExists(_productCode))
             {
                 retVal = true;
             }
-            else if (GlobalVariables.newProductSizesList.Exists(x => x.productCode == _productCode))
+            else if (GlobalVariables.newProductSizesList.Exists(x => x.ProductCode == _productCode))
             {
                 retVal = true;
             }

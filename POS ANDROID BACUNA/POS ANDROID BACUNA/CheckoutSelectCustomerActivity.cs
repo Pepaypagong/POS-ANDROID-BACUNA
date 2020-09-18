@@ -18,20 +18,22 @@ using SupportSearchBar = Android.Support.V7.Widget.SearchView;
 using Android.Views.InputMethods;
 using POS_ANDROID_BACUNA.Fragments;
 using POS_ANDROID_BACUNA.Data_Classes;
+using POS_ANDROID_BACUNA.SQLite;
 
 namespace POS_ANDROID_BACUNA
 {
     [Activity(Label = "CheckoutSelectCustomerActivity", Theme = "@style/AppTheme", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
     public class CheckoutSelectCustomerActivity : AppCompatActivity
     {
-
         private Button mBtnSelectCustomer;
-        private List<Customers> mItems;
-        private List<Runners> mRunners;
+        private List<CustomersModel> mItems;
+        private List<RunnersModel> mRunners;
         private ListView mListView;
         private SupportSearchBar searchBar;
         private SupportToolbar toolBar;
         private bool mIsCustomer;
+        private CustomersDataAccess mCustomersDataAccess;
+        private RunnersDataAccess mRunnersDataAccess;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -59,6 +61,14 @@ namespace POS_ANDROID_BACUNA
         private void FnGetData()
         {
             mIsCustomer = Intent.GetBooleanExtra("isCustomer", true);
+            if (mIsCustomer)
+            {
+                mCustomersDataAccess = new CustomersDataAccess();
+            }
+            else
+            {
+                mRunnersDataAccess = new RunnersDataAccess();
+            }
         }
 
         private void FnSetUpEvents()
@@ -106,15 +116,7 @@ namespace POS_ANDROID_BACUNA
 
         private void FnPopulateRunners(string _queryString)
         {
-            mRunners = new List<Runners>();
-            mRunners.Add(new Runners() { FullName = "Rick Grimes", FirstName = "Rick", LastName = "Grimes", Age = "24", Gender = "Male" });
-            mRunners.Add(new Runners() { FullName = "Glenn Greene", FirstName = "Glenn", LastName = "Greene", Age = "21", Gender = "Female" });
-            mRunners.Add(new Runners() { FullName = "Star Platinum", FirstName = "Star", LastName = "Platinum", Age = "18", Gender = "Male" });
-            mRunners.Add(new Runners() { FullName = "Rosita Novi", FirstName = "Rosita", LastName = "Novi", Age = "56", Gender = "Female" });
-            mRunners.Add(new Runners() { FullName = "Houioun Kyoma", FirstName = "Houioun", LastName = "Kyoma", Age = "55", Gender = "Male" });
-
-            GlobalVariables.globalRunnersList = mRunners;
-
+            mRunners = mRunnersDataAccess.SelectTable();
             if (_queryString != "")
             {
                 mRunners = mRunners
@@ -127,15 +129,7 @@ namespace POS_ANDROID_BACUNA
 
         private void FnPopulateCustomers(string _queryString)
         {
-            mItems = new List<Customers>();
-            mItems.Add(new Customers() { FullName = "Jeffrey Bacuna", FirstName = "Jeffrey", LastName = "Bacuna", Age = "24", Gender = "Male" });
-            mItems.Add(new Customers() { FullName = "Joan Bacuna", FirstName = "Joan", LastName = "Bacuna", Age = "21", Gender = "Female" });
-            mItems.Add(new Customers() { FullName = "Justine Bacuna", FirstName = "Justine", LastName = "Bacuna", Age = "18", Gender = "Male" });
-            mItems.Add(new Customers() { FullName = "Melinda Bacuna", FirstName = "Melinda", LastName = "Bacuna", Age = "56", Gender = "Female" });
-            mItems.Add(new Customers() { FullName = "Generoso Bacuna", FirstName = "Generoso", LastName = "Bacuna", Age = "55", Gender = "Male" });
-
-            GlobalVariables.globalCustomersList = mItems;
-
+            mItems = mCustomersDataAccess.SelectTable();
             if (_queryString != "")
             {
                 mItems = mItems
@@ -164,12 +158,11 @@ namespace POS_ANDROID_BACUNA
 
         private void MListView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            string firstName = mIsCustomer ? mItems[e.Position].FirstName : mRunners[e.Position].FirstName;
-            string lastName = mIsCustomer ? mItems[e.Position].LastName : mRunners[e.Position].LastName;
+            string fullname = mIsCustomer ? mItems[e.Position].FullName : mRunners[e.Position].FullName;
 
             //var result = new Intent(); 
             //result.PutExtra("Key", firstName + " " + lastName);
-            GlobalVariables.mCurrentSelectedCustomerOnCheckout = firstName + " " + lastName; //set current selected customer
+            GlobalVariables.mCurrentSelectedCustomerOnCheckout = fullname; //set current selected customer
             GlobalVariables.mHasSelectedCustomerOnCheckout = true;
             SetResult(Result.Ok); //SetResult(Result.Ok, result);
 
@@ -194,7 +187,16 @@ namespace POS_ANDROID_BACUNA
                     Finish();
                     return true;
                 case Resource.Id.add_new_item:
-                    //add customer
+                    if (mIsCustomer)
+                    {
+                        Intent intent = new Intent(this, typeof(CustomersFragmentAddCustomerActivity));
+                        StartActivityForResult(intent, 35);
+                    }
+                    else
+                    {
+                        //Intent intent = new Intent(this, typeof(RunnersFragmentAddRunnerActivity));
+                        //StartActivityForResult(intent, 36);
+                    }
                     return true;
                 default:
                     return base.OnOptionsItemSelected(item);
@@ -205,6 +207,19 @@ namespace POS_ANDROID_BACUNA
         {
             MenuInflater.Inflate(Resource.Menu.toolbar_menu_products_categories_search, menu);
             return base.OnCreateOptionsMenu(menu);
+        }
+
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+            if (requestCode == 35)
+            {
+                FnPopulateCustomers("");
+            }
+            else
+            {
+                FnPopulateRunners("");
+            }
         }
 
     }

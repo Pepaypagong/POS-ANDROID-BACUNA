@@ -14,12 +14,12 @@ using POS_ANDROID_BACUNA.Data_Classes;
 
 namespace POS_ANDROID_BACUNA
 {
-    class ProductsItemSelectCategoryAdapter : BaseAdapter<ProductCategories>
+    class ProductsItemSelectCategoryAdapter : BaseAdapter<ProductCategoriesModel>
     {
-        private List<ProductCategories> mItems;
+        private List<ProductCategoriesModel> mItems;
         private Context mContext;
 
-        public ProductsItemSelectCategoryAdapter(Context context, List<ProductCategories> items)
+        public ProductsItemSelectCategoryAdapter(Context context, List<ProductCategoriesModel> items)
         {
             mItems = items;
             mContext = context;
@@ -34,7 +34,7 @@ namespace POS_ANDROID_BACUNA
             return position;
         }
 
-        public override ProductCategories this[int position]
+        public override ProductCategoriesModel this[int position]
         {
             get { return mItems[position]; }
         }
@@ -48,7 +48,7 @@ namespace POS_ANDROID_BACUNA
             }
 
             TextView txtCategoryName = row.FindViewById<TextView>(Resource.Id.txtCategoryName);
-            txtCategoryName.Text = mItems[position].productCategoryName;
+            txtCategoryName.Text = mItems[position].ProductCategoryName;
 
             return row;
         }

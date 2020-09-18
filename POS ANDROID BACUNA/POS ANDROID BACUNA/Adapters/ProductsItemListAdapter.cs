@@ -20,15 +20,15 @@ namespace POS_ANDROID_BACUNA.Adapters
     public class ProductsItemListAdapter : BaseExpandableListAdapter
     {
         private SupportFragment _supportFragment;
-        private List<ParentProducts> _listDataHeader; // header titles
+        private List<ParentProductsModel> _listDataHeader; // header titles
                                               // child data in format of header title, child title
-        private Dictionary<int, List<Product>> _listDataChild;
+        private Dictionary<int, List<ProductsModel>> _listDataChild;
         private ExpandableListView _expandableListView;
 
         string pesoSign = "\u20b1 ";
 
-        public ProductsItemListAdapter(SupportFragment supportFragment, List<ParentProducts> listDataHeader, 
-            Dictionary<int,List<Product>> listChildData, ExpandableListView expadableListview)
+        public ProductsItemListAdapter(SupportFragment supportFragment, List<ParentProductsModel> listDataHeader, 
+            Dictionary<int,List<ProductsModel>> listChildData, ExpandableListView expadableListview)
         {
             _supportFragment = supportFragment;
             _listDataHeader = listDataHeader;
@@ -41,9 +41,9 @@ namespace POS_ANDROID_BACUNA.Adapters
             throw new NotImplementedException();
         }
 
-        protected Product GetProductChild(int groupPosition, int childPosition)
+        protected ProductsModel GetProductChild(int groupPosition, int childPosition)
         {
-            return _listDataChild[_listDataHeader[groupPosition].parentProductId][childPosition];
+            return _listDataChild[_listDataHeader[groupPosition].Id][childPosition];
         }
 
         public override long GetChildId(int groupPosition, int childPosition)
@@ -53,7 +53,7 @@ namespace POS_ANDROID_BACUNA.Adapters
 
         public override View GetChildView(int groupPosition, int childPosition, bool isLastChild, View convertView, ViewGroup parent)
         {
-            Product child = GetProductChild(groupPosition, childPosition);
+            ProductsModel child = GetProductChild(groupPosition, childPosition);
 
             if (convertView == null)
             {
@@ -63,16 +63,16 @@ namespace POS_ANDROID_BACUNA.Adapters
             TextView txtWholesalePrice = (TextView)convertView.FindViewById(Resource.Id.txtWsPrice);
             TextView txtRetailPrice = (TextView)convertView.FindViewById(Resource.Id.txtRetailPrice);
             TextView txtRunnerPrice = (TextView)convertView.FindViewById(Resource.Id.txtRunnerPrice);
-            txtListChild.Text = child.productName;
-            txtWholesalePrice.Text = pesoSign + string.Format("{0:n}", child.productWholesalePrice);
-            txtRetailPrice.Text = pesoSign + string.Format("{0:n}", child.productRetailPrice);
-            txtRunnerPrice.Text = pesoSign + string.Format("{0:n}", child.productRunnerPrice);
+            txtListChild.Text = child.ProductName;
+            txtWholesalePrice.Text = pesoSign + string.Format("{0:n}", child.ProductWholesalePrice);
+            txtRetailPrice.Text = pesoSign + string.Format("{0:n}", child.ProductRetailPrice);
+            txtRunnerPrice.Text = pesoSign + string.Format("{0:n}", child.ProductRunnerPrice);
             return convertView;
         } 
 
         public override int GetChildrenCount(int groupPosition)
         {
-            return _listDataChild[_listDataHeader[groupPosition].parentProductId].Count;
+            return _listDataChild[_listDataHeader[groupPosition].Id].Count;
         }
 
         public override Java.Lang.Object GetGroup(int groupPosition)
@@ -80,7 +80,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             throw new NotImplementedException();
         }
 
-        protected ParentProducts GetProductGroup(int groupPosition)
+        protected ParentProductsModel GetProductGroup(int groupPosition)
         {
             return _listDataHeader[groupPosition];
         }
@@ -99,8 +99,8 @@ namespace POS_ANDROID_BACUNA.Adapters
         public override View GetGroupView(int groupPosition, bool isExpanded, View convertView, ViewGroup parent)
         {
             //string headerTitle = (string)GetGroup(groupPosition);
-            ParentProducts group = GetProductGroup(groupPosition);
-            string headerTitle = group.parentProductName;
+            ParentProductsModel group = GetProductGroup(groupPosition);
+            string headerTitle = group.ParentProductName;
 
             convertView = convertView ?? _supportFragment.LayoutInflater.Inflate(Resource.Layout.products_fragment_items_list_item_parent, parent, false);
             var lblListHeader = (TextView)convertView.FindViewById(Resource.Id.lblListHeader);
@@ -111,9 +111,9 @@ namespace POS_ANDROID_BACUNA.Adapters
             var imgEdit = (ImageView)convertView.FindViewById(Resource.Id.btnEditParentItem);
 
             lblListHeader.Text = headerTitle;
-            txtParentProductId.Text = group.parentProductId.ToString();
-            cardViewItemImageHolder.SetCardBackgroundColor(Android.Graphics.Color.ParseColor("#" + group.productColorBg));
-            txtItemAlias.Text = group.productAlias;
+            txtParentProductId.Text = group.Id.ToString();
+            cardViewItemImageHolder.SetCardBackgroundColor(Android.Graphics.Color.ParseColor("#" + group.ProductColorBg));
+            txtItemAlias.Text = group.ProductAlias;
 
             rlEdit.Click -= RlEdit_Click;
             rlEdit.Click += RlEdit_Click;

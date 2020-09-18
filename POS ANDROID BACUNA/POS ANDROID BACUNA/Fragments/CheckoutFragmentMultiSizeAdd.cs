@@ -21,7 +21,7 @@ using POS_ANDROID_BACUNA.Data_Classes;
 using Java.Util;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Adapters;
-
+using POS_ANDROID_BACUNA.SQLite;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -46,12 +46,15 @@ namespace POS_ANDROID_BACUNA.Fragments
         LinearLayout mllCheckoutCartButtonContainer;
         Button mBtnCheckoutMultiAddAddToCart;
         float mDpVal;
+        ParentProductsDataAccess mParentProductDataAccess;
+        ProductsDataAccess mProductsDataAccess;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.checkout_fragment_multi_size_add);
             mDpVal = this.Resources.DisplayMetrics.Density;
+            FnSetUpData();
             FnSetUpToolBar();
             FnSetControls();
             FnSetControlClickEvents();
@@ -62,6 +65,13 @@ namespace POS_ANDROID_BACUNA.Fragments
                 SetRecyclerViewLayoutHeight(mRvSizes, mRlSizesHeader);
             });
         }
+
+        private void FnSetUpData()
+        {
+            mParentProductDataAccess = new ParentProductsDataAccess();
+            mProductsDataAccess = new ProductsDataAccess();
+        }
+
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             MenuInflater.Inflate(Resource.Menu.toolbar_menu_checkout_multi_add, menu);
@@ -85,39 +95,39 @@ namespace POS_ANDROID_BACUNA.Fragments
         private List<MultiSizeAddProductsHolder> InitialDataLoad()
         {
             int selectedParentProductId = GlobalVariables.mCurrentSelectedItemIdMultiSize;
-            List<Product> products = GlobalVariables.globalProductList
-                .Where(o => o.parentProductId == selectedParentProductId)
-                .OrderBy(o => o.productSizeId) //3x -> S
+            List<ProductsModel> products = mProductsDataAccess.SelectTable()
+                .Where(o => o.ParentProductId == selectedParentProductId)
+                .OrderBy(o => o.ProductSizeId) //3x -> S
                 .ToList();
             mProductHolder = new List<MultiSizeAddProductsHolder>();
             foreach (var item in products)
             {
                 mProductHolder.Add(new MultiSizeAddProductsHolder()
                 {
-                    productId = item.productId,
+                    productId = item.Id,
                     isSelected = false,
-                    productSize = item.productSize,
-                    productPrice = GetProductPrice(GlobalVariables.mCurrentSelectedPricingType, products, item.productId),
+                    productSize = item.ProductSize,
+                    productPrice = GetProductPrice(GlobalVariables.mCurrentSelectedPricingType, products, item.Id),
                     quantity = 0
                 });
             }
             return mProductHolder;
         }
-        private decimal GetProductPrice(string mCurrentSelectedPricingType, List<Product> products, int productId)
+        private decimal GetProductPrice(string mCurrentSelectedPricingType, List<ProductsModel> products, int productId)
         {
             decimal retval = 0;
-            var productsEnum = products.Where(x => x.productId == productId);
+            var productsEnum = products.Where(x => x.Id == productId);
             if (mCurrentSelectedPricingType == "RT")
             {
-                retval = productsEnum.Select(x=>x.productRetailPrice).FirstOrDefault();
+                retval = productsEnum.Select(x=>x.ProductRetailPrice).FirstOrDefault();
             }
             else if (mCurrentSelectedPricingType == "WS")
             {
-                retval = productsEnum.Select(x => x.productWholesalePrice).FirstOrDefault();
+                retval = productsEnum.Select(x => x.ProductWholesalePrice).FirstOrDefault();
             }
             else //runner
             {
-                retval = productsEnum.Select(x => x.productRunnerPrice).FirstOrDefault();
+                retval = productsEnum.Select(x => x.ProductRunnerPrice).FirstOrDefault();
             }
             return retval;
         }
@@ -185,18 +195,14 @@ namespace POS_ANDROID_BACUNA.Fragments
                 int parentProductId = 1;
 
                 //get from db here where item id
-                foreach (var item in GlobalVariables.globalProductList)
-                {
-                    if (item.productId == _itemId)
-                    {
-                        productName = item.productName;
-                        productCategoryId = item.productCategoryId;
-                        productCategory = item.productCategory;
-                        productSizeId = item.productSizeId;
-                        productSize = item.productSize;
-                        parentProductId = item.parentProductId;
-                    }
-                }
+                var selectedProductRecord = mProductsDataAccess.SelectRecord(_itemId);
+
+                productName = selectedProductRecord[0].ProductName;
+                productCategoryId = selectedProductRecord[0].ProductCategoryId;
+                productCategory = selectedProductRecord[0].ProductCategory;
+                productSizeId = selectedProductRecord[0].ProductSizeId;
+                productSize = selectedProductRecord[0].ProductSize;
+                parentProductId = selectedProductRecord[0].ParentProductId;
 
                 GlobalVariables.globalProductsOnCart.Add(new ProductsOnCart()
                 {
@@ -214,25 +220,17 @@ namespace POS_ANDROID_BACUNA.Fragments
                     productDiscountAmount = 0.00M,
                     productDiscountPercentage = 0.00M,
                     parentProductId = parentProductId,
-                    parentProductName = GetParentProductName(parentProductId)
+                    parentProductName = mParentProductDataAccess.SelectRecord(parentProductId)[0].ParentProductName
                 });
             }
         }
 
-        private int GetSizeRank(int _productSizeId)
+        private int GetSizeRank(int _ProductSizeId)
         {
             return GlobalVariables.globalSizesList
-                    .Where(x => x.productSizeId == _productSizeId)
-                    .Select(x => x.sizeRank)
+                    .Where(x => x.ProductSizeId == _ProductSizeId)
+                    .Select(x => x.SizeRank)
                     .FirstOrDefault();
-        }
-
-        private string GetParentProductName(int _parentProductId)
-        {
-            return GlobalVariables.globalParentProductList
-                .Where(x => x.parentProductId == _parentProductId)
-                .Select(x => x.parentProductName)
-                .FirstOrDefault();
         }
 
         public string ComputeQuantity(string _value, bool _isToAdd)

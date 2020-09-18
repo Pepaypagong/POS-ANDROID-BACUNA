@@ -7,6 +7,7 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
 using Android.Widget;
@@ -42,8 +43,10 @@ namespace POS_ANDROID_BACUNA
         float mDpVal;
         private int origGridHeight;
         LinearLayout gridHolder;
+        RecyclerView recyclerView;
         RelativeLayout button;
         Toolbar toolbar;
+        SearchView searchView;
 
         public SearchViewFocusListener(Context _context, String _senderFragmentName)
         {
@@ -75,6 +78,28 @@ namespace POS_ANDROID_BACUNA
                     SetGridHeight(gridHolder, 0, 0, toolbar, true);
                 }
             }
+            else if(mSenderFragmentName == "TransactionsFragment")
+            {
+                if (hasFocus)
+                {
+                    //keyboard opened here
+                    //get the current recyclerview
+                    ViewGroup parentView = (ViewGroup)v.Parent.Parent;
+                    recyclerView = parentView.FindViewById<RecyclerView>(Resource.Id.recyclerViewTransactions);
+                    button = parentView.FindViewById<RelativeLayout>(Resource.Id.rlDateFilter); //date filter footer holder
+                    searchView = parentView.FindViewById<SearchView>(Resource.Id.searchBar);
+
+                    origGridHeight = recyclerView.Height;
+                    recyclerView.PostDelayed(() => {
+                        SetGridHeight(recyclerView, recyclerView.Height, button.Height, searchView, false);
+                    }, 100);
+                }
+                else
+                {
+                    SoftKeyboardHelper.HideKeyboard(v, mContext);
+                    SetGridHeight(recyclerView, 0, 0, searchView, true);
+                }
+            }
             else
             {
                 if (!hasFocus)
@@ -84,12 +109,19 @@ namespace POS_ANDROID_BACUNA
             }
         }
 
-        private void SetGridHeight(LinearLayout gridHolder, int gridheight, int buttonheight, Toolbar layoutBelow, bool isKeyboardHidden)
+        private void SetGridHeight(View gridHolder, int gridheight, int buttonheight, View layoutBelow, bool isKeyboardHidden)
         {
             mDpVal = mContext.Resources.DisplayMetrics.Density;
             RelativeLayout.LayoutParams layoutParams =
             new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MatchParent, isKeyboardHidden ? origGridHeight : gridheight - buttonheight);
-            layoutParams.SetMargins(dpToPixel(5), dpToPixel(0), dpToPixel(5), dpToPixel(0));
+            if (mSenderFragmentName == "TransactionsFragment")
+            {
+                layoutParams.SetMargins(dpToPixel(0), dpToPixel(2), dpToPixel(0), dpToPixel(0));
+            }
+            else
+            {
+                layoutParams.SetMargins(dpToPixel(5), dpToPixel(0), dpToPixel(5), dpToPixel(0));
+            }
             layoutParams.AddRule(LayoutRules.Below, layoutBelow.Id);
             gridHolder.LayoutParameters = layoutParams;
             gridHolder.RequestLayout();

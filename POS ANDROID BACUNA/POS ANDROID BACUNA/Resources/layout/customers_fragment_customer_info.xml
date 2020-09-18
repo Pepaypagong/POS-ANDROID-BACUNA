@@ -1,0 +1,140 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        app:popupTheme="@style/AppTheme"
+        app:itemIconTint="?attr/colorPrimaryDark"
+    />
+
+    <RelativeLayout
+        android:id="@+id/rlContents"
+        android:layout_below="@id/toolbarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/rlCustomerAppearanceContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:paddingTop="40dp"
+            android:paddingBottom="40dp"
+            android:background="@color/colorBlurredBackground">
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardviewCustomerAppearance"
+                android:layout_centerInParent="true"
+                android:layout_width="120dp"
+                android:layout_height="110dp"
+                app:cardBackgroundColor="#454E5f"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                android:foreground="?android:attr/selectableItemBackground">
+            </android.support.v7.widget.CardView>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlCustomerInfoContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="10dp"
+            android:layout_below="@id/rlCustomerAppearanceContainer">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/txtInputLayoutCustomerName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/etCustomerName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:inputType="text"
+                    android:textSize="17sp"
+                    android:hint="Customer name"
+                />
+
+            </android.support.design.widget.TextInputLayout>
+            
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/txtInputLayoutMobileNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" 
+                android:layout_below="@id/txtInputLayoutCustomerName">
+
+                <EditText
+                    android:id="@+id/etMobileNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:inputType="phone"
+                    android:textSize="17sp"
+                    android:hint="Mobile #"
+                />
+
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/txtInputLayoutCustomerAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtInputLayoutMobileNumber">
+
+                <EditText
+                    android:id="@+id/etCustomerAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:inputType="text"
+                    android:textSize="17sp"
+                    android:hint="Address"
+                />
+
+            </android.support.design.widget.TextInputLayout>
+            
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/llSaveButtonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/btnSaveCustomer"
+            android:layout_width="match_parent"
+            android:minHeight="50dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/buttonCheckoutRoundBorderWithItem"
+            android:text="SAVE CUSTOMER"
+            android:textColor="?android:attr/colorPrimary"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_gravity="center_horizontal"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:layout_centerInParent="true"
+        />
+    </LinearLayout>
+
+</RelativeLayout>

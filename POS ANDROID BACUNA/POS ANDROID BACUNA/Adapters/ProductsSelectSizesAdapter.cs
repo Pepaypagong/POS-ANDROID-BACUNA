@@ -14,12 +14,12 @@ using POS_ANDROID_BACUNA.Data_Classes;
 
 namespace POS_ANDROID_BACUNA
 {
-    class ProductsSelectSizesAdapter : BaseAdapter<ProductSizes>
+    class ProductsSelectSizesAdapter : BaseAdapter<ProductSizesModel>
     {
-        private List<ProductSizes> mItems;
+        private List<ProductSizesModel> mItems;
         private Context mContext;
 
-        public ProductsSelectSizesAdapter(Context context, List<ProductSizes> items)
+        public ProductsSelectSizesAdapter(Context context, List<ProductSizesModel> items)
         {
             mItems = items;
             mContext = context;
@@ -34,7 +34,7 @@ namespace POS_ANDROID_BACUNA
             return position;
         }
 
-        public override ProductSizes this[int position]
+        public override ProductSizesModel this[int position]
         {
             get { return mItems[position]; }
         }
@@ -48,11 +48,11 @@ namespace POS_ANDROID_BACUNA
             }
 
             TextView txtSize = row.FindViewById<TextView>(Resource.Id.txtSizeName);
-            txtSize.Text = mItems[position].productSizeName;
+            txtSize.Text = mItems[position].ProductSizeName;
 
             TextView txtStatus = row.FindViewById<TextView>(Resource.Id.txtSizeStatus);
 
-            bool alreadyExists = GlobalVariables.newProductSizesList.Any(x => x.productSize == mItems[position].productSizeName);
+            bool alreadyExists = GlobalVariables.newProductSizesList.Any(x => x.ProductSize == mItems[position].ProductSizeName);
 
             txtStatus.Text = alreadyExists ? "added" : "not yet added";
 

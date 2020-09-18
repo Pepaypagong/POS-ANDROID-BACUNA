@@ -12,7 +12,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using SupportFragment = Android.Support.V4.App.Fragment;
-using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
+using Product = POS_ANDROID_BACUNA.Data_Classes.ProductsModel;
 using POS_ANDROID_BACUNA.Data_Classes;
 using POS_ANDROID_BACUNA.Fragments;
 

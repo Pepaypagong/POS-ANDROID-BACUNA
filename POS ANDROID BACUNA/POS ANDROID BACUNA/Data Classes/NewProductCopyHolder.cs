@@ -9,25 +9,26 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using SQLitePCL;
 
 namespace POS_ANDROID_BACUNA.Data_Classes
 {
     public class NewProductCopyHolder
     {
-        public int productId {get; set;}
-        public string productName { get; set; }
-        public int parentProductId { get; set; }
-        public int productCategoryId { get; set; }
-        public string productCategory { get; set; }
-        public int productSizeId { get; set; }
-        public string productSize { get; set; }
-        public decimal productCost { get; set; }
-        public decimal productRetailPrice { get; set; }
-        public decimal productWholesalePrice { get; set; }
-        public decimal productRunnerPrice { get; set; }
-        public string productColorBg { get; set; }
-        public System.Drawing.Image productImage { get; set; }
-        public string productAlias { get; set; }
-        public string productCode { get; set; }
+        public int ProductId {get; set;}
+        public string ProductName { get; set; }
+        public int ParentProductId { get; set; }
+        public int ProductCategoryId { get; set; }
+        public string ProductCategory { get; set; }
+        public int ProductSizeId { get; set; }
+        public string ProductSize { get; set; }
+        public decimal ProductCost { get; set; }
+        public decimal ProductRetailPrice { get; set; }
+        public decimal ProductWholesalePrice { get; set; }
+        public decimal ProductRunnerPrice { get; set; }
+        public string ProductColorBg { get; set; }
+        public byte[] ProductImage { get; set; }
+        public string ProductAlias { get; set; }
+        public string ProductCode { get; set; }
     }
 }

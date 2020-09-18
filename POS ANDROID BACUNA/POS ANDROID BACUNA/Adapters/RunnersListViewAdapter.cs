@@ -12,15 +12,15 @@ using Android.Widget;
 
 namespace POS_ANDROID_BACUNA
 {
-    class RunnersListViewAdapter : BaseAdapter<Runners>
+    class RunnersListViewAdapter : BaseAdapter<RunnersModel>
     {
-        private List<Runners> mItems;
+        private List<RunnersModel> mItems;
         private Context mContext;
         private TextView mTxtCustomerName;
         private TextView mTxtAvgPurchaseAmt;
         private TextView mTxtSalesCount;
 
-        public RunnersListViewAdapter(Context context, List<Runners> items)
+        public RunnersListViewAdapter(Context context, List<RunnersModel> items)
         {
             mItems = items;
             mContext = context;
@@ -35,7 +35,7 @@ namespace POS_ANDROID_BACUNA
             return position;
         }
 
-        public override Runners this[int position]
+        public override RunnersModel this[int position]
         {
             get { return mItems[position]; }
         }
@@ -50,7 +50,7 @@ namespace POS_ANDROID_BACUNA
 
             FnSetControls(row);
 
-            mTxtCustomerName.Text = mItems[position].FirstName + " " + mItems[position].LastName;
+            mTxtCustomerName.Text = mItems[position].FullName;
             mTxtAvgPurchaseAmt.Text = "Hasn't made a purchase";
             mTxtSalesCount.Text = "5 Sales";
 

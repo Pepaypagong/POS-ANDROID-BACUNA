@@ -12,22 +12,22 @@ using Android.Widget;
 
 namespace POS_ANDROID_BACUNA
 {
-    class CustomersListViewAdapter : BaseAdapter<Customers>
+    class CustomersListViewAdapter : BaseAdapter<CustomersModel>
     {
-        private List<Customers> mItems;
+        private List<CustomersModel> mItems;
         private Context mContext;
         private TextView mTxtCustomerName;
         private TextView mTxtAvgPurchaseAmt;
         private TextView mTxtSalesCount;
 
-        public CustomersListViewAdapter(Context context, List<Customers> items)
+        public CustomersListViewAdapter(Context context, List<CustomersModel> items)
         {
             mItems = items;
             mContext = context;
         }
         public override int Count
         {
-            get { return mItems.Count; }
+            get { return mItems == null ? 0 : mItems.Count; }
         }
 
         public override long GetItemId(int position)
@@ -35,7 +35,7 @@ namespace POS_ANDROID_BACUNA
             return position;
         }
 
-        public override Customers this[int position]
+        public override CustomersModel this[int position]
         {
             get { return mItems[position]; }
         }
@@ -50,7 +50,7 @@ namespace POS_ANDROID_BACUNA
 
             FnSetControls(row);
 
-            mTxtCustomerName.Text = mItems[position].FirstName + " " + mItems[position].LastName;
+            mTxtCustomerName.Text = mItems[position].FullName;
             mTxtAvgPurchaseAmt.Text = "Hasn't made a purchase";
             mTxtSalesCount.Text = "3 Sales";
 

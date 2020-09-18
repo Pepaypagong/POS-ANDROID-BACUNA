@@ -22,7 +22,7 @@ using POS_ANDROID_BACUNA.Data_Classes;
 using Java.Util;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Adapters;
-
+using POS_ANDROID_BACUNA.SQLite;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -30,13 +30,14 @@ namespace POS_ANDROID_BACUNA.Fragments
     public class ProductsFragmentItemsSelectCategoryActivity : AppCompatActivity
     {
         private SupportToolbar mToolBar;
-        private List<ProductCategories> mProductCategories;
+        private List<ProductCategoriesModel> mProductCategories;
         private ListView mLvCategories;
         private SupportSearchBar searchBar;
         bool mDialogShown = false;
         string selectedCategory;
         string caller;
-
+        CategoriesDataAccess mCategoriesDataAccess;
+        
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -54,6 +55,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void FnGetData()
         {
+            mCategoriesDataAccess = new CategoriesDataAccess();
             selectedCategory = Intent.GetStringExtra("productCatNameInit");
             caller = Intent.GetStringExtra("caller");
         }
@@ -64,30 +66,30 @@ namespace POS_ANDROID_BACUNA.Fragments
             {
                 if (_queryString != "")
                 {
-                    mProductCategories = GlobalVariables.globalProductCategoryList
-                        .OrderBy(x => x.productCategoryId)
-                        .Where(x => x.productCategoryName.ToLower().Contains(_queryString))
+                    mProductCategories = mCategoriesDataAccess.SelectTable()
+                        .OrderBy(x => x.Id)
+                        .Where(x => x.ProductCategoryName.ToLower().Contains(_queryString))
                         .ToList();
                 }
                 else
                 {
-                    mProductCategories = GlobalVariables.globalProductCategoryList.OrderBy(x => x.productCategoryId).ToList();
+                    mProductCategories = mCategoriesDataAccess.SelectTable().OrderBy(x => x.Id).ToList();
                 }
             }
             else
             {
                 if (_queryString != "")
                 {
-                    mProductCategories = GlobalVariables.globalProductCategoryList
-                        .OrderBy(x => x.productCategoryId)
-                        .Where(x => x.productCategoryName != "All")
-                        .Where(x => x.productCategoryName.ToLower().Contains(_queryString))
+                    mProductCategories = mCategoriesDataAccess.SelectTable()
+                        .OrderBy(x => x.Id)
+                        .Where(x => x.ProductCategoryName != "All")
+                        .Where(x => x.ProductCategoryName.ToLower().Contains(_queryString))
                         .ToList();
                 }
                 else
                 {
-                    mProductCategories = GlobalVariables.globalProductCategoryList
-                        .OrderBy(x => x.productCategoryId).Where(x => x.productCategoryName != "All").ToList();
+                    mProductCategories = mCategoriesDataAccess.SelectTable()
+                        .OrderBy(x => x.Id).Where(x => x.ProductCategoryName != "All").ToList();
                 }
             }
             ProductsItemSelectCategoryAdapter adapter = new ProductsItemSelectCategoryAdapter(this, mProductCategories);
@@ -115,8 +117,8 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void MLvSizes_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            int categoryId = mProductCategories[e.Position].productCategoryId;
-            string categoryName = mProductCategories[e.Position].productCategoryName;
+            int categoryId = mProductCategories[e.Position].Id;
+            string categoryName = mProductCategories[e.Position].ProductCategoryName;
 
             var result = new Intent(); 
             result.PutExtra("productCategoryName", categoryName);

@@ -56,10 +56,12 @@
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Refractored.Controls.CircleImageView">
       <HintPath>..\..\..\..\..\.nuget\packages\refractored.controls.circleimageview\1.0.1\lib\MonoAndroid10\Refractored.Controls.CircleImageView.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Mono.Android" />
@@ -77,12 +79,13 @@
     <Compile Include="Adapters\CheckoutCartItemListAdapter.cs" />
     <Compile Include="Adapters\CheckoutMultiAddListRecyclerViewAdapter.cs" />
     <Compile Include="Adapters\SortCartItemsListAdapter.cs" />
+    <Compile Include="Adapters\TransactionsRecyclerViewAdapter.cs" />
     <Compile Include="CheckoutSelectCustomerActivity.cs" />
     <Compile Include="ColorHelper.cs" />
     <Compile Include="CurrencyTextWatcher.cs" />
     <Compile Include="Data Classes\MultiSizeAddProductsHolder.cs" />
-    <Compile Include="Data Classes\Runners.cs" />
-    <Compile Include="Data Classes\Customers.cs" />
+    <Compile Include="Data Classes\RunnersModel.cs" />
+    <Compile Include="Data Classes\CustomersModel.cs" />
     <Compile Include="BluetoothDevicesListViewAdapter.cs" />
     <Compile Include="Adapters\RunnersListViewAdapter.cs" />
     <Compile Include="Data Classes\ConnectedBluetoothDevice.cs" />
@@ -90,15 +93,25 @@
     <Compile Include="Data Classes\Options.cs" />
     <Compile Include="Data Classes\OrderFields.cs" />
     <Compile Include="Data Classes\ParentProductCopyHolder.cs" />
-    <Compile Include="Data Classes\ParentProducts.cs" />
+    <Compile Include="Data Classes\ParentProductsModel.cs" />
     <Compile Include="Data Classes\NewProduct.cs" />
-    <Compile Include="Data Classes\Product.cs" />
-    <Compile Include="Data Classes\ProductCategories.cs" />
-    <Compile Include="Data Classes\ProductSizes.cs" />
+    <Compile Include="Data Classes\ProductsModel.cs" />
+    <Compile Include="Data Classes\ProductCategoriesModel.cs" />
+    <Compile Include="Data Classes\ProductSizesModel.cs" />
     <Compile Include="Data Classes\ProductsOnCart.cs" />
     <Compile Include="Data Classes\SplitPayments.cs" />
+    <Compile Include="Data Classes\TransactionList\TransactionListGroupedByDate.cs" />
+    <Compile Include="Data Classes\TransactionsModel.cs" />
     <Compile Include="DataClassHelper.cs" />
     <Compile Include="DialogMessageService.cs" />
+    <Compile Include="Fragments\CustomersFragmentEditCustomerActivity.cs" />
+    <Compile Include="Fragments\CustomersFragmentEditOrdersFragment.cs" />
+    <Compile Include="Fragments\CustomersFragmentEditSalesFragment.cs" />
+    <Compile Include="Fragments\CustomersFragmentEditInfoFragment.cs" />
+    <Compile Include="SQLite\CategoriesDataAccess.cs" />
+    <Compile Include="SQLite\ParentProductsDataAccess.cs" />
+    <Compile Include="SQLite\ProductsDataAccess.cs" />
+    <Compile Include="TabFragmentAdapter.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartAddNoteActivity.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartNumpadDiscountActivity.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartNumpadActivity.cs" />
@@ -109,6 +122,7 @@
     <Compile Include="Fragments\CheckoutFragmentPaymentMethodsActivity.cs" />
     <Compile Include="Fragments\CheckoutFragmentPaymentNumpadActivity.cs" />
     <Compile Include="Fragments\CheckoutFragmentPaymentActivity.cs" />
+    <Compile Include="Fragments\CustomersFragmentAddCustomerActivity.cs" />
     <Compile Include="Fragments\ProductsFragmentAddCategoryOrSizeActivity.cs" />
     <Compile Include="Fragments\ProductsFragmentItemsDescriptionActivity.cs" />
     <Compile Include="Fragments\ProductsFragmentItemsSelectCategoryActivity.cs" />
@@ -139,6 +153,10 @@
     <Compile Include="SingleClickListener.cs" />
     <Compile Include="SoftKeyboardHelper.cs" />
     <Compile Include="SortCartItemsDialogFragment.cs" />
+    <Compile Include="SQLite\RunnersDataAccess.cs" />
+    <Compile Include="SQLite\SQLiteConnetionString.cs" />
+    <Compile Include="SQLite\CustomersDataAccess.cs" />
+    <Compile Include="SQLite\TransactionsDataAccess.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\fonts\Roboto-ThinItalic.ttf" />
@@ -153,9 +171,15 @@
     <AndroidAsset Include="Assets\fonts\Roboto-MediumItalic.ttf" />
     <AndroidAsset Include="Assets\fonts\Roboto-Regular.ttf" />
     <AndroidAsset Include="Assets\fonts\Roboto-Thin.ttf" />
-    <Content Include="PosDatabase.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <AndroidResource Include="Resources\layout\transactions_fragment_list_row.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\menu\toolbar_menu_customers.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\customers_fragment_customer_info.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />
@@ -201,16 +225,19 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
     </PackageReference>
-    <PackageReference Include="System.Data.SQLite.Core">
-      <Version>1.0.113.1</Version>
+    <PackageReference Include="sqlite-net-pcl">
+      <Version>1.7.335</Version>
+    </PackageReference>
+    <PackageReference Include="System.Collections.NonGeneric">
+      <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Linq.Dynamic.Core">
-      <Version>1.2.0</Version>
+      <Version>1.2.2</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.1" />
-    <PackageReference Include="Xamarin.Android.Support.Core.Utils" Version="28.0.0.1" />
-    <PackageReference Include="Xamarin.Android.Support.CustomTabs" Version="28.0.0.1" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.2.0" />
+    <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.3" />
+    <PackageReference Include="Xamarin.Android.Support.Core.Utils" Version="28.0.0.3" />
+    <PackageReference Include="Xamarin.Android.Support.CustomTabs" Version="28.0.0.3" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\include_body_container.xml">
@@ -746,6 +773,36 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\buttonCheckoutRoundBorderWithItemRed.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_fragment_list_row_header.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\customers_fragment_customer_holder.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\customers_fragment_customer_sales.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\customers_fragment_customer_orders.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\toolbar_menu_customers_edit.xml">
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
       <SubType>Designer</SubType>
     </AndroidResource>

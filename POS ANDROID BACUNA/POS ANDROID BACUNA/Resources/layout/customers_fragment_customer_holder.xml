@@ -1,0 +1,30 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        app:popupTheme="@style/AppTheme"
+        app:itemIconTint="?attr/colorPrimaryDark"
+    />
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabsMenu"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        style="@style/TabLayoutThemes"
+        android:layout_below="@id/toolbarTitle"
+    />
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tabsMenu"
+    />
+</RelativeLayout>

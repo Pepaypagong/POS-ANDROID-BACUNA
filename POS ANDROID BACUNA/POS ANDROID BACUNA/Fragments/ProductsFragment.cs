@@ -16,7 +16,7 @@ using SupportFragmentManager = Android.Support.V4.App.FragmentManager;
 using SearchView = Android.Support.V7.Widget.SearchView;
 using Android.Views.InputMethods;
 using Android.Support.V7.Widget;
-using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
+using Product = POS_ANDROID_BACUNA.Data_Classes.ProductsModel;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Data_Classes;
 using POS_ANDROID_BACUNA.Adapters;
@@ -69,49 +69,12 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void SetUpViewPager(ViewPager viewPager)
         {
-            TabAdapter adapter = new TabAdapter(ChildFragmentManager);
+            TabFragmentAdapter adapter = new TabFragmentAdapter(ChildFragmentManager);
             adapter.AddFragment(new ProductsFragmentItemsFragment(), "ITEMS");
             adapter.AddFragment(new ProductsFragmentStocksFragment(), "STOCK");
             adapter.AddFragment(new ProductsFragmentCategoriesFragment(), "CATEGORIES");
             adapter.AddFragment(new ProductsFragmentSizesFragment(), "SIZES");
             viewPager.Adapter = adapter;
-        }
-
-        public class TabAdapter : FragmentPagerAdapter
-        {
-            public List<SupportFragment> Fragments { get; set; }
-            public List<string> FragmentNames { get; set; }
-
-            public TabAdapter(SupportFragmentManager sfm) : base(sfm)
-            {
-                Fragments = new List<SupportFragment>();
-                FragmentNames = new List<string>();
-            }
-
-            public void AddFragment(SupportFragment fragment, string name)
-            {
-                Fragments.Add(fragment);
-                FragmentNames.Add(name);
-            }
-
-            public override int Count
-            {
-                get
-                {
-                    return Fragments.Count;
-                }
-            }
-
-            public override SupportFragment GetItem(int position)
-            {
-                return Fragments[position];
-            }
-
-            public override ICharSequence GetPageTitleFormatted(int position)
-            {
-                return new Java.Lang.String(FragmentNames[position]);
-            }
-
         }
     }
 }

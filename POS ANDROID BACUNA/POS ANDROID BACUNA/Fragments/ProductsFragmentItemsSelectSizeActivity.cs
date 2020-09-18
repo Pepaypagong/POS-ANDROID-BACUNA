@@ -31,7 +31,7 @@ namespace POS_ANDROID_BACUNA.Fragments
     {
         SupportToolbar mToolBar;
         ListView mLvSizes;
-        List<ProductSizes> mProductSizes;
+        List<ProductSizesModel> mProductSizes;
         private SupportSearchBar searchBar;
         bool mDialogShown = false;
         Button mBtnCreateSize;
@@ -61,13 +61,13 @@ namespace POS_ANDROID_BACUNA.Fragments
             ProductsSelectSizesAdapter adapter = new ProductsSelectSizesAdapter(this, PopulateProductSizes(_queryString));
             mLvSizes.Adapter = adapter;
         }
-        private List<ProductSizes> PopulateProductSizes(string _queryString)
+        private List<ProductSizesModel> PopulateProductSizes(string _queryString)
         {
             var sizes = GlobalVariables.globalSizesList;
             if (_queryString != "")
             {
                 mProductSizes = sizes
-                    .Where(x => x.productSizeName.ToLower().Contains(_queryString))
+                    .Where(x => x.ProductSizeName.ToLower().Contains(_queryString))
                     .ToList();
             }
             else
@@ -99,9 +99,9 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void MLvSizes_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            int sizeId = mProductSizes[e.Position].productSizeId;
-            string sizeName = mProductSizes[e.Position].productSizeName;
-            bool alreadyExists = GlobalVariables.newProductSizesList.Any(x => x.productSize == sizeName);
+            int sizeId = mProductSizes[e.Position].ProductSizeId;
+            string sizeName = mProductSizes[e.Position].ProductSizeName;
+            bool alreadyExists = GlobalVariables.newProductSizesList.Any(x => x.ProductSize == sizeName);
 
             if (!alreadyExists)
             {

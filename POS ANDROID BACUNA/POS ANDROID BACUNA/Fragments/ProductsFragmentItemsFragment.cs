@@ -15,11 +15,12 @@ using TabLayout = Android.Support.Design.Widget.TabLayout;
 using SearchView = Android.Support.V7.Widget.SearchView;
 using Android.Views.InputMethods;
 using Android.Support.V7.Widget;
-using Product = POS_ANDROID_BACUNA.Data_Classes.Product;
+using ProductsModel = POS_ANDROID_BACUNA.Data_Classes.ProductsModel;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Data_Classes;
 using POS_ANDROID_BACUNA.Adapters;
 using static POS_ANDROID_BACUNA.Fragments.CheckoutFragment;
+using POS_ANDROID_BACUNA.SQLite;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -27,6 +28,10 @@ namespace POS_ANDROID_BACUNA.Fragments
     {
         View thisFragmentView;
         TabLayout mTabs;
+
+        //data
+        ProductsDataAccess mProductsDataAccess;
+        ParentProductsDataAccess mParentProductsDataAccess;
 
         //toolbar
         Android.Support.V7.Widget.Toolbar toolbar;
@@ -40,9 +45,9 @@ namespace POS_ANDROID_BACUNA.Fragments
         string mSelectedProductCategory = "All";
         ExpandableListView lvCartItemList;
         ProductsItemListAdapter mListAdapter;
-        List<ParentProducts> mListDataHeader;
-        Dictionary<int, List<Product>> mListDataChild;
-        List<Product> mListChildProducts;
+        List<ParentProductsModel> mListDataHeader;
+        Dictionary<int, List<ProductsModel>> mListDataChild;
+        List<ProductsModel> mListChildProducts;
         int previousGroup = -1;
 
         static bool mDialogShown = false;  // flag for stopping double click
@@ -59,11 +64,20 @@ namespace POS_ANDROID_BACUNA.Fragments
             thisFragmentView.Clickable = true;
             thisFragmentView.FocusableInTouchMode = true;
             SoftKeyboardHelper.SetUpFocusAndClickUI(thisFragmentView);
+            FnSetUpData();
             FnSetUpControls(inflater);
             FnSetUpSearchToolbar(inflater);
             FnSetUpListView("");
             FnClickEvents();
             return thisFragmentView;
+        }
+
+        private void FnSetUpData()
+        {
+            mProductsDataAccess = new ProductsDataAccess();
+            mParentProductsDataAccess = new ParentProductsDataAccess();
+            mProductsDataAccess.CreateTable();
+            mParentProductsDataAccess.CreateTable();
         }
 
         private void FnSetUpControls(LayoutInflater inflater)
@@ -113,26 +127,26 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         void FnGetListData(string _queryString)
         {
-            mListDataHeader = new List<ParentProducts>();
-            mListChildProducts = new List<Product>();
-            mListDataChild = new Dictionary<int, List<Product>>();
+            mListDataHeader = new List<ParentProductsModel>();
+            mListChildProducts = new List<ProductsModel>();
+            mListDataChild = new Dictionary<int, List<ProductsModel>>();
 
             // Adding child data
-            mListDataHeader = GlobalVariables.globalParentProductList;
+            mListDataHeader = mParentProductsDataAccess.SelectTable();
 
             if (mSelectedProductCategory != "All")
             {
                 if (_queryString != "")
                 {
                     mListDataHeader = mListDataHeader
-                    .Where(o => o.categoryName == mSelectedProductCategory)
-                    .Where(o => o.parentProductName.ToLower().Contains(_queryString) || o.productAlias.ToLower().Contains(_queryString))
+                    .Where(o => o.CategoryName == mSelectedProductCategory)
+                    .Where(o => o.ParentProductName.ToLower().Contains(_queryString) || o.ProductAlias.ToLower().Contains(_queryString))
                     .ToList();
                 }
                 else
                 {
                     mListDataHeader = mListDataHeader
-                    .Where(o => o.categoryName == mSelectedProductCategory)
+                    .Where(o => o.CategoryName == mSelectedProductCategory)
                     .ToList();
                 }
             }
@@ -141,7 +155,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                 if (_queryString != "")
                 {
                     mListDataHeader = mListDataHeader
-                    .Where(o => o.parentProductName.ToLower().Contains(_queryString) || o.productAlias.ToLower().Contains(_queryString))
+                    .Where(o => o.ParentProductName.ToLower().Contains(_queryString) || o.ProductAlias.ToLower().Contains(_queryString))
                     .ToList();
                 }
                 else
@@ -150,13 +164,13 @@ namespace POS_ANDROID_BACUNA.Fragments
                     .ToList();
                 }
             }
-           
-            mListChildProducts = GlobalVariables.globalProductList;
+
+            mListChildProducts = mProductsDataAccess.SelectTable();
 
             for (int i = 0; i < mListDataHeader.Count; i++)
             {
-                var childProductList = mListChildProducts.Where(o => o.parentProductId == mListDataHeader[i].parentProductId).ToList();
-                mListDataChild.Add(mListDataHeader[i].parentProductId, childProductList.OrderBy(x => x.productSizeId).ToList());
+                var childProductList = mListChildProducts.Where(o => o.ParentProductId == mListDataHeader[i].Id).ToList();
+                mListDataChild.Add(mListDataHeader[i].Id, childProductList.OrderBy(x => x.ProductSizeId).ToList());
             }
         }
 
