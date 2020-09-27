@@ -32,7 +32,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         //data
         ProductsDataAccess mProductsDataAccess;
         ParentProductsDataAccess mParentProductsDataAccess;
-
+        SizesDataAccess mSizesDataAccess;
         //toolbar
         Android.Support.V7.Widget.Toolbar toolbar;
         bool mToolbarVisibiltyStatus = true;
@@ -76,8 +76,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             mProductsDataAccess = new ProductsDataAccess();
             mParentProductsDataAccess = new ParentProductsDataAccess();
-            mProductsDataAccess.CreateTable();
-            mParentProductsDataAccess.CreateTable();
+            mSizesDataAccess = new SizesDataAccess();
         }
 
         private void FnSetUpControls(LayoutInflater inflater)
@@ -170,8 +169,13 @@ namespace POS_ANDROID_BACUNA.Fragments
             for (int i = 0; i < mListDataHeader.Count; i++)
             {
                 var childProductList = mListChildProducts.Where(o => o.ParentProductId == mListDataHeader[i].Id).ToList();
-                mListDataChild.Add(mListDataHeader[i].Id, childProductList.OrderBy(x => x.ProductSizeId).ToList());
+                mListDataChild.Add(mListDataHeader[i].Id, childProductList.OrderBy(x => GetSizeRank(x.ProductSizeId)).ToList());
             }
+        }
+
+        private int GetSizeRank(int id)
+        {
+            return mSizesDataAccess.SelectRecord(id)[0].SizeRank;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -228,7 +232,6 @@ namespace POS_ANDROID_BACUNA.Fragments
             mToolbarVisibiltyStatus = true;
             //remove menu items and replace with activated searchbar
             toolbar.Menu.SetGroupVisible(Resource.Id.menugroup_search, mToolbarVisibiltyStatus);
-            Toast.MakeText((MainActivity)this.Activity, "Search Cancelled", ToastLength.Long).Show();
         }
 
         private void btnSearchActivate_Click(object sender, EventArgs e)
@@ -239,7 +242,6 @@ namespace POS_ANDROID_BACUNA.Fragments
             mToolbarVisibiltyStatus = false;
             //remove menu items and replace with activated searchbar
             toolbar.Menu.SetGroupVisible(Resource.Id.menugroup_search, mToolbarVisibiltyStatus);
-            Toast.MakeText((MainActivity)this.Activity, "Search Activated", ToastLength.Long).Show();
         }
 
         private void Toolbar_MenuItemClick(object sender, Android.Support.V7.Widget.Toolbar.MenuItemClickEventArgs e)
@@ -280,6 +282,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                 lvCartItemList.Invalidate();
                 //refresh count on main activty toolbar title
                 ((MainActivity)this.Activity).SetProductCountTitle();
+                ((MainActivity)this.Activity).RefreshItemListOnCheckout();
             }
             else if (requestCode == 15)
             {
@@ -292,6 +295,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                 lvCartItemList.Invalidate();
                 //refresh count on main activty toolbar title
                 ((MainActivity)this.Activity).SetProductCountTitle();
+                ((MainActivity)this.Activity).RefreshItemListOnCheckout();
                 //clear search
                 searchViewSearchItems.SetQuery("", false);
             }

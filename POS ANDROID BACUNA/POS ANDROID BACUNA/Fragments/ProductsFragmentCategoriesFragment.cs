@@ -20,10 +20,13 @@ using Android.Graphics;
 using POS_ANDROID_BACUNA.Data_Classes;
 using POS_ANDROID_BACUNA.Adapters;
 using static POS_ANDROID_BACUNA.Fragments.CheckoutFragment;
+using Android.Support.V7.Widget.Helper;
+using POS_ANDROID_BACUNA.Interfaces;
+using POS_ANDROID_BACUNA.SQLite;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
-    public class ProductsFragmentCategoriesFragment : SupportFragment
+    public class ProductsFragmentCategoriesFragment : SupportFragment, IOnStartDragListener
     {
         View thisFragmentView;
         //toolbar
@@ -31,11 +34,18 @@ namespace POS_ANDROID_BACUNA.Fragments
         bool mToolbarVisibiltyStatus = true;
         View inactiveSearchView;
         View activeSearchView;
+        ImageView searchCancelButton;
         SearchView searchViewSearchItems;
 
-        static bool mDialogShown = false;  // flag for stopping double click
+        private ItemTouchHelper _mItemTouchHelper;
+        public static List<ProductCategoriesModel> mCategoriesList;
+        private RecyclerView rvCategories;
+        private CategoriesDataAccess mCategoriesDataAccess;
+        ProductsItemCategoryReorderableAdapter mResourceAdapter;
 
-        
+        static bool mDialogShown = false;  // flag for stopping double click
+        private bool disableReordering = false;
+
         public override void OnCreate(Bundle savedInstanceState)
         {
             HasOptionsMenu = true; //enable on menu on fragment
@@ -51,7 +61,44 @@ namespace POS_ANDROID_BACUNA.Fragments
             thisFragmentView.FocusableInTouchMode = true;
             SoftKeyboardHelper.SetUpFocusAndClickUI(thisFragmentView);
             FnSetUpSearchToolbar(inflater);
+            FnSetUpData();
+            FnSetUpControls();
+            FnSetUpList();
+
             return thisFragmentView;
+        }
+
+        private void FnSetUpList()
+        {
+            FnGetListData("");
+            mResourceAdapter = new ProductsItemCategoryReorderableAdapter(mCategoriesList, this, this);
+            rvCategories.SetLayoutManager(new LinearLayoutManager(Context, LinearLayoutManager.Vertical, false));
+            rvCategories.SetAdapter(mResourceAdapter);
+            rvCategories.HasFixedSize = true;
+
+            ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mResourceAdapter);
+            _mItemTouchHelper = new ItemTouchHelper(callback);
+            _mItemTouchHelper.AttachToRecyclerView(rvCategories);
+        }
+
+        private void FnGetListData(string queryString)
+        {
+            mCategoriesList = mCategoriesDataAccess.SelectTable().Where(x => x.Id != 1).ToList();
+            //mCategoriesList = mCategoriesDataAccess.SelectTable().ToList();
+            mCategoriesList = mCategoriesDataAccess != null ? 
+                              mCategoriesList.OrderBy(x => x.Rank)
+                                             .Where(x => x.ProductCategoryName.ToUpper().Contains(queryString.ToUpper())).ToList() : 
+                              mCategoriesList;
+        }
+
+        private void FnSetUpData()
+        {
+            mCategoriesDataAccess = new CategoriesDataAccess();
+        }
+
+        private void FnSetUpControls()
+        {
+            rvCategories = thisFragmentView.FindViewById<RecyclerView>(Resource.Id.rvList);
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -63,6 +110,19 @@ namespace POS_ANDROID_BACUNA.Fragments
             mToolbarVisibiltyStatus = true;
             toolbar.Menu.SetGroupVisible(Resource.Id.menugroup_search, mToolbarVisibiltyStatus);
             base.OnCreateOptionsMenu(menu, inflater);
+        }
+
+        public void DeactivateSearch()
+        {
+            try
+            {
+                toolbar.RemoveView(inactiveSearchView);
+                searchCancelButton.PerformClick();
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         private void FnSetUpSearchToolbar(LayoutInflater inflater)
@@ -81,11 +141,24 @@ namespace POS_ANDROID_BACUNA.Fragments
             btnSearchActivate.Click += btnSearchActivate_Click;
 
             //search deactivate
-            var searchCancelButton = activeSearchView.FindViewById<ImageView>(Resource.Id.imgSearchCancel);
+            searchCancelButton = activeSearchView.FindViewById<ImageView>(Resource.Id.imgSearchCancel);
             searchCancelButton.Click += SearchCancelButton_Click;
             searchViewSearchItems = activeSearchView.FindViewById<SearchView>(Resource.Id.txtSearchItems);
             //reused from CheckoutFragment
             searchViewSearchItems.SetOnQueryTextFocusChangeListener(new SearchViewFocusListener(this.Context,"ProductsFragment"));
+            searchViewSearchItems.QueryHint = "Search categories";
+            searchViewSearchItems.QueryTextChange += SearchViewSearchItems_QueryTextChange;
+        }
+
+        private void SearchViewSearchItems_QueryTextChange(object sender, SearchView.QueryTextChangeEventArgs e)
+        {
+            string queryString = e.NewText.ToUpper();
+            FnGetListData(queryString);
+            mResourceAdapter.RefreshList(mCategoriesList);
+
+            _mItemTouchHelper.AttachToRecyclerView(queryString == "" ? rvCategories : null);
+            disableReordering = queryString == "" ? false : true;
+            mResourceAdapter.ShowReorderableIcon(!disableReordering);
         }
 
         private void SearchCancelButton_Click(object sender, EventArgs e)
@@ -97,7 +170,6 @@ namespace POS_ANDROID_BACUNA.Fragments
             mToolbarVisibiltyStatus = true;
             //remove menu items and replace with activated searchbar
             toolbar.Menu.SetGroupVisible(Resource.Id.menugroup_search, mToolbarVisibiltyStatus);
-            Toast.MakeText((MainActivity)this.Activity, "Search Cancelled", ToastLength.Long).Show();
         }
 
         private void btnSearchActivate_Click(object sender, EventArgs e)
@@ -108,7 +180,6 @@ namespace POS_ANDROID_BACUNA.Fragments
             mToolbarVisibiltyStatus = false;
             //remove menu items and replace with activated searchbar
             toolbar.Menu.SetGroupVisible(Resource.Id.menugroup_search, mToolbarVisibiltyStatus);
-            Toast.MakeText((MainActivity)this.Activity, "Search Activated", ToastLength.Long).Show();
         }
 
         private void Toolbar_MenuItemClick(object sender, Android.Support.V7.Widget.Toolbar.MenuItemClickEventArgs e)
@@ -132,8 +203,24 @@ namespace POS_ANDROID_BACUNA.Fragments
             if (requestCode == 12)
             {
                 mDialogShown = false;
+                FnGetListData(searchViewSearchItems.Query);
+                mResourceAdapter.RefreshList(mCategoriesList);
+                ((MainActivity)this.Activity).RefreshCategoryTabsOnCheckout(); //refresh categories on checkout
+            }
+            else if (requestCode == 38)
+            {
+                FnGetListData(searchViewSearchItems.Query);
+                mResourceAdapter.RefreshList(mCategoriesList);
+                ((MainActivity)this.Activity).RefreshCategoryTabsOnCheckout(); //refresh categories on checkout
             }
         }
 
+        public void OnStartDrag(RecyclerView.ViewHolder viewHolder)
+        {
+            if (!disableReordering)
+            {
+                _mItemTouchHelper.StartDrag(viewHolder);
+            }
+        }
     }
 }

@@ -30,9 +30,18 @@ namespace POS_ANDROID_BACUNA.Fragments
     {
         TabLayout mTabs;
         View thisFragmentView;
+        ProductsFragmentItemsFragment mProductsFragmentItemsFragment;
+        ProductsFragmentStocksFragment mProductsFragmentStocksFragment;
+        ProductsFragmentCategoriesFragment mProductsFragmentCategoriesFragment;
+        ProductsFragmentSizesFragment mProductsFragmentSizesFragment;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
+            mProductsFragmentItemsFragment = new ProductsFragmentItemsFragment();
+            mProductsFragmentStocksFragment = new ProductsFragmentStocksFragment();
+            mProductsFragmentCategoriesFragment = new ProductsFragmentCategoriesFragment();
+            mProductsFragmentSizesFragment = new ProductsFragmentSizesFragment();
+
             HasOptionsMenu = true; //enable on menu on fragment
             base.OnCreate(savedInstanceState);
         }
@@ -61,8 +70,13 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void MTabs_TabSelected(object sender, TabLayout.TabSelectedEventArgs e)
         {
-            if (e.Tab.Text == "ITEMS")
+            if (e.Tab.Text == "CATEGORIES")
             {
+                mProductsFragmentCategoriesFragment.DeactivateSearch();
+            }
+            if (e.Tab.Text == "SIZES")
+            {
+                mProductsFragmentSizesFragment.DeactivateSearch();
             }
             thisFragmentView.RequestFocus();
         }
@@ -70,10 +84,10 @@ namespace POS_ANDROID_BACUNA.Fragments
         private void SetUpViewPager(ViewPager viewPager)
         {
             TabFragmentAdapter adapter = new TabFragmentAdapter(ChildFragmentManager);
-            adapter.AddFragment(new ProductsFragmentItemsFragment(), "ITEMS");
-            adapter.AddFragment(new ProductsFragmentStocksFragment(), "STOCK");
-            adapter.AddFragment(new ProductsFragmentCategoriesFragment(), "CATEGORIES");
-            adapter.AddFragment(new ProductsFragmentSizesFragment(), "SIZES");
+            adapter.AddFragment(mProductsFragmentItemsFragment, "ITEMS");
+            adapter.AddFragment(mProductsFragmentStocksFragment, "STOCK");
+            adapter.AddFragment(mProductsFragmentCategoriesFragment, "CATEGORIES");
+            adapter.AddFragment(mProductsFragmentSizesFragment, "SIZES");
             viewPager.Adapter = adapter;
         }
     }

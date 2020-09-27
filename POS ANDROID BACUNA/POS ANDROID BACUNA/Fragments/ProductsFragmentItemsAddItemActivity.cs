@@ -67,6 +67,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         ProductsDataAccess mProductsDataAccess;
         ParentProductsDataAccess mParentProductsDataAccess;
+        SizesDataAccess mSizesDataAccess;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -91,6 +92,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             mParentProductsDataAccess = new ParentProductsDataAccess();
             mProductsDataAccess = new ProductsDataAccess();
+            mSizesDataAccess = new SizesDataAccess();
         }
 
         private void FnShowSelectedData(int _parentProductId)
@@ -129,8 +131,15 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void FnSetListViewAdapter()
         {
-            mAdapter = new ProductsItemSizesListViewAdapter(this, GlobalVariables.newProductSizesList.OrderBy(x => x.ProductSizeId).ToList());
+            mAdapter = new ProductsItemSizesListViewAdapter(this, 
+                            GlobalVariables.newProductSizesList.OrderBy(x => GetSizeRank(x.ProductSizeId))
+                            .ToList());
             mLvProductSizes.Adapter = mAdapter;
+        }
+
+        private int GetSizeRank(int id)
+        {
+            return mSizesDataAccess.SelectRecord(id)[0].SizeRank;
         }
 
         private void FnSetEvents()

@@ -16,21 +16,9 @@ using SQLite;
 
 namespace POS_ANDROID_BACUNA.SQLite
 {
-    class CategoriesDataAccess
+    class SizesDataAccess
     {
         string connectionString = SQLiteConnetionString.LoadConnectionString();
-        public CategoriesDataAccess()
-        {
-            //insert "All" Category as Id 1
-            if (!NameExists("All"))
-            {
-                var Category = new ProductCategoriesModel {
-                    ProductCategoryName = "All",
-                    Rank = 1
-                };
-                InsertIntoTable(Category);
-            }
-        }
 
         public bool CreateTable()
         {
@@ -38,8 +26,8 @@ namespace POS_ANDROID_BACUNA.SQLite
             {
                 using (var connection = new SQLiteConnection(connectionString))
                 {
-                    //connection.DeleteAll<ProductCategoriesModel>();
-                    connection.CreateTable<ProductCategoriesModel>(); //automatic create table if not exists
+                    //connection.DeleteAll<ProductSizesModel>();
+                    connection.CreateTable<ProductSizesModel>(); //automatic create table if not exists
                     return true;
                 }
             }
@@ -50,7 +38,7 @@ namespace POS_ANDROID_BACUNA.SQLite
             }
         }
 
-        public bool InsertIntoTable(ProductCategoriesModel row)
+        public bool InsertIntoTable(ProductSizesModel row)
         {
             try
             {
@@ -66,13 +54,13 @@ namespace POS_ANDROID_BACUNA.SQLite
                 return false;
             }
         }
-        public List<ProductCategoriesModel> SelectTable()
+        public List<ProductSizesModel> SelectTable()
         {
             try
             {
                 using (var connection = new SQLiteConnection(connectionString))
                 {
-                    return connection.Table<ProductCategoriesModel>().ToList();
+                    return connection.Table<ProductSizesModel>().ToList();
                 }
             }
             catch (SQLiteException ex)
@@ -82,14 +70,32 @@ namespace POS_ANDROID_BACUNA.SQLite
             }
         }
 
-        public bool UpdateTable(ProductCategoriesModel ProductCategoriesModel)
+        public bool UpdateTable(ProductSizesModel ProductSizesModel)
         {
             try
             {
                 using (var connection = new SQLiteConnection(connectionString))
                 {
-                    connection.Query<ProductCategoriesModel>("UPDATE ProductCategoriesModel set ProductCategoryName=? Where Id=?",
-                        ProductCategoriesModel.ProductCategoryName, ProductCategoriesModel.Id);
+                    connection.Query<ProductSizesModel>("UPDATE ProductSizesModel set ProductSizeName=? Where Id=?",
+                        ProductSizesModel.ProductSizeName, ProductSizesModel.Id);
+                    return true;
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                Log.Info("SQLiteEx", ex.Message);
+                return false;
+            }
+        }
+
+        public bool UpdateRank(int id, int rank)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Query<ProductSizesModel>("UPDATE ProductSizesModel set SizeRank=? Where Id=?",
+                        rank, id);
                     return true;
                 }
             }
@@ -106,7 +112,7 @@ namespace POS_ANDROID_BACUNA.SQLite
             {
                 using (var connection = new SQLiteConnection(connectionString))
                 {
-                    connection.Delete<ProductCategoriesModel>(Id);
+                    connection.Delete<ProductSizesModel>(Id);
                     return true;
                 }
             }
@@ -123,7 +129,7 @@ namespace POS_ANDROID_BACUNA.SQLite
             {
                 using (var connection = new SQLiteConnection(connectionString))
                 {
-                    var x = connection.Query<ProductCategoriesModel>("SELECT * FROM ProductCategoriesModel Where ProductCategoryName=?", name);
+                    var x = connection.Query<ProductSizesModel>("SELECT * FROM ProductSizesModel Where ProductSizeName=?", name);
                     return x.Count == 0 ? false : true;
                 }
             }
@@ -134,13 +140,13 @@ namespace POS_ANDROID_BACUNA.SQLite
             }
         }
 
-        public List<ProductCategoriesModel> SelectRecord(int id)
+        public List<ProductSizesModel> SelectRecord(int id)
         {
             try
             {
                 using (var connection = new SQLiteConnection(connectionString))
                 { 
-                    var x = connection.Query<ProductCategoriesModel>("SELECT * FROM ProductCategoriesModel Where Id=?", id);
+                    var x = connection.Query<ProductSizesModel>("SELECT * FROM ProductSizesModel Where Id=?", id);
                     return x;
                 }
             }
@@ -151,34 +157,16 @@ namespace POS_ANDROID_BACUNA.SQLite
             }
         }
 
-        public bool UpdateRank(int id, int rank)
+        public int GetMaxSizeRank()
         {
             try
             {
                 using (var connection = new SQLiteConnection(connectionString))
                 {
-                    connection.Query<ProductCategoriesModel>("UPDATE ProductCategoriesModel set Rank=? Where Id=?",
-                        rank, id);
-                    return true;
-                }
-            }
-            catch (SQLiteException ex)
-            {
-                Log.Info("SQLiteEx", ex.Message);
-                return false;
-            }
-        }
-
-        public int GetMaxRank()
-        {
-            try
-            {
-                using (var connection = new SQLiteConnection(connectionString))
-                {
-                    var x = connection.Query<ProductCategoriesModel>("SELECT * FROM ProductCategoriesModel ORDER BY Rank DESC LIMIT 1");
+                    var x = connection.Query<ProductSizesModel>("SELECT * FROM ProductSizesModel ORDER BY SizeRank DESC LIMIT 1");
                     try
                     {
-                        return x[0].Rank;
+                        return x[0].SizeRank;
                     }
                     catch (Exception)
                     {
@@ -190,6 +178,64 @@ namespace POS_ANDROID_BACUNA.SQLite
             {
                 Log.Info("SQLiteEx", ex.Message);
                 return 0;
+            }
+        }
+
+        public int GetMaxId()
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    var x = connection.Query<ProductSizesModel>("SELECT * FROM ProductSizesModel ORDER BY Id DESC LIMIT 1");
+                    try
+                    {
+                        return x[0].Id;
+                    }
+                    catch (Exception)
+                    {
+                        return 0;
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                Log.Info("SQLiteEx", ex.Message);
+                return 0;
+            }
+        }
+
+        public bool InsertAll(List<ProductSizesModel> sizes)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.InsertAll(sizes);
+                    return true;
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                Log.Info("SQLiteEx", ex.Message);
+                return false;
+            }
+        }
+
+        public bool DeleteAll()
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.DeleteAll<ProductSizesModel>();
+                    return true;
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                Log.Info("SQLiteEx", ex.Message);
+                return false;
             }
         }
 

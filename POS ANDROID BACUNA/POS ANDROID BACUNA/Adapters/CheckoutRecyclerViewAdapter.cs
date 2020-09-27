@@ -37,6 +37,7 @@ namespace POS_ANDROID_BACUNA.Adapters
         Context mCheckoutContext;
         string mCurrentSelectedPricingType;
         ParentProductsDataAccess mParentProductsDataAccess;
+        SizesDataAccess mSizesDataAccess;
 
         public CheckoutRecyclerViewAdapter(float dpVal, int gridHeight, List<ProductsModel> products,
             List<ParentProductsModel> parentProducts, bool isGrid, RecyclerView recyclerView, 
@@ -55,6 +56,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             mSupportFragment = supportFragment;
             mCurrentSelectedPricingType = pricingType;
             mParentProductsDataAccess = new ParentProductsDataAccess();
+            mSizesDataAccess = new SizesDataAccess();
         }
 
         public class MyViewHolder : RecyclerView.ViewHolder
@@ -290,7 +292,7 @@ namespace POS_ANDROID_BACUNA.Adapters
                     productCategory = mProducts[position].ProductCategory,
                     productSizeId = mProducts[position].ProductSizeId,
                     productSize = mProducts[position].ProductSize,
-                    sizeRank = GetSizeRank(mProducts[position].ProductSizeId),
+                    sizeRank = mSizesDataAccess.SelectRecord(mProducts[position].ProductSizeId)[0].SizeRank,
                     productSubTotalPrice = GetProductPrice(position),
                     productDiscountAmount = 0.00M,
                     productDiscountPercentage = 0.00M,
@@ -310,14 +312,6 @@ namespace POS_ANDROID_BACUNA.Adapters
             {
                 ShowCurrentQuantityOnCartList(sender, clickedProductRow[0].productCountOnCart);
             }
-        }
-
-        private int GetSizeRank(int _productSizeId)
-        {
-            return GlobalVariables.globalSizesList
-                    .Where(x => x.ProductSizeId == _productSizeId)
-                    .Select(x => x.SizeRank)
-                    .FirstOrDefault();
         }
 
         private void ShowCurrentQuantityOnCartList(object _sender, int _itemQty)

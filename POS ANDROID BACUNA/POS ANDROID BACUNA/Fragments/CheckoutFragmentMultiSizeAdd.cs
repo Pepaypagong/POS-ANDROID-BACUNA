@@ -48,6 +48,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         float mDpVal;
         ParentProductsDataAccess mParentProductDataAccess;
         ProductsDataAccess mProductsDataAccess;
+        SizesDataAccess mSizesDataAccess;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -70,6 +71,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             mParentProductDataAccess = new ParentProductsDataAccess();
             mProductsDataAccess = new ProductsDataAccess();
+            mSizesDataAccess = new SizesDataAccess();
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -97,7 +99,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             int selectedParentProductId = GlobalVariables.mCurrentSelectedItemIdMultiSize;
             List<ProductsModel> products = mProductsDataAccess.SelectTable()
                 .Where(o => o.ParentProductId == selectedParentProductId)
-                .OrderBy(o => o.ProductSizeId) //3x -> S
+                .OrderBy(o => GetSizeRank(o.ProductSizeId))
                 .ToList();
             mProductHolder = new List<MultiSizeAddProductsHolder>();
             foreach (var item in products)
@@ -113,6 +115,12 @@ namespace POS_ANDROID_BACUNA.Fragments
             }
             return mProductHolder;
         }
+
+        private int GetSizeRank(int id)
+        {
+            return mSizesDataAccess.SelectRecord(id)[0].SizeRank;
+        }
+
         private decimal GetProductPrice(string mCurrentSelectedPricingType, List<ProductsModel> products, int productId)
         {
             decimal retval = 0;
@@ -215,7 +223,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                     productCategory = productCategory,
                     productSizeId = productSizeId,
                     productSize = productSize,
-                    sizeRank = GetSizeRank(productSizeId),
+                    sizeRank = mSizesDataAccess.SelectRecord(productSizeId)[0].SizeRank,
                     productSubTotalPrice = _itemQty * _itemPrice,
                     productDiscountAmount = 0.00M,
                     productDiscountPercentage = 0.00M,
@@ -223,14 +231,6 @@ namespace POS_ANDROID_BACUNA.Fragments
                     parentProductName = mParentProductDataAccess.SelectRecord(parentProductId)[0].ParentProductName
                 });
             }
-        }
-
-        private int GetSizeRank(int _ProductSizeId)
-        {
-            return GlobalVariables.globalSizesList
-                    .Where(x => x.ProductSizeId == _ProductSizeId)
-                    .Select(x => x.SizeRank)
-                    .FirstOrDefault();
         }
 
         public string ComputeQuantity(string _value, bool _isToAdd)

@@ -20,6 +20,7 @@ using Android.Graphics;
 using POS_ANDROID_BACUNA.Data_Classes;
 using POS_ANDROID_BACUNA.Adapters;
 using POS_ANDROID_BACUNA.SQLite;
+using Android.Provider;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -49,6 +50,8 @@ namespace POS_ANDROID_BACUNA.Fragments
         ParentProductsDataAccess mParentProductsDataAccess;
         ProductsDataAccess mProductsDataAccess;
         CategoriesDataAccess mCategoriesDataAccess;
+        SizesDataAccess mSizesDataAccess;
+
         public override void OnCreate(Bundle savedInstanceState)
         {
             HasOptionsMenu = true; //enable on menu on fragment
@@ -71,9 +74,9 @@ namespace POS_ANDROID_BACUNA.Fragments
             });
             thisFragmentViewOriginalHeight = thisFragmentView.Height;
             FnSetUpControls();
+            FnSetUpSearchToolBar();
             FnSetUpEvents();
             FnSetUpCategories();
-            FnSetUpSearchToolBar();
             //get screendensity
             Context cont = (MainActivity)this.Activity;
             mDpVal = cont.Resources.DisplayMetrics.Density;
@@ -113,6 +116,18 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             toolbar.MenuItemClick += Toolbar_MenuItemClick; 
             mBtnCheckoutButton.Click += MBtnCheckoutButton_Click;
+            //mTabs.TabSelected += MTabs_TabSelected;
+        }
+
+        private void MTabs_TabSelected(object sender, TabLayout.TabSelectedEventArgs e)
+        {
+            thisFragmentView.RequestFocus();//to hide keyboard on search
+            var tab = e.Tab;
+            mSelectedProductCategory = tab.Text;
+            searchViewSearchItems.SetQuery("", false);
+            //redraw grid
+            SetGridLayout(mLayoutInflater, mViewGroup, mIsGrid);
+            mRecyclerViewItemsList.Invalidate();
         }
 
         private void FnSetUpData()
@@ -120,6 +135,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             mParentProductsDataAccess = new ParentProductsDataAccess();
             mProductsDataAccess = new ProductsDataAccess();
             mCategoriesDataAccess = new CategoriesDataAccess();
+            mSizesDataAccess = new SizesDataAccess();
         }
 
         private void SearchViewSearchItems_QueryTextChange(object sender, SearchView.QueryTextChangeEventArgs e)
@@ -142,24 +158,14 @@ namespace POS_ANDROID_BACUNA.Fragments
         public void FnSetUpCategories()
         {
             var productCategories = new List<ProductCategoriesModel>();
-            productCategories = mCategoriesDataAccess.SelectTable();
+            productCategories = mCategoriesDataAccess.SelectTable().OrderBy(x=>x.Rank).ToList();
+            mTabs.RemoveAllTabs();
             for (int i = 0; i < productCategories.Count; i++)
             {
                 mTabs.AddTab(mTabs.NewTab().SetText(productCategories[i].ProductCategoryName));
             }
-
-            mTabs.TabSelected += (object sender, TabLayout.TabSelectedEventArgs e) =>
-            {
-                thisFragmentView.RequestFocus();//to hide keyboard on search
-                var tab = e.Tab;
-                mSelectedProductCategory = tab.Text;
-                searchViewSearchItems.SetQuery("", false);
-                //redraw grid
-                SetGridLayout(mLayoutInflater, mViewGroup, mIsGrid);
-                mRecyclerViewItemsList.Invalidate();
-
-                Toast.MakeText((MainActivity)this.Activity, "Showed " + tab.Text + " Products",ToastLength.Long).Show();
-            };
+            mTabs.TabSelected -= MTabs_TabSelected;
+            mTabs.TabSelected += MTabs_TabSelected;
         }
 
         private void MBtnCheckoutButton_Click(object sender, EventArgs e)
@@ -396,7 +402,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                     mProducts = mProducts
                     .Where(o => o.ProductCategory == mSelectedProductCategory)
                     .OrderBy(o => o.ParentProductId)
-                    .ThenBy(o => o.ProductSizeId)
+                    .ThenBy(o => GetSizeRank(o.ProductSizeId))
                     .Where(o => o.ProductName.ToLower().Contains(_queryString) || o.ProductAlias.ToLower().Contains(_queryString))
                     .ToList();
                 }
@@ -405,7 +411,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                     mProducts = mProducts
                     .Where(o => o.ProductCategory == mSelectedProductCategory)
                     .OrderBy(o => o.ParentProductId)
-                    .ThenBy(o => o.ProductSizeId)
+                    .ThenBy(o => GetSizeRank(o.ProductSizeId))
                     .ToList();
                 }
                 
@@ -420,7 +426,7 @@ namespace POS_ANDROID_BACUNA.Fragments
                 {
                     mProducts = mProducts
                     .OrderBy(o => o.ParentProductId)
-                    .ThenBy(o => o.ProductSizeId)
+                    .ThenBy(o => GetSizeRank(o.ProductSizeId))
                     .Where(o => o.ProductName.ToLower().Contains(_queryString) || o.ProductAlias.ToLower().Contains(_queryString))
                     .ToList();
                 }
@@ -428,12 +434,17 @@ namespace POS_ANDROID_BACUNA.Fragments
                 {
                     mProducts = mProducts
                     .OrderBy(o => o.ParentProductId)
-                    .ThenBy(o => o.ProductSizeId)
+                    .ThenBy(o => GetSizeRank(o.ProductSizeId))
                     .ToList();
                 }
             }
 
             return mProducts;
+        }
+
+        private int GetSizeRank(int id)
+        {
+            return mSizesDataAccess.SelectRecord(id)[0].SizeRank;
         }
 
         private void SearchCancelButton_Click(object sender, EventArgs e)

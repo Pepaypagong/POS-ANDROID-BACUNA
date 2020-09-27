@@ -18,5 +18,6 @@ namespace POS_ANDROID_BACUNA.Data_Classes
         [AutoIncrement,PrimaryKey]
         public int Id { get; set;}
         public string ProductCategoryName { get; set; }
+        public int Rank { get; set; }
     }
 }

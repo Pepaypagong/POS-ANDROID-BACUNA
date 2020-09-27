@@ -43,6 +43,7 @@ namespace POS_ANDROID_BACUNA
         private ParentProductsDataAccess mParentProductsDataAccess;
         private ProductsDataAccess mProductsDataAccess;
         private CategoriesDataAccess mCategoriesDataAccess;
+        private SizesDataAccess mSizesDataAccess;
         protected override void AttachBaseContext(Context @base)
         {
             base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base)); //custom font
@@ -113,6 +114,8 @@ namespace POS_ANDROID_BACUNA
             mProductsDataAccess.CreateTable();
             mCategoriesDataAccess = new CategoriesDataAccess();
             mCategoriesDataAccess.CreateTable();
+            mSizesDataAccess = new SizesDataAccess();
+            mSizesDataAccess.CreateTable();
         }
 
         private void MDrawerLayout_DrawerOpened(object sender, DrawerLayout.DrawerOpenedEventArgs e)
@@ -133,7 +136,7 @@ namespace POS_ANDROID_BACUNA
                 {
                     case (Resource.Id.nav_checkout):
                         ShowFragment(mCheckoutFragment);
-                        mCheckoutFragment.PeformRefresh();
+                        RefreshItemListOnCheckout();
                         ab.SetTitle(Resource.String.checkout_title);
                         break;
                     case (Resource.Id.nav_products):
@@ -440,6 +443,16 @@ namespace POS_ANDROID_BACUNA
         {
             SupportActionBar supportActionBar = SupportActionBar;
             supportActionBar.Title = "PRODUCTS (" + mProductsDataAccess.SelectTable().Count.ToString() + ")";
+        }
+
+        public void RefreshCategoryTabsOnCheckout()
+        {
+            mCheckoutFragment.FnSetUpCategories();
+        }
+
+        public void RefreshItemListOnCheckout()
+        {
+            mCheckoutFragment.PeformRefresh();
         }
 
     }

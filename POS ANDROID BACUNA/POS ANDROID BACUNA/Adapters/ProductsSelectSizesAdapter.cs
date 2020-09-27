@@ -26,7 +26,7 @@ namespace POS_ANDROID_BACUNA
         }
         public override int Count
         {
-            get { return mItems.Count; }
+            get { return mItems != null ? mItems.Count : 0; }
         }
 
         public override long GetItemId(int position)

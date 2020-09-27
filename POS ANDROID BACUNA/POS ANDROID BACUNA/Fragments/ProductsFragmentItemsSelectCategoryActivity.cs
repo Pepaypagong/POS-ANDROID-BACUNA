@@ -67,13 +67,13 @@ namespace POS_ANDROID_BACUNA.Fragments
                 if (_queryString != "")
                 {
                     mProductCategories = mCategoriesDataAccess.SelectTable()
-                        .OrderBy(x => x.Id)
+                        .OrderBy(x => x.Rank)
                         .Where(x => x.ProductCategoryName.ToLower().Contains(_queryString))
                         .ToList();
                 }
                 else
                 {
-                    mProductCategories = mCategoriesDataAccess.SelectTable().OrderBy(x => x.Id).ToList();
+                    mProductCategories = mCategoriesDataAccess.SelectTable().OrderBy(x => x.Rank).ToList();
                 }
             }
             else
@@ -81,15 +81,15 @@ namespace POS_ANDROID_BACUNA.Fragments
                 if (_queryString != "")
                 {
                     mProductCategories = mCategoriesDataAccess.SelectTable()
-                        .OrderBy(x => x.Id)
-                        .Where(x => x.ProductCategoryName != "All")
+                        .OrderBy(x => x.Rank)
+                        .Where(x => x.Id != 1)
                         .Where(x => x.ProductCategoryName.ToLower().Contains(_queryString))
                         .ToList();
                 }
                 else
                 {
                     mProductCategories = mCategoriesDataAccess.SelectTable()
-                        .OrderBy(x => x.Id).Where(x => x.ProductCategoryName != "All").ToList();
+                        .OrderBy(x => x.Rank).Where(x => x.Id != 1).ToList();
                 }
             }
             ProductsItemSelectCategoryAdapter adapter = new ProductsItemSelectCategoryAdapter(this, mProductCategories);

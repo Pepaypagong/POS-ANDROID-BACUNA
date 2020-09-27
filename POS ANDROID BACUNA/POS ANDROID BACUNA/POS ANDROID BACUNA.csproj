@@ -72,12 +72,14 @@
     <Compile Include="Adapters\CustomersListViewAdapter.cs" />
     <Compile Include="Adapters\MoreOptionsListAdapter.cs" />
     <Compile Include="Adapters\PaymentMethodsListViewAdapter.cs" />
+    <Compile Include="Adapters\ProductsItemSizesReorderableAdapter.cs" />
     <Compile Include="Adapters\ProductsItemSelectCategoryAdapter.cs" />
     <Compile Include="Adapters\ProductsSelectSizesAdapter.cs" />
     <Compile Include="Adapters\ProductsItemSizesListViewAdapter.cs" />
     <Compile Include="Adapters\ProductsItemListAdapter.cs" />
     <Compile Include="Adapters\CheckoutCartItemListAdapter.cs" />
     <Compile Include="Adapters\CheckoutMultiAddListRecyclerViewAdapter.cs" />
+    <Compile Include="Adapters\ProductsItemCategoryReorderableAdapter.cs" />
     <Compile Include="Adapters\SortCartItemsListAdapter.cs" />
     <Compile Include="Adapters\TransactionsRecyclerViewAdapter.cs" />
     <Compile Include="CheckoutSelectCustomerActivity.cs" />
@@ -108,6 +110,10 @@
     <Compile Include="Fragments\CustomersFragmentEditOrdersFragment.cs" />
     <Compile Include="Fragments\CustomersFragmentEditSalesFragment.cs" />
     <Compile Include="Fragments\CustomersFragmentEditInfoFragment.cs" />
+    <Compile Include="Interfaces\ITemTouchHelperAdapter.cs" />
+    <Compile Include="Interfaces\IOnStartDragListener.cs" />
+    <Compile Include="SimpleItemTouchHelperCallback.cs" />
+    <Compile Include="SQLite\SizesDataAccess.cs" />
     <Compile Include="SQLite\CategoriesDataAccess.cs" />
     <Compile Include="SQLite\ParentProductsDataAccess.cs" />
     <Compile Include="SQLite\ProductsDataAccess.cs" />
@@ -806,6 +812,15 @@
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
       <SubType>Designer</SubType>
     </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\products_fragment_categories_list_row_item.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\hamburger_icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

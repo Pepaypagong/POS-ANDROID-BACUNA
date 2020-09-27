@@ -109,36 +109,36 @@ namespace POS_ANDROID_BACUNA
         }
         public static void PopulateSizes()
         {
-            GlobalVariables.globalSizesList.Clear();
+            //GlobalVariables.globalSizesList.Clear();
             var sizes = new List<ProductSizesModel>();
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 1, SizeRank = 19, ProductSizeName = "3X" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 2, SizeRank = 18, ProductSizeName = "2X" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 3, SizeRank = 17, ProductSizeName = "XL" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 4, SizeRank = 16, ProductSizeName = "L" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 5, SizeRank = 15, ProductSizeName = "M" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 6, SizeRank = 6, ProductSizeName = "S" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 7, SizeRank = 7, ProductSizeName = "24" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 8, SizeRank = 8, ProductSizeName = "22" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 9, SizeRank = 9, ProductSizeName = "20" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 10, SizeRank = 10, ProductSizeName = "18" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 11, SizeRank = 11, ProductSizeName = "16" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 12, SizeRank = 12, ProductSizeName = "14" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 13, SizeRank = 13, ProductSizeName = "12" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 14, SizeRank = 14, ProductSizeName = "10" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 15, SizeRank = 15, ProductSizeName = "8" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 16, SizeRank = 16, ProductSizeName = "6" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 17, SizeRank = 17, ProductSizeName = "4" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 18, SizeRank = 18, ProductSizeName = "2" });
-            sizes.Add(new ProductSizesModel() { ProductSizeId = 19, SizeRank = 19, ProductSizeName = "0" });
+            sizes.Add(new ProductSizesModel() { Id = 1, SizeRank = 19, ProductSizeName = "3X" });
+            sizes.Add(new ProductSizesModel() { Id = 2, SizeRank = 18, ProductSizeName = "2X" });
+            sizes.Add(new ProductSizesModel() { Id = 3, SizeRank = 17, ProductSizeName = "XL" });
+            sizes.Add(new ProductSizesModel() { Id = 4, SizeRank = 16, ProductSizeName = "L" });
+            sizes.Add(new ProductSizesModel() { Id = 5, SizeRank = 15, ProductSizeName = "M" });
+            sizes.Add(new ProductSizesModel() { Id = 6, SizeRank = 6, ProductSizeName = "S" });
+            sizes.Add(new ProductSizesModel() { Id = 7, SizeRank = 7, ProductSizeName = "24" });
+            sizes.Add(new ProductSizesModel() { Id = 8, SizeRank = 8, ProductSizeName = "22" });
+            sizes.Add(new ProductSizesModel() { Id = 9, SizeRank = 9, ProductSizeName = "20" });
+            sizes.Add(new ProductSizesModel() { Id = 10, SizeRank = 10, ProductSizeName = "18" });
+            sizes.Add(new ProductSizesModel() { Id = 11, SizeRank = 11, ProductSizeName = "16" });
+            sizes.Add(new ProductSizesModel() { Id = 12, SizeRank = 12, ProductSizeName = "14" });
+            sizes.Add(new ProductSizesModel() { Id = 13, SizeRank = 13, ProductSizeName = "12" });
+            sizes.Add(new ProductSizesModel() { Id = 14, SizeRank = 14, ProductSizeName = "10" });
+            sizes.Add(new ProductSizesModel() { Id = 15, SizeRank = 15, ProductSizeName = "8" });
+            sizes.Add(new ProductSizesModel() { Id = 16, SizeRank = 16, ProductSizeName = "6" });
+            sizes.Add(new ProductSizesModel() { Id = 17, SizeRank = 17, ProductSizeName = "4" });
+            sizes.Add(new ProductSizesModel() { Id = 18, SizeRank = 18, ProductSizeName = "2" });
+            sizes.Add(new ProductSizesModel() { Id = 19, SizeRank = 19, ProductSizeName = "0" });
 
             int counter = sizes.Count();
-            foreach (var item in sizes.OrderBy(x=>x.ProductSizeId))
+            foreach (var item in sizes.OrderBy(x=>x.Id))
             {
                 item.SizeRank = counter;
                 counter -= 1;
             }
 
-            GlobalVariables.globalSizesList = sizes;
+            //GlobalVariables.globalSizesList = sizes;
         }
     }
 }

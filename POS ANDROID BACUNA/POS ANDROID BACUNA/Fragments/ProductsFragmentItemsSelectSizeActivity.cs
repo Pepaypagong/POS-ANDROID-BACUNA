@@ -22,7 +22,8 @@ using POS_ANDROID_BACUNA.Data_Classes;
 using Java.Util;
 using Android.Graphics;
 using POS_ANDROID_BACUNA.Adapters;
-
+using POS_ANDROID_BACUNA.SQLite;
+using System.Xml.Xsl;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -36,6 +37,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         bool mDialogShown = false;
         Button mBtnCreateSize;
         string productName;
+        SizesDataAccess mSizesDataAccess;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -53,6 +55,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void FnGetData()
         {
+            mSizesDataAccess = new SizesDataAccess();
             productName = Intent.GetStringExtra("productName");
         }
 
@@ -63,17 +66,18 @@ namespace POS_ANDROID_BACUNA.Fragments
         }
         private List<ProductSizesModel> PopulateProductSizes(string _queryString)
         {
-            var sizes = GlobalVariables.globalSizesList;
+            var sizes = mSizesDataAccess.SelectTable();
             if (_queryString != "")
             {
                 mProductSizes = sizes
+                    .OrderBy(x => x.SizeRank)
                     .Where(x => x.ProductSizeName.ToLower().Contains(_queryString))
                     .ToList();
             }
             else
             {
 
-                mProductSizes = sizes;
+                mProductSizes = sizes.OrderBy(x => x.SizeRank).ToList();
             }
             return mProductSizes;
         }
@@ -99,7 +103,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void MLvSizes_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            int sizeId = mProductSizes[e.Position].ProductSizeId;
+            int sizeId = mProductSizes[e.Position].Id;
             string sizeName = mProductSizes[e.Position].ProductSizeName;
             bool alreadyExists = GlobalVariables.newProductSizesList.Any(x => x.ProductSize == sizeName);
 

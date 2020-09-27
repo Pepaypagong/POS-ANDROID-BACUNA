@@ -9,12 +9,14 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using SQLite;
 
 namespace POS_ANDROID_BACUNA.Data_Classes
 {
     public class ProductSizesModel
     {
-        public int ProductSizeId { get; set; }
+        [AutoIncrement,PrimaryKey]
+        public int Id { get; set; }
         public string ProductSizeName { get; set; }
         public int SizeRank { get; set; }
     }

@@ -1,0 +1,51 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:id="@+id/ReorderView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" 
+	android:foreground="?android:attr/selectableItemBackground"
+    android:background="@color/colorPrimary">
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="50dp"
+		android:paddingTop="5dp"
+		android:paddingBottom="5dp"
+		android:background="@android:color/transparent"
+		android:gravity="center_horizontal">
+		<TextView
+			android:id="@+id/mTVResourceName"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_centerInParent="true"
+			android:layout_toLeftOf="@+id/mTvReorderIcon"
+			android:text="sample"
+			android:textColor="@android:color/black"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:paddingLeft="15dp"
+			android:paddingRight="5dp"
+			android:layout_marginLeft="8dp"
+			android:textSize="15dp"
+			android:layout_centerVertical="true" />
+		<ImageView
+			android:id="@+id/mTvReorderIcon"
+			android:layout_width="30dp"
+			android:layout_height="30dp"
+			android:layout_marginRight="15dp"
+			android:src="@drawable/hamburger_icon"
+			android:layout_alignParentRight="true"
+			android:clickable="false"
+			android:layout_centerVertical="true" />
+	</RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/lightGray" />
+	<TextView 
+		android:id="@+id/txtRecordId" 
+		android:layout_height="0dp" 
+		android:layout_width="0dp"
+	/>
+</LinearLayout>
