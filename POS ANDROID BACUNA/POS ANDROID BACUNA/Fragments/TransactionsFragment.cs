@@ -4,7 +4,7 @@ using Android.Views;
 using Android.Widget;
 using POS_ANDROID_BACUNA.Adapters;
 using POS_ANDROID_BACUNA.Data_Classes;
-using POS_ANDROID_BACUNA.Data_Classes.TransactionList;
+using POS_ANDROID_BACUNA.Data_Classes.Temp;
 using POS_ANDROID_BACUNA.SQLite;
 using System;
 using System.Collections.Generic;
@@ -131,6 +131,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             mRecyclerViewTransactionList.HasFixedSize = true;
             mRecyclerViewTransactionList.SetAdapter(
                 new TransactionsRecyclerViewAdapter(
+                    this.Activity,
                     (MainActivity)this.Activity,
                     GetGroupedList())
                 );

@@ -31,12 +31,13 @@ namespace POS_ANDROID_BACUNA.Data_Classes
 
         public static SupportFragment mCheckoutFragmentCurrentInstance;
 
-        public static bool mIsPrinterSet = false;
-        public static BluetoothDevice mSelectedDevice;
+        //public static bool mIsPrinterSet = false;
+        //public static BluetoothDevice mSelectedDevice;
 
         public static string mCurrentSelectedPricingType = "RT";
         public static View mCurrentSelectedCustomerButtonLayout = null;
         public static string mCurrentSelectedCustomerOnCheckout = "";
+        public static int mCurrentSelectedCustomerIdOrRunnerIdOnCheckout = 0;
         public static bool mHasSelectedCustomerOnCheckout = false;
         public static bool mIsAllCollapsed = true; //check if all listview items on cart is closed
 

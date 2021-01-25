@@ -9,6 +9,7 @@
   <string name="search_bar_query_hint_checkout">Search Items</string>
   <string name="products_title">PRODUCTS</string>
   <string name="customers_title">CUSTOMERS</string>
+  <string name="runners_title">RUNNERS</string>
   <string name="transactions_title">TRANSACTIONS</string>
   <string name="settings_title">SETTINGS</string>
   <string name="settings_select_printer">Printer</string>

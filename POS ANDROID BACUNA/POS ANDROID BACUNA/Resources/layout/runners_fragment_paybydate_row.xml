@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:paddingTop="10dp">
+    <TextView
+        android:id="@+id/txtDateAndTime"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="15sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginBottom="5dp"
+    />
+    <TextView
+        android:id="@+id/txtTransactionNumber"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_below="@id/txtDateAndTime"
+    />
+    <TextView
+        android:id="@id/txtSaleAmount"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="15dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/txtDateAndTime"
+    />
+    <View
+        android:layout_height="1dp"
+        android:layout_width="match_parent"
+        android:layout_below="@id/txtTransactionNumber"
+        android:background="@color/lightGray"
+    />
+</RelativeLayout>
+

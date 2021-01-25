@@ -70,14 +70,16 @@ namespace POS_ANDROID_BACUNA.SQLite
             }
         }
 
-        public bool UpdateTable(TransactionsModel trasactionsModel)
+        public bool UpdateTransactionStatusToPaid(TransactionsModel _model)
         {
             try
             {
                 using (var connection = new SQLiteConnection(connectionString))
                 {
-                    //connection.Query<TransactionsModel>("UPDATE Person set Name=?, Department=?, Email=? Where Id=?", person.Name, person.Department, person.Email, person.Id);
-                    connection.Update(trasactionsModel);
+                    connection.Query<TransactionsModel>("UPDATE TransactionsModel set DateModified=?, IsPaid=?, PaymentCashAmount=?, " +
+                        "PaymentCheckAmount=? Where id=?",
+                        _model.DateModified, _model.IsPaid, _model.PaymentCashAmount, _model.PaymentCheckAmount, _model.id);
+                    connection.Update(_model);
                     return true;
                 }
             }
@@ -119,6 +121,40 @@ namespace POS_ANDROID_BACUNA.SQLite
             {
                 Log.Info("SQLiteEx", ex.Message);
                 return false;
+            }
+        }
+
+        public List<TransactionsModel> SelectRecord(int id)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    var x = connection.Query<TransactionsModel>("SELECT * FROM TransactionsModel Where Id=?", id);
+                    return x;
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                Log.Info("SQLiteEx", ex.Message);
+                return null;
+            }
+        }
+
+        public int GetLatestTransactionId()
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    var x = connection.Query<TransactionsModel>("SELECT * FROM TransactionsModel ORDER BY id DESC LIMIT 1");
+                    return x[0].id;
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                Log.Info("SQLiteEx", ex.Message);
+                return 0;
             }
         }
 

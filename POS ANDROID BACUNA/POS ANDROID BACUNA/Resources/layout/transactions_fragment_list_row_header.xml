@@ -8,21 +8,21 @@
     <TextView
         android:id="@+id/txtDate"
         android:textColor="@color/colorPrimaryDark"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginLeft="15dp"
     />
     <TextView
         android:id="@+id/txtSaleCountAndAmount"
         android:textColor="@color/colorPrimaryDark"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:text="N sales, P 1,000.00"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="5dp"
         android:layout_marginLeft="15dp"
         android:layout_below="@id/txtDate"
     />

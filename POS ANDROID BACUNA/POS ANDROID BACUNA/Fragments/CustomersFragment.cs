@@ -26,6 +26,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         ListView mLvCustomers;
         CustomersDataAccess mCustomersDataAccess;
         List<CustomersModel> mCustomersList;
+        CustomersListViewAdapter mAdapter;
         bool mDialogShown;
 
         public override void OnCreate(Bundle savedInstanceState)
@@ -40,7 +41,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             FnSetUpData();
             FnSetUpControls();
             FnSetUpEvents();
-            FnSetCustomersList("");
+            FnSetCustomersList();
             searchViewSearchCustomers.OnActionViewExpanded(); //show edit mode of searchview
             searchViewSearchCustomers.ClearFocus(); //clear focus and hide keyboard
             return mThisFragmentView;
@@ -75,7 +76,8 @@ namespace POS_ANDROID_BACUNA.Fragments
         private void SearchBar_QueryTextChange(object sender, SearchView.QueryTextChangeEventArgs e)
         {
             string queryString = e.NewText.ToLower().Trim();
-            FnSetCustomersList(queryString);
+            FnGetList(queryString);
+            mAdapter.RefreshList(mCustomersList);
             mLvCustomers.Invalidate();
         }
         private void SearchBar_Click(object sender, EventArgs e, SearchView s)
@@ -94,7 +96,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             }
         }
 
-        public void FnSetCustomersList(string _queryString)
+        private void FnGetList(string _queryString)
         {
             mCustomersList = mCustomersDataAccess.SelectTable();
             var mItems = mCustomersList;  //GlobalVariables.globalCustomersList;
@@ -105,8 +107,13 @@ namespace POS_ANDROID_BACUNA.Fragments
                     .ToList();
                 mCustomersList = mItems;
             }
-            CustomersListViewAdapter adapter = new CustomersListViewAdapter((MainActivity)this.Activity, mItems);
-            mLvCustomers.Adapter = adapter;
+        }
+
+        public void FnSetCustomersList()
+        {
+            FnGetList("");
+            mAdapter = new CustomersListViewAdapter((MainActivity)this.Activity, mCustomersList);
+            mLvCustomers.Adapter = mAdapter;
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
@@ -115,7 +122,9 @@ namespace POS_ANDROID_BACUNA.Fragments
             if (requestCode == 34)
             {
                 mDialogShown = false;
-                FnSetCustomersList("");
+                FnGetList(searchViewSearchCustomers.Query);
+                mAdapter.RefreshList(mCustomersList);
+                mLvCustomers.Invalidate();
                 searchViewSearchCustomers.SetQuery("", false);
             }
         }

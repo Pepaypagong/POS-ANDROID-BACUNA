@@ -16,7 +16,7 @@ using SQLite;
 
 namespace POS_ANDROID_BACUNA.SQLite
 {
-    class RunnersDataAccess
+    public class RunnersDataAccess
     {
         string connectionString = SQLiteConnetionString.LoadConnectionString();
 
@@ -76,8 +76,8 @@ namespace POS_ANDROID_BACUNA.SQLite
             {
                 using (var connection = new SQLiteConnection(connectionString))
                 {
-                    connection.Query<RunnersModel>("UPDATE Person set FullName=?, Contact=?, Address=?, DateModified=? Where Id=?",
-                        runnersModel.FullName, runnersModel.Contact, runnersModel.Address, runnersModel.DateModified, runnersModel.id);
+                    connection.Query<RunnersModel>("UPDATE RunnersModel set FullName=?, Contact=?, Address=?, DateModified=? Where Id=?",
+                        runnersModel.FullName, runnersModel.Contact, runnersModel.Address, runnersModel.DateModified, runnersModel.Id);
                     return true;
                 }
             }
@@ -119,6 +119,40 @@ namespace POS_ANDROID_BACUNA.SQLite
             {
                 Log.Info("SQLiteEx", ex.Message);
                 return false;
+            }
+        }
+
+        public bool RunnerNameExists(string name)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    var x = connection.Query<RunnersModel>("SELECT * FROM RunnersModel Where FullName=?", name);
+                    return x.Count == 0 ? false : true;
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                Log.Info("SQLiteEx", ex.Message);
+                return false;
+            }
+        }
+
+        public List<RunnersModel> SelectRecord(int id)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    var x = connection.Query<RunnersModel>("SELECT * FROM RunnersModel Where Id=?", id);
+                    return x;
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                Log.Info("SQLiteEx", ex.Message);
+                return null;
             }
         }
 

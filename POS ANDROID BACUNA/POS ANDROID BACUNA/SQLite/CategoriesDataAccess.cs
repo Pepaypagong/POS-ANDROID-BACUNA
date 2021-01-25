@@ -21,6 +21,7 @@ namespace POS_ANDROID_BACUNA.SQLite
         string connectionString = SQLiteConnetionString.LoadConnectionString();
         public CategoriesDataAccess()
         {
+            CreateTable();
             //insert "All" Category as Id 1
             if (!NameExists("All"))
             {

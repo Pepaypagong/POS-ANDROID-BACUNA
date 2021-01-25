@@ -34,6 +34,7 @@ namespace POS_ANDROID_BACUNA
         private bool mIsCustomer;
         private CustomersDataAccess mCustomersDataAccess;
         private RunnersDataAccess mRunnersDataAccess;
+        private TransactionsDataAccess mTransactionsDataAccess;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -69,6 +70,7 @@ namespace POS_ANDROID_BACUNA
             {
                 mRunnersDataAccess = new RunnersDataAccess();
             }
+            mTransactionsDataAccess = new TransactionsDataAccess();
         }
 
         private void FnSetUpEvents()
@@ -117,20 +119,20 @@ namespace POS_ANDROID_BACUNA
         private void FnPopulateRunners(string _queryString)
         {
             mRunners = mRunnersDataAccess.SelectTable();
-            if (_queryString != "")
+            if (_queryString != "" && mRunners != null)
             {
                 mRunners = mRunners
                     .Where(x => x.FullName.ToLower().Contains(_queryString))
                     .ToList();
             }
-            RunnersListViewAdapter adapter = new RunnersListViewAdapter(this, mRunners);
+            RunnersListViewAdapter adapter = new RunnersListViewAdapter(this, mRunners, mTransactionsDataAccess.SelectTable());
             mListView.Adapter = adapter;
         }
 
         private void FnPopulateCustomers(string _queryString)
         {
             mItems = mCustomersDataAccess.SelectTable();
-            if (_queryString != "")
+            if (_queryString != "" && mItems != null)
             {
                 mItems = mItems
                     .Where(x => x.FullName.ToLower().Contains(_queryString))
@@ -159,10 +161,11 @@ namespace POS_ANDROID_BACUNA
         private void MListView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
             string fullname = mIsCustomer ? mItems[e.Position].FullName : mRunners[e.Position].FullName;
-
+            int id = mIsCustomer ? mItems[e.Position].Id : mRunners[e.Position].Id;
             //var result = new Intent(); 
             //result.PutExtra("Key", firstName + " " + lastName);
             GlobalVariables.mCurrentSelectedCustomerOnCheckout = fullname; //set current selected customer
+            GlobalVariables.mCurrentSelectedCustomerIdOrRunnerIdOnCheckout = id;
             GlobalVariables.mHasSelectedCustomerOnCheckout = true;
             SetResult(Result.Ok); //SetResult(Result.Ok, result);
 
@@ -172,6 +175,7 @@ namespace POS_ANDROID_BACUNA
         private void MBtnSelectCustomer_Click(object sender, EventArgs e) //remove customer
         {
             GlobalVariables.mCurrentSelectedCustomerOnCheckout = "";
+            GlobalVariables.mCurrentSelectedCustomerIdOrRunnerIdOnCheckout = 0;
             GlobalVariables.mHasSelectedCustomerOnCheckout = false;
             SetResult(Result.Ok);
 
@@ -194,8 +198,8 @@ namespace POS_ANDROID_BACUNA
                     }
                     else
                     {
-                        //Intent intent = new Intent(this, typeof(RunnersFragmentAddRunnerActivity));
-                        //StartActivityForResult(intent, 36);
+                        Intent intent = new Intent(this, typeof(RunnersFragmentAddRunnerActivity));
+                        StartActivityForResult(intent, 36);
                     }
                     return true;
                 default:

@@ -17,7 +17,7 @@
       android:title="Customers"/>
     <item
       android:id="@+id/nav_runners"
-      android:icon="@drawable/customer_icon"
+      android:icon="@drawable/runner_icon"
       android:title="Runners"/>
     <item
       android:id="@+id/nav_transactions"
@@ -25,7 +25,7 @@
       android:title="Transactions"/>
     <item
       android:id="@+id/nav_orders"
-      android:icon="@drawable/transactions_icon"
+      android:icon="@drawable/order_icon"
       android:title="Orders"/>
     <item
       android:id="@+id/nav_settings"

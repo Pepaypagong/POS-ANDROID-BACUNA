@@ -25,6 +25,7 @@ namespace POS_ANDROID_BACUNA
         private List<Options> mSelectedOptions;
         int listviewClickedPos = -1;
         Context mCallerContext;
+        private int mSelectedTransactionId = 0;
 
         public MoreOptionsDialogFragment(Context _callerContext)
         {
@@ -33,63 +34,7 @@ namespace POS_ANDROID_BACUNA
 
         public override void OnCreate(Bundle savedInstanceState)
         {
-            CreateOptions();
             base.OnCreate(savedInstanceState);
-        }
-
-        private void CreateOptions()
-        {
-            GlobalVariables.globalOptionList.Clear();
-            GlobalVariables.globalOptionList
-                .Add(new Options()
-                {
-                    OptionId = 1,
-                    OptionText = "Add note",
-                    TextColorResourceId = Resource.Color.colorLightBlack,
-                    ShowArrow = true,
-                    CallerClassName = "CheckoutFragmentCartActivity",
-                    Action = "Modify",
-                    TargetActivity = "CheckoutFragmentCartAddNoteActivity",
-                    RequestCode = 19,
-                    IsDialog = false
-                });
-            GlobalVariables.globalOptionList
-                .Add(new Options()
-                {
-                    OptionId = 2,
-                    OptionText = "Add Discount",
-                    TextColorResourceId = Resource.Color.colorLightBlack,
-                    ShowArrow = true,
-                    CallerClassName = "CheckoutFragmentCartActivity",
-                    Action = "Modify",
-                    TargetActivity = "CheckoutFragmentCartNumpadDiscountActivity",
-                    RequestCode = 20,
-                    IsDialog = false
-                });
-            GlobalVariables.globalOptionList
-                .Add(new Options()
-                {
-                    OptionId = 3,
-                    OptionText = "Sort cart items",
-                    TextColorResourceId = Resource.Color.colorLightBlack,
-                    ShowArrow = true,
-                    CallerClassName = "CheckoutFragmentCartActivity",
-                    Action = "Modify",
-                    TargetActivity = "CheckoutFragmentCartAddNoteActivity",
-                    RequestCode = 21,
-                    IsDialog = true
-                });
-            GlobalVariables.globalOptionList
-                .Add(new Options()
-                {
-                    OptionId = 4,
-                    OptionText = "Clear cart",
-                    TextColorResourceId = Resource.Color.colorRed,
-                    ShowArrow = false,
-                    CallerClassName = "CheckoutFragmentCartActivity",
-                    Action = "Delete",
-                    IsDialog = false
-                });
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -102,6 +47,7 @@ namespace POS_ANDROID_BACUNA
             FnSetUpEvents(view);
 
             string caller = Arguments.GetString("caller");
+            mSelectedTransactionId = Arguments.GetInt("selectedTransactionId");
             FnSetUpListView(caller);
 
             return view;
@@ -180,31 +126,65 @@ namespace POS_ANDROID_BACUNA
                 string callerClassName = mSelectedOptions[listviewClickedPos].CallerClassName;
                 string targetClassName = mSelectedOptions[listviewClickedPos].TargetActivity;
                 int requestCode = mSelectedOptions[listviewClickedPos].RequestCode;
-                if (action == "Modify")
+                if (callerClassName == "CheckoutFragmentCartActivity")
                 {
-                    if (isDialog)
+                    if (action == "Modify")
                     {
-                        if (optionId == 3)
+                        if (isDialog)
                         {
-                            ((CheckoutFragmentCartActivity)this.Activity).ShowSortCartItemsBy();
+                            if (optionId == 3)
+                            {
+                                ((CheckoutFragmentCartActivity)this.Activity).ShowSortCartItemsBy();
+                            }
+                        }
+                        else
+                        {
+                            Intent intent = new Intent(mCallerContext, Type.GetType("POS_ANDROID_BACUNA.Fragments." + targetClassName));
+                            ((Android.App.Activity)mCallerContext).StartActivityForResult(intent, requestCode);
                         }
                     }
-                    else
+                    else if (action == "Delete")
                     {
-                        Intent intent = new Intent(mCallerContext, Type.GetType("POS_ANDROID_BACUNA.Fragments." + targetClassName));
-                        ((Android.App.Activity)mCallerContext).StartActivityForResult(intent, requestCode);
+                        if (optionId == 4) //clearcart
+                        {
+                            ((CheckoutFragmentCartActivity)this.Activity).ClearCart();
+                            //Type type = Type.GetType("POS_ANDROID_BACUNA.Fragments." + callerClassName);
+                            //MethodInfo method = type.GetMethod("ClearCart");
+                            //method.Invoke(((CheckoutFragmentCartActivity)this.Activity), null);
+                        }
                     }
                 }
-                else if (action == "Delete")
+                else if (callerClassName == "TransactionsFragmentTransactionInfoActivity")
                 {
-                    if (optionId == 4) //clearcart
+                    if (action == "Modify")
                     {
-                        ((CheckoutFragmentCartActivity)this.Activity).ClearCart();
-                        //Type type = Type.GetType("POS_ANDROID_BACUNA.Fragments." + callerClassName);
-                        //MethodInfo method = type.GetMethod("ClearCart");
-                        //method.Invoke(((CheckoutFragmentCartActivity)this.Activity), null);
+                        if (isDialog)
+                        {
+                            if (optionId == 3)
+                            {
+                                ((CheckoutFragmentCartActivity)this.Activity).ShowSortCartItemsBy();
+                            }
+                        }
+                        else
+                        {
+                            string prefix = optionId == 1 ? "POS_ANDROID_BACUNA." : "POS_ANDROID_BACUNA.Fragments.";
+                            Intent intent = new Intent(mCallerContext, Type.GetType(prefix + targetClassName));
+                            if (optionId == 1)
+                            {
+                                intent.PutExtra("selectedTransactionId", mSelectedTransactionId);
+                            }
+                            ((Android.App.Activity)mCallerContext).StartActivityForResult(intent, requestCode);
+                        }
+                    }
+                    else if (action == "Delete")
+                    {
+                        if (optionId == 2) //cancel transaction
+                        {
+                            ((TransactionsFragmentTransactionInfoActivity)this.Activity).CancelTransaction();
+                        }
                     }
                 }
+                
             }
 
             base.OnPause();

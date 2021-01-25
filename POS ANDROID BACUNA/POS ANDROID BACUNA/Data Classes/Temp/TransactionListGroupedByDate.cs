@@ -10,7 +10,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
-namespace POS_ANDROID_BACUNA.Data_Classes.TransactionList
+namespace POS_ANDROID_BACUNA.Data_Classes.Temp
 {
     class TransactionListGroupedByDate
     {
@@ -22,8 +22,9 @@ namespace POS_ANDROID_BACUNA.Data_Classes.TransactionList
         public int CustomerOrRunnerId { get; set; }
         public decimal SubTotalAmount { get; set; }
         public decimal DiscountAmount { get; set; }
-        public string TransactionType { get; set; }
+        public string TransactionType { get; set; } //ORDER [for customers], PAYMENT [for customers cash/check/split], PAYLATER [for runners]
         public bool isHeader { get; set; }
         public int TransactionCount { get; set; }
+        public bool isPaid { get; set; }
     }
 }

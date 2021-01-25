@@ -19,6 +19,7 @@ using Android.Views.InputMethods;
 using Android.Bluetooth;
 using POS_ANDROID_BACUNA.Data_Classes;
 using Java.Util;
+using POS_ANDROID_BACUNA.SQLite;
 
 namespace POS_ANDROID_BACUNA.Fragments
 {
@@ -29,11 +30,13 @@ namespace POS_ANDROID_BACUNA.Fragments
         BluetoothAdapter mBluetoothAdapter;
         List<ConnectedBluetoothDevice> mDevices = new List<ConnectedBluetoothDevice>();
         ListView mListViewPrinters;
-
+        SettingsDataAccess mSettingsDataAccess;
+        SettingsModel mPrinterSettings;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.settings_fragment_devices_list);
+            FnGetData();
             mToolBar = FindViewById<SupportToolbar>(Resource.Id.toolBarPrinterList);
             SetSupportActionBar(mToolBar);
             SupportActionBar actionBar = SupportActionBar;
@@ -44,6 +47,12 @@ namespace POS_ANDROID_BACUNA.Fragments
             mListViewPrinters = FindViewById<ListView>(Resource.Id.lvBluetoothDevicesList);
             mListViewPrinters.ItemClick += MListViewPrinters_ItemClick;
             LoadPrinterList();
+        }
+
+        private void FnGetData()
+        {
+            mSettingsDataAccess = new SettingsDataAccess();
+            mPrinterSettings = mSettingsDataAccess.SelectTable()[0];
         }
 
         private void MListViewPrinters_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
@@ -60,10 +69,24 @@ namespace POS_ANDROID_BACUNA.Fragments
 
             //show selected printer page
             Intent intent = new Intent(this, typeof(SettingsFragmentSelectedPrinterActivity));
-            GlobalVariables.mIsPrinterSet = true;
-            GlobalVariables.mSelectedDevice = selectedDevice;
+            UpdateSelectedPrinter(deviceName, deviceAddress);
             Finish();
             StartActivity(intent);
+        }
+
+        private void UpdateSelectedPrinter(string _deviceName, string _deviceAddress)
+        {
+            SettingsModel input = new SettingsModel() { 
+                Id = 1,
+                ReceiptAddressLine1 = mPrinterSettings.ReceiptAddressLine1,
+                ReceiptAddressLine2 = mPrinterSettings.ReceiptAddressLine2,
+                ReceiptCompanyName = mPrinterSettings.ReceiptCompanyName,
+                ReceiptContactNumber = mPrinterSettings.ReceiptContactNumber,
+                ReceiptFooterNote = mPrinterSettings.ReceiptFooterNote,
+                ReceiptPrinterAddress = _deviceAddress,
+                ReceiptPrinterName = _deviceName
+            };
+            mSettingsDataAccess.UpdateTable(input);
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)

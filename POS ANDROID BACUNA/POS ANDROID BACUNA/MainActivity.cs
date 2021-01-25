@@ -34,6 +34,7 @@ namespace POS_ANDROID_BACUNA
         private CheckoutFragment mCheckoutFragment;
         private ProductsFragment mProductsFragment;
         private CustomersFragment mCustomersFragment;
+        private RunnersFragment mRunnersFragment;
         private TransactionsFragment mTransactionsFragment;
         private SettingsFragment mSettingsFragment;
         private Stack<SupportFragment> mStackFragment;
@@ -44,6 +45,11 @@ namespace POS_ANDROID_BACUNA
         private ProductsDataAccess mProductsDataAccess;
         private CategoriesDataAccess mCategoriesDataAccess;
         private SizesDataAccess mSizesDataAccess;
+        private TransactionsDataAccess mTransactionsDataAccess;
+        private TransactionItemsDataAccess mTransactionItemsDataAccess;
+        private SettingsDataAccess mSettingsDataAccess;
+        private RunnersMultipayRecordsDataAccess mRunnersMultipayRecordsDataAccess;
+
         protected override void AttachBaseContext(Context @base)
         {
             base.AttachBaseContext(CalligraphyContextWrapper.Wrap(@base)); //custom font
@@ -59,6 +65,7 @@ namespace POS_ANDROID_BACUNA
             mCheckoutFragment = new CheckoutFragment();
             mProductsFragment = new ProductsFragment();
             mCustomersFragment = new CustomersFragment();
+            mRunnersFragment = new RunnersFragment();
             mTransactionsFragment = new TransactionsFragment();
             mSettingsFragment = new SettingsFragment();
             mStackFragment = new Stack<SupportFragment>();
@@ -89,6 +96,8 @@ namespace POS_ANDROID_BACUNA
             trans.Hide(mSettingsFragment);
             trans.Add(Resource.Id.fragmentContainer, mTransactionsFragment, "TransactionsFragment");
             trans.Hide(mTransactionsFragment);
+            trans.Add(Resource.Id.fragmentContainer, mRunnersFragment, "RunnersFragment");
+            trans.Hide(mRunnersFragment);
             trans.Add(Resource.Id.fragmentContainer, mCustomersFragment, "CustomersFragment");
             trans.Hide(mCustomersFragment);
             trans.Add(Resource.Id.fragmentContainer, mProductsFragment, "ProductsFragment");
@@ -116,6 +125,14 @@ namespace POS_ANDROID_BACUNA
             mCategoriesDataAccess.CreateTable();
             mSizesDataAccess = new SizesDataAccess();
             mSizesDataAccess.CreateTable();
+            mTransactionsDataAccess = new TransactionsDataAccess();
+            mTransactionsDataAccess.CreateTable();
+            mTransactionItemsDataAccess = new TransactionItemsDataAccess();
+            mTransactionItemsDataAccess.CreateTable();
+            mSettingsDataAccess = new SettingsDataAccess();
+            mSettingsDataAccess.CreateTable();
+            mRunnersMultipayRecordsDataAccess = new RunnersMultipayRecordsDataAccess();
+            mRunnersMultipayRecordsDataAccess.CreateTable();
         }
 
         private void MDrawerLayout_DrawerOpened(object sender, DrawerLayout.DrawerOpenedEventArgs e)
@@ -149,6 +166,11 @@ namespace POS_ANDROID_BACUNA
                         ShowFragment(mCustomersFragment);
                         //refresh list here
                         ab.SetTitle(Resource.String.customers_title);
+                        break;
+                    case (Resource.Id.nav_runners):
+                        ShowFragment(mRunnersFragment);
+                        //refresh list here
+                        ab.SetTitle(Resource.String.runners_title);
                         break;
                     case (Resource.Id.nav_transactions):
                         ShowFragment(mTransactionsFragment);
@@ -219,6 +241,11 @@ namespace POS_ANDROID_BACUNA
                 ab.SetTitle(Resource.String.customers_title);
                 returnValue = Resource.Id.nav_customers;
             }
+            else if (currentFragment == mRunnersFragment)
+            {
+                ab.SetTitle(Resource.String.runners_title);
+                returnValue = Resource.Id.nav_runners;
+            }
             else if (currentFragment == mTransactionsFragment)
             {
                 ab.SetTitle(Resource.String.transactions_title);
@@ -272,6 +299,14 @@ namespace POS_ANDROID_BACUNA
                         StartActivityForResult(intent, 33);
                     }
                     return true;
+                case Resource.Id.menuItem_AddNewRunner:
+                    if (!mDialogShown)//customers fragment
+                    {
+                        mDialogShown = true;
+                        Intent intent = new Intent(this, typeof(RunnersFragmentAddRunnerActivity));
+                        StartActivityForResult(intent, 40);
+                    }
+                    return true;
                 default:
                     return base.OnOptionsItemSelected(item);
             }
@@ -318,6 +353,10 @@ namespace POS_ANDROID_BACUNA
             {
                 MenuInflater.Inflate(Resource.Menu.toolbar_menu_customers, menu);
             }
+            else if (mCurrentFragment == mRunnersFragment)
+            {
+                MenuInflater.Inflate(Resource.Menu.toolbar_menu_runners, menu);
+            }
 
             return base.OnCreateOptionsMenu(menu);
         }
@@ -328,6 +367,7 @@ namespace POS_ANDROID_BACUNA
             {
                 GlobalVariables.mHasSelectedCustomerOnCheckout = false;
                 GlobalVariables.mCurrentSelectedCustomerOnCheckout = "";
+                GlobalVariables.mCurrentSelectedCustomerIdOrRunnerIdOnCheckout = 0;
                 IMenuItem customerMenuItem = mCurrentToolBarMenu.FindItem(Resource.Id.toolbarMenu_customer);
                 removeActionLayout(customerMenuItem);
             }
@@ -402,12 +442,22 @@ namespace POS_ANDROID_BACUNA
             {
                 mDialogShown = false;
                 SetSelectedCustomerIconAppearance();
+                mCustomersFragment.searchViewSearchCustomers.SetQuery("", false);
+                mCustomersFragment.FnSetCustomersList();
+                mRunnersFragment.searchViewSearchRunners.SetQuery("", false);
+                mRunnersFragment.FnSetRunnersList();
             }
             else if (requestCode == 33)//customers fragment add new 
             {
                 mDialogShown = false;
                 mCustomersFragment.searchViewSearchCustomers.SetQuery("", false);
-                mCustomersFragment.FnSetCustomersList("");
+                mCustomersFragment.FnSetCustomersList();
+            }
+            else if (requestCode == 40)//runners fragment add new 
+            {
+                mDialogShown = false;
+                mRunnersFragment.searchViewSearchRunners.SetQuery("", false);
+                mRunnersFragment.FnSetRunnersList();
             }
         }
 

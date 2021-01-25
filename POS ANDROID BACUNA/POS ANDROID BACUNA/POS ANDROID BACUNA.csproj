@@ -80,12 +80,19 @@
     <Compile Include="Adapters\CheckoutCartItemListAdapter.cs" />
     <Compile Include="Adapters\CheckoutMultiAddListRecyclerViewAdapter.cs" />
     <Compile Include="Adapters\ProductsItemCategoryReorderableAdapter.cs" />
+    <Compile Include="Adapters\RunnersMultipayReceiptRecyclerViewAdapter.cs" />
+    <Compile Include="Adapters\RunnersMultipayRecordsRecyclerViewAdapter.cs" />
     <Compile Include="Adapters\SortCartItemsListAdapter.cs" />
+    <Compile Include="Adapters\RunnersMultipayRecyclerViewAdapter.cs" />
+    <Compile Include="Adapters\TransactionItemsRecyclerViewAdapter.cs" />
     <Compile Include="Adapters\TransactionsRecyclerViewAdapter.cs" />
     <Compile Include="CheckoutSelectCustomerActivity.cs" />
     <Compile Include="ColorHelper.cs" />
     <Compile Include="CurrencyTextWatcher.cs" />
     <Compile Include="Data Classes\MultiSizeAddProductsHolder.cs" />
+    <Compile Include="Data Classes\SettingsModel.cs" />
+    <Compile Include="Data Classes\Temp\RunnersMultipayReceiptGroupedByDate.cs" />
+    <Compile Include="Data Classes\TransactionItemsModel.cs" />
     <Compile Include="Data Classes\RunnersModel.cs" />
     <Compile Include="Data Classes\CustomersModel.cs" />
     <Compile Include="BluetoothDevicesListViewAdapter.cs" />
@@ -102,21 +109,40 @@
     <Compile Include="Data Classes\ProductSizesModel.cs" />
     <Compile Include="Data Classes\ProductsOnCart.cs" />
     <Compile Include="Data Classes\SplitPayments.cs" />
-    <Compile Include="Data Classes\TransactionList\TransactionListGroupedByDate.cs" />
+    <Compile Include="Data Classes\Temp\TransactionListGroupedByDate.cs" />
+    <Compile Include="Data Classes\RunnersMultipayRecordsModel.cs" />
     <Compile Include="Data Classes\TransactionsModel.cs" />
     <Compile Include="DataClassHelper.cs" />
     <Compile Include="DialogMessageService.cs" />
+    <Compile Include="Fragments\RunnersFragmentPaymentMethodsActivity.cs" />
+    <Compile Include="Fragments\RunnersFragmentPaymentDoneActivity.cs" />
+    <Compile Include="Fragments\RunnersFragmentPaymentNumpadActivity.cs" />
+    <Compile Include="Fragments\RunnersFragmentPaymentActivity.cs" />
+    <Compile Include="Fragments\RunnersFragmentMultiplePaymentRecords.cs" />
+    <Compile Include="Fragments\TransactionsFragmentTransactionDetailsFragment.cs" />
+    <Compile Include="Fragments\TransactionsFragmentTransactionItemsFragment.cs" />
+    <Compile Include="Fragments\RunnersFragmentPaybydateActivity.cs" />
+    <Compile Include="Fragments\RunnersFragmentEditSalesFragment.cs" />
+    <Compile Include="Fragments\RunnersFragmentEditInfoFragment.cs" />
+    <Compile Include="Fragments\RunnersFragmentEditRunnerActivity.cs" />
+    <Compile Include="Fragments\RunnersFragmentAddRunnerActivity.cs" />
+    <Compile Include="Fragments\RunnersFragment.cs" />
     <Compile Include="Fragments\CustomersFragmentEditCustomerActivity.cs" />
     <Compile Include="Fragments\CustomersFragmentEditOrdersFragment.cs" />
     <Compile Include="Fragments\CustomersFragmentEditSalesFragment.cs" />
     <Compile Include="Fragments\CustomersFragmentEditInfoFragment.cs" />
+    <Compile Include="Fragments\TransactionsFragmentTransactionInfoActivity.cs" />
     <Compile Include="Interfaces\ITemTouchHelperAdapter.cs" />
     <Compile Include="Interfaces\IOnStartDragListener.cs" />
+    <Compile Include="PrintReceiptService.cs" />
     <Compile Include="SimpleItemTouchHelperCallback.cs" />
     <Compile Include="SQLite\SizesDataAccess.cs" />
     <Compile Include="SQLite\CategoriesDataAccess.cs" />
     <Compile Include="SQLite\ParentProductsDataAccess.cs" />
     <Compile Include="SQLite\ProductsDataAccess.cs" />
+    <Compile Include="SQLite\TransactionItemsDataAccess.cs" />
+    <Compile Include="SQLite\SettingsDataAccess.cs" />
+    <Compile Include="SQLite\RunnersMultipayRecordsDataAccess.cs" />
     <Compile Include="TabFragmentAdapter.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartAddNoteActivity.cs" />
     <Compile Include="Fragments\CheckoutFragmentCartNumpadDiscountActivity.cs" />
@@ -163,6 +189,8 @@
     <Compile Include="SQLite\SQLiteConnetionString.cs" />
     <Compile Include="SQLite\CustomersDataAccess.cs" />
     <Compile Include="SQLite\TransactionsDataAccess.cs" />
+    <Compile Include="TransactionsReceiptPreview.cs" />
+    <Compile Include="TransactionsFilterActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\fonts\Roboto-ThinItalic.ttf" />
@@ -821,6 +849,165 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\hamburger_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\toolbar_menu_runners.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\runner_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\order_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\toolbar_menu_runners_sales.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\filter_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\toolbar_filter_layout.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\toolbar_delete_layout.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\runners_fragment_paybydate.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\toolbar_menu_runners_paybydate.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\runners_fragment_paybydate_row.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\runners_fragment.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_fragment_transaction_info.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_fragment_items_fragment.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_fragment_items_fragment_row.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_fragment_details_fragment.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_filter.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\toolbar_menu_transactions_filter.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\borderTopAndRight.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\calendar_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\paid_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_fragment_receipt_preview.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\x_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\share_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\email_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\print_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\pdf_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_fragment_receipt_preview_header.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_fragment_receipt_preview_child.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_fragment_receipt_preview_childfooter.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\transactions_fragment_receipt_preview_footer.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\runners_fragment_multipay_records.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\runners_fragment_multipay_records_row.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\toolbar_menu_runners_new_multipay.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

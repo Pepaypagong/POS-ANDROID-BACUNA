@@ -63,5 +63,11 @@ namespace POS_ANDROID_BACUNA
             mTxtAvgPurchaseAmt = _view.FindViewById<TextView>(Resource.Id.txtAvgPurchaseAmt);
             mTxtSalesCount = _view.FindViewById<TextView>(Resource.Id.txtSalesCount);
         }
+
+        public void RefreshList(List<CustomersModel> updatedList)
+        {
+            mItems = updatedList;
+            NotifyDataSetChanged();
+        }
     }
 }

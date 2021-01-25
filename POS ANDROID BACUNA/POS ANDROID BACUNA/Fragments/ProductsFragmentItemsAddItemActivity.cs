@@ -323,7 +323,7 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void MLvProductSizes_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            int sizeId = GlobalVariables.newProductSizesList.OrderBy(x => x.ProductSizeId).ToList()[e.Position].ProductSizeId;
+            int sizeId = GlobalVariables.newProductSizesList.OrderBy(x => GetSizeRank(x.ProductSizeId)).ToList()[e.Position].ProductSizeId;
             if (!mDialogShown)
             {
                 mDialogShown = true;

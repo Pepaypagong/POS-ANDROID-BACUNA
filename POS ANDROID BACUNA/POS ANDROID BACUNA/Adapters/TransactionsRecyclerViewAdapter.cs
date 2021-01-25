@@ -16,7 +16,9 @@ using Product = POS_ANDROID_BACUNA.Data_Classes.ProductsModel;
 using POS_ANDROID_BACUNA.Data_Classes;
 using POS_ANDROID_BACUNA.Fragments;
 using Android.Graphics.Drawables;
-using POS_ANDROID_BACUNA.Data_Classes.TransactionList;
+using POS_ANDROID_BACUNA.Data_Classes.Temp;
+using POS_ANDROID_BACUNA.SQLite;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace POS_ANDROID_BACUNA.Adapters
 {
@@ -24,14 +26,28 @@ namespace POS_ANDROID_BACUNA.Adapters
     {
         private static int TYPE_HEADER = 0;
         private static int TYPE_ITEM = 1;
+        private static string PAYLATER = "PAYLATER";
+        private static string PAYMENT = "PAYMENT";
+        private static string ORDER = "ORDER";
         private List<TransactionListGroupedByDate> mTransactionGroupedList;
         Context mContext;
+        Activity mActivity;
         string mPesoSign = "\u20b1";
-
-        public TransactionsRecyclerViewAdapter(Context _context, List<TransactionListGroupedByDate> _model)
+        RunnersDataAccess mRunnersDataAccess;
+        CustomersDataAccess mCustomersDataAccess;
+        public TransactionsRecyclerViewAdapter(Activity _activity, Context _context, List<TransactionListGroupedByDate> _model)
         {
+            mActivity = _activity;
             mContext = _context;
             mTransactionGroupedList = _model;
+            mRunnersDataAccess = new RunnersDataAccess();
+            mCustomersDataAccess = new CustomersDataAccess();
+        }
+
+        public void RefreshData(List<TransactionListGroupedByDate> _dataSource)
+        {
+            mTransactionGroupedList = _dataSource;
+            this.NotifyDataSetChanged();
         }
 
         public class HeaderViewHolder : RecyclerView.ViewHolder
@@ -106,7 +122,7 @@ namespace POS_ANDROID_BACUNA.Adapters
             {
                 HeaderViewHolder myHolder = viewHolder as HeaderViewHolder;
                 myHolder.mTransactionDate.Text = GetDate(mTransactionGroupedList[position].TransactionDateTime);
-                myHolder.mSaleAmountAndCount.Text = GenerateTotalSaleAmountAndCount(position); 
+                myHolder.mSaleAmountAndCount.Text = GenerateTotalSaleAmountAndCount(position);
             }
             else if (type == TYPE_ITEM)
             {
@@ -118,12 +134,68 @@ namespace POS_ANDROID_BACUNA.Adapters
                 myHolder.mTransactionId.Text = "# " + mTransactionGroupedList[position].ticketNumber.ToString();
                 myHolder.mTransactionTime.Text = GetTime(mTransactionGroupedList[position].TransactionDateTime);
                 myHolder.mSaleAmount.Text = mPesoSign + string.Format("{0:n}", mTransactionGroupedList[position].SubTotalAmount);
-                myHolder.mCustomerOrRunnerName.Text = mTransactionGroupedList[position].CustomerOrRunnerId.ToString();
-                myHolder.mTransactionTypeIcon.SetBackgroundResource(GetTranstypeIconResource(mTransactionGroupedList[position].TransactionType));
-                myHolder.mCustomerOrRunnerIcon.SetColorFilter(mTransactionGroupedList[position].TransactionType == "PAYLATER" ?
-                            ColorHelper.ResourceIdToColor(Resource.Color.orange, mContext) :
-                            ColorHelper.ResourceIdToColor(Resource.Color.colorAccent, mContext));
+                myHolder.mCustomerOrRunnerName.Text = GetCustomerOrRunnerName(mTransactionGroupedList[position].TransactionType,
+                                                                              mTransactionGroupedList[position].CustomerOrRunnerId);
+                myHolder.mTransactionTypeIcon.SetImageResource(GetTranstypeIconResource(mTransactionGroupedList[position].TransactionType, mTransactionGroupedList[position].isPaid));
+                myHolder.mTransactionTypeIcon.SetColorFilter(GetTranstypeIconColorFilter(mTransactionGroupedList[position].TransactionType, mTransactionGroupedList[position].isPaid));
+                myHolder.mCustomerOrRunnerIcon.SetImageResource(GetCustomerOrRunnerIcon(mTransactionGroupedList[position].TransactionType));
+                myHolder.mCustomerOrRunnerIcon.SetColorFilter(GetIconColorFilter(mTransactionGroupedList[position].TransactionType));
             }
+        }
+
+        private Android.Graphics.Color GetTranstypeIconColorFilter(string _transactionType, bool _isPaid)
+        {
+            Android.Graphics.Color retVal = ColorHelper.ResourceIdToColor(Resource.Color.colorPrimaryDark, mContext);
+            if (_transactionType == PAYLATER && !_isPaid)
+            {
+                retVal = ColorHelper.ResourceIdToColor(Resource.Color.colorRed, mContext);
+            }
+            else
+            {
+                retVal = ColorHelper.ResourceIdToColor(Resource.Color.colorPrimaryDark, mContext);
+            }
+
+            return retVal;
+        }
+
+        private int GetCustomerOrRunnerIcon(string _transactionType)
+        {
+            int retval = 0;
+            if (_transactionType == PAYMENT || _transactionType == ORDER)
+            {
+                retval = Resource.Drawable.customer_icon;
+            }
+            else if (_transactionType == PAYLATER)
+            {
+                retval = Resource.Drawable.runner_icon;
+            }
+            return retval;
+        }
+
+        private Android.Graphics.Color GetIconColorFilter(string _transactionType)
+        {
+            return _transactionType == PAYLATER ?
+                   ColorHelper.ResourceIdToColor(Resource.Color.orange, mContext) :
+                   ColorHelper.ResourceIdToColor(Resource.Color.colorAccent, mContext);
+        }
+
+        private string GetCustomerOrRunnerName(string _transactionType, int _id)
+        {
+            string retVal = "";
+            if (_transactionType == PAYMENT || _transactionType == ORDER)
+            {
+                retVal = mCustomersDataAccess.SelectRecord(_id)[0].FullName;
+            }
+            else if (_transactionType == PAYLATER)
+            {
+                retVal = mRunnersDataAccess.SelectRecord(_id)[0].FullName;
+            }
+            else
+            {
+                retVal = "[null]";
+            }
+
+            return retVal;
         }
 
         private string GenerateTotalSaleAmountAndCount(int position)
@@ -153,22 +225,26 @@ namespace POS_ANDROID_BACUNA.Adapters
             return Convert.ToDateTime(_datetime).ToString("hh:mm tt").ToUpper();
         }
 
-        private int GetTranstypeIconResource(string _transactionType)
+        private int GetTranstypeIconResource(string _transactionType, bool _isPaid)
         {
             int retval = 0;
-            if (_transactionType == "PAYMENT")
+            if (_transactionType == PAYMENT)
             {
                 retval = Resource.Drawable.money_icon;
             }
-            else if (_transactionType == "PAYLATER")
+            else if (_transactionType == PAYLATER)
             {
-                retval = Resource.Drawable.down_arrow_icon;
+                retval = _isPaid ? Resource.Drawable.paid_icon : Resource.Drawable.down_arrow_icon;
             }
             return retval;
         }
 
         private void MMainView_Click(object sender, EventArgs e)
         {
+            string id = ((ViewGroup)sender).FindViewById<TextView>(Resource.Id.txtTransactionNumber).Text.Remove(0,2);
+            Intent intent = new Intent(mContext, typeof(TransactionsFragmentTransactionInfoActivity));
+            intent.PutExtra("selectedTransactionId", Convert.ToInt32(id));
+            mActivity.StartActivityForResult(intent, 41);
         }
 
         public override int ItemCount

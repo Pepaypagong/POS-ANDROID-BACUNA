@@ -87,6 +87,7 @@ namespace POS_ANDROID_BACUNA.Fragments
             {
                 GlobalVariables.mHasSelectedCustomerOnCheckout = false;
                 GlobalVariables.mCurrentSelectedCustomerOnCheckout = "";
+                GlobalVariables.mCurrentSelectedCustomerIdOrRunnerIdOnCheckout = 0;
                 IMenuItem customerMenuItem = mCurrentToolbarMenu.FindItem(Resource.Id.menuItem_customer_cart);
                 removeActionLayout(customerMenuItem);
             }
@@ -148,9 +149,9 @@ namespace POS_ANDROID_BACUNA.Fragments
 
             alert.SetButton("YES", (c, ev) =>
             {
-                PrintText(GlobalVariables.mSelectedDevice, toPrint("20200201", "BACUNA RTW", "BEELINE BUILDING, BRGY. BACLARAN", "PARANAQUE CITY, PHILIPPINES", "09174897988",
-                "JEFFREY BACUNA", GlobalVariables.mCurrentSelectedCustomerOnCheckout,
-                "Please come again, thank you :)"));
+                //PrintText(GlobalVariables.mSelectedDevice, toPrint("20200201", "BACUNA RTW", "BEELINE BUILDING, BRGY. BACLARAN", "PARANAQUE CITY, PHILIPPINES", "09174897988",
+                //"JEFFREY BACUNA", GlobalVariables.mCurrentSelectedCustomerOnCheckout,
+                //"Please come again, thank you :)"));
                 GlobalVariables.globalProductsOnCart.Clear();
                 GlobalVariables.mIsAllCollapsed = true;
                 Finish();
@@ -177,6 +178,7 @@ namespace POS_ANDROID_BACUNA.Fragments
         private void ShowMoreOptionsDialogFragment()
         {
             //show dialog here
+            CreateOptions();
             SupportFragmentTransaction transaction = SupportFragmentManager.BeginTransaction();
             MoreOptionsDialogFragment moreOptionsDialog = new MoreOptionsDialogFragment(this);
             moreOptionsDialog.SetStyle((int)DialogFragmentStyle.Normal, Resource.Style.Dialog_FullScreen);
@@ -186,6 +188,61 @@ namespace POS_ANDROID_BACUNA.Fragments
             args.PutString("caller", "CheckoutFragmentCartActivity");
             moreOptionsDialog.Arguments = args;
             moreOptionsDialog.Show(transaction, "moreOptionsDialogFragment");
+        }
+
+        private void CreateOptions()
+        {
+            GlobalVariables.globalOptionList.Clear();
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 1,
+                    OptionText = "Add note",
+                    TextColorResourceId = Resource.Color.colorLightBlack,
+                    ShowArrow = true,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Modify",
+                    TargetActivity = "CheckoutFragmentCartAddNoteActivity",
+                    RequestCode = 19,
+                    IsDialog = false
+                });
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 2,
+                    OptionText = "Add Discount",
+                    TextColorResourceId = Resource.Color.colorLightBlack,
+                    ShowArrow = true,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Modify",
+                    TargetActivity = "CheckoutFragmentCartNumpadDiscountActivity",
+                    RequestCode = 20,
+                    IsDialog = false
+                });
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 3,
+                    OptionText = "Sort cart items",
+                    TextColorResourceId = Resource.Color.colorLightBlack,
+                    ShowArrow = true,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Modify",
+                    TargetActivity = "CheckoutFragmentCartAddNoteActivity",
+                    RequestCode = 21,
+                    IsDialog = true
+                });
+            GlobalVariables.globalOptionList
+                .Add(new Options()
+                {
+                    OptionId = 4,
+                    OptionText = "Clear cart",
+                    TextColorResourceId = Resource.Color.colorRed,
+                    ShowArrow = false,
+                    CallerClassName = "CheckoutFragmentCartActivity",
+                    Action = "Delete",
+                    IsDialog = false
+                });
         }
 
         internal void PricingTypeDialogFragmentOnActivityResult(bool _clearCart)

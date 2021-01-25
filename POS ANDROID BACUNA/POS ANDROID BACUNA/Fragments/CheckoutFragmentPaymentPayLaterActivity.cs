@@ -55,7 +55,11 @@ namespace POS_ANDROID_BACUNA.Fragments
         int selectedHourOfDay;
         int selectedMinute;
 
+        TransactionsDataAccess mTransactionsDataAccess;
+        TransactionItemsDataAccess mTransactionItemsDataAccess;
+
         TransactionsModel mTransaction;
+        TransactionItemsModel mTransactionItem;
         string mPesoSign = "\u20b1";
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -71,11 +75,14 @@ namespace POS_ANDROID_BACUNA.Fragments
         {
             mTotalSaleAmount = Intent.GetDoubleExtra("TotalSaleAmount", 0);
             mCurrentSelectedRunner = GlobalVariables.mCurrentSelectedCustomerOnCheckout; //runner
-            mCurrentSelectedRunnerId = 0; //not yet implemented
+            mCurrentSelectedRunnerId = GlobalVariables.mCurrentSelectedCustomerIdOrRunnerIdOnCheckout;
             mSelectedTransactionDatetime = DateTime.Now;
             mCurrentAccountBalance = 0; //not yet implemented
 
             SetSelectedDateNow();
+
+            mTransactionsDataAccess = new TransactionsDataAccess();
+            mTransactionItemsDataAccess = new TransactionItemsDataAccess();
         }
 
         private void SetSelectedDateNow()
@@ -181,16 +188,40 @@ namespace POS_ANDROID_BACUNA.Fragments
 
         private void SaveTransactionToDatabase()
         {
-            TransactionsDataAccess transactionsDataAccess = new TransactionsDataAccess();
             mTransaction = new TransactionsModel();
             mTransaction.TransactionDateTime = GetSelectedDateTime();
             mTransaction.DateCreated = DateTime.Now.ToString(GlobalVariables.DATABASE_TIME_FORMAT);
             mTransaction.DateModified = DateTime.Now.ToString(GlobalVariables.DATABASE_TIME_FORMAT);
-            mTransaction.CustomerOrRunnerId = 1; //to change
+            mTransaction.CustomerOrRunnerId = mCurrentSelectedRunnerId; //to change
             mTransaction.SubTotalAmount = Convert.ToDecimal(mTotalSaleAmount);
             mTransaction.DiscountAmount = 0;
             mTransaction.TransactionType = "PAYLATER"; //ORDER, PAYMENT, PAYLATER
-            transactionsDataAccess.InsertIntoTable(mTransaction);
+            mTransaction.CashierName = "JEPOY"; //not implemented
+            mTransaction.IsPaid = false;
+            mTransactionsDataAccess.InsertIntoTable(mTransaction);
+
+            SaveTransactionItems();
+        }
+
+        private void SaveTransactionItems()
+        {
+            foreach (var item in GlobalVariables.globalProductsOnCart)
+            {
+                mTransactionItem = new TransactionItemsModel
+                {
+                    TransactionId = mTransactionsDataAccess.GetLatestTransactionId(),
+                    ProductId = item.productId,
+                    ProductName = item.productName,
+                    ProductSize = item.productSize,
+                    ProductPrice = item.productPrice,
+                    ProductOrigPrice = item.productOrigPrice,
+                    ProductDiscountAmount = item.productDiscountAmount,
+                    ProductDiscountPercentage = item.productDiscountPercentage,
+                    ProductSubTotalPrice = item.productSubTotalPrice,
+                    ProductCountOnCart = item.productCountOnCart
+                };
+                mTransactionItemsDataAccess.InsertIntoTable(mTransactionItem);
+            }
         }
 
         private string GetSelectedDateTime()

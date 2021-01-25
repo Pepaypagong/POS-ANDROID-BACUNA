@@ -5,7 +5,7 @@ namespace POS_ANDROID_BACUNA
     public class RunnersModel
     {
         [PrimaryKey, AutoIncrement]
-        public int id { get; set; }
+        public int Id { get; set; }
         public string DateCreated { get; set; }
         public string DateModified { get; set; }
         public string FullName { get; set; }
